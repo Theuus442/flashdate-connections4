@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { SectionNavigator } from '@/components/SectionNavigator';
 import { HeroSection } from '@/components/HeroSection';
 import { HowItWorksSection } from '@/components/HowItWorksSection';
 import { MatchLogicSection } from '@/components/MatchLogicSection';
@@ -11,23 +11,48 @@ import { NewsletterSection } from '@/components/NewsletterSection';
 import { Footer } from '@/components/Footer';
 
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
-        <HeroSection />
-        <HowItWorksSection />
-        <MatchLogicSection />
-        <NextEventSection />
-        <LGBTSection />
-        <WhoAttendsSection />
-        <AboutSection />
-        <FAQSection />
-        <NewsletterSection />
-      </main>
-      <Footer />
-    </div>
-  );
+  const sections = [
+    {
+      id: 'home',
+      content: <HeroSection />,
+    },
+    {
+      id: 'como-funciona',
+      content: (
+        <>
+          <HowItWorksSection />
+          <MatchLogicSection />
+        </>
+      ),
+    },
+    {
+      id: 'proximo-evento',
+      content: <NextEventSection />,
+    },
+    {
+      id: 'lgbtq',
+      content: <LGBTSection />,
+    },
+    {
+      id: 'sobre',
+      content: <WhoAttendsSection />,
+    },
+    {
+      id: 'faq',
+      content: <FAQSection />,
+    },
+    {
+      id: 'contato',
+      content: (
+        <>
+          <NewsletterSection />
+          <Footer />
+        </>
+      ),
+    },
+  ];
+
+  return <SectionNavigator sections={sections} />;
 };
 
 export default Index;

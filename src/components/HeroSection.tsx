@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col overflow-hidden"
+      className="relative min-h-full flex flex-col"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
@@ -63,16 +62,6 @@ export const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator - Fixed at bottom */}
-      <div className="relative z-10 pb-8">
-        <a 
-          href="#como-funciona" 
-          className="flex flex-col items-center gap-2 text-gold/60 hover:text-gold transition-colors animate-bounce"
-        >
-          <span className="text-xs uppercase tracking-widest">Descubra</span>
-          <ChevronDown className="w-5 h-5" />
-        </a>
-      </div>
     </section>
   );
 };

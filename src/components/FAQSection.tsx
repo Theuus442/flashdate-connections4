@@ -232,7 +232,7 @@ const faqData = [
 
 export const FAQSection = () => {
   return (
-    <section id="faq" className="py-24 bg-background relative overflow-hidden">
+    <section id="faq" className="min-h-full bg-background relative flex flex-col">
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-wine/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">

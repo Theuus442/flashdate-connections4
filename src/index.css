@@ -115,6 +115,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: var(--font-sans);
+    height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -194,6 +195,16 @@
   .animate-scale-in {
     animation: scaleIn 0.6s ease-out forwards;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
