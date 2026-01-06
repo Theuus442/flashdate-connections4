@@ -41,9 +41,9 @@ export const NextEventSection = () => {
         <div className="max-w-5xl mx-auto mb-16">
           <div className="bg-card-gradient rounded-3xl border border-gold/20 overflow-hidden shadow-elegant">
             {/* Venue Image */}
-            <div className="relative w-full aspect-video overflow-hidden rounded-t-3xl">
+            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '475/633'}}>
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1?format=webp&width=1200"
+                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1?format=webp&width=950&height=1266"
                 alt="Armazém São Caetano"
                 className="w-full h-full object-cover"
               />
@@ -144,7 +144,7 @@ export const NextEventSection = () => {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-gold/10 border border-gold/20">
                   <AlertCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">⚠️ Valor Promocional: R$40,00</p>
+                    <p className="font-semibold text-foreground mb-1">Valor Promocional: R$40,00</p>
                     <p className="text-muted-foreground">(não reembolsável por desistência)</p>
                   </div>
                 </div>
