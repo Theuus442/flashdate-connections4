@@ -5,7 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Heart, Send } from 'lucide-react';
 import { toast } from 'sonner';
-import lgbtLogo from '@/assets/Gemini_Generated_Image_667hnk667hnk667h.png';
 
 export const LGBTSection = () => {
   const [formData, setFormData] = useState({
