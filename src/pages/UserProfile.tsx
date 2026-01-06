@@ -223,7 +223,7 @@ export default function UserProfile() {
                 {/* Users Grid */}
                 <div className="grid sm:grid-cols-2 gap-6">
                   {otherUsers.map(user => {
-                    const selection = selections.find(s => s.userId === user.id);
+                    const selection = getSelectionForUser(user.id);
                     return (
                       <div
                         key={user.id}
