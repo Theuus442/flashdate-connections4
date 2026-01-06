@@ -45,7 +45,7 @@ const matchLogic = [
 
 export const MatchLogicSection = () => {
   return (
-    <section className="h-full bg-elegant-gradient relative overflow-hidden flex flex-col">
+    <section className="min-h-full bg-elegant-gradient relative flex flex-col">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-wine/10 via-transparent to-transparent" />
       
       <div className="container mx-auto px-6 relative z-10">
