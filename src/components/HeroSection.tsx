@@ -14,12 +14,12 @@ export const HeroSection = () => {
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/50 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/20" />
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-1/4 left-10 w-64 h-64 bg-blue-300/15 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-yellow-300/10 rounded-full blur-3xl animate-float delay-300" />
+      <div className="absolute top-1/4 left-10 w-64 h-64 bg-red-400/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-blue-300/8 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
