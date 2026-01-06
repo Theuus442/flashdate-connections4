@@ -205,13 +205,6 @@
     display: none;
   }
 
-  /* Hide all scrollbars */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
