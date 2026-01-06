@@ -1,13 +1,14 @@
-import { Check, X, UserPlus } from 'lucide-react';
+import { Check, X, UserPlus, Heart } from 'lucide-react';
 
 const matchLogic = [
   {
     yourChoice: 'SIM',
     theirChoice: 'SIM',
     result: 'MATCH',
-    icon: Check,
+    icon: Heart,
     color: 'text-green-400',
     bgColor: 'bg-green-500/20',
+    borderColor: 'border-green-500/30',
     description: 'Conexão perfeita! Vocês receberão os contatos um do outro.',
   },
   {
@@ -17,6 +18,7 @@ const matchLogic = [
     icon: UserPlus,
     color: 'text-gold',
     bgColor: 'bg-gold/20',
+    borderColor: 'border-gold/30',
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
@@ -26,6 +28,7 @@ const matchLogic = [
     icon: UserPlus,
     color: 'text-gold',
     bgColor: 'bg-gold/20',
+    borderColor: 'border-gold/30',
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
@@ -35,6 +38,7 @@ const matchLogic = [
     icon: X,
     color: 'text-wine-light',
     bgColor: 'bg-wine/20',
+    borderColor: 'border-wine/30',
     description: 'Privacidade respeitada. Nenhum contato será trocado.',
   },
 ];
@@ -58,55 +62,98 @@ export const MatchLogicSection = () => {
           </p>
         </div>
 
-        {/* Match Logic Cards */}
+        {/* Match Logic Table */}
         <div className="max-w-4xl mx-auto">
-          <div className="grid gap-4">
+          {/* Desktop Table */}
+          <div className="hidden md:block bg-card rounded-2xl border border-border overflow-hidden shadow-elegant">
+            {/* Table Header */}
+            <div className="grid grid-cols-4 gap-4 p-6 bg-muted/30 border-b border-border">
+              <div className="text-center">
+                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Sua Escolha</span>
+              </div>
+              <div className="text-center">
+                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Outra Pessoa</span>
+              </div>
+              <div className="text-center">
+                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Resultado</span>
+              </div>
+              <div className="text-center">
+                <span className="text-sm font-semibold text-gold uppercase tracking-wider">O que acontece</span>
+              </div>
+            </div>
+
+            {/* Table Rows */}
             {matchLogic.map((item, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl p-6 border border-border hover:border-gold/30 transition-all duration-300 shadow-elegant"
+                className={`grid grid-cols-4 gap-4 p-6 items-center ${
+                  index !== matchLogic.length - 1 ? 'border-b border-border/50' : ''
+                } hover:bg-muted/20 transition-colors`}
               >
-                <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-                  {/* Your Choice */}
-                  <div className="flex items-center gap-3 md:w-1/4">
-                    <span className="text-sm text-muted-foreground">Sua Escolha:</span>
-                    <span className={`px-3 py-1 rounded-full font-semibold text-sm ${
+                <div className="text-center">
+                  <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
+                    item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
+                    item.yourChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
+                    'bg-wine/20 text-wine-light'
+                  }`}>
+                    {item.yourChoice}
+                  </span>
+                </div>
+                <div className="text-center">
+                  <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
+                    item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
+                    item.theirChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {item.theirChoice}
+                  </span>
+                </div>
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full ${item.bgColor} flex items-center justify-center`}>
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                    </div>
+                    <span className={`font-serif font-bold ${item.color}`}>{item.result}</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <span className="text-sm text-muted-foreground">{item.description}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {matchLogic.map((item, index) => (
+              <div
+                key={index}
+                className={`bg-card rounded-xl p-6 border ${item.borderColor} shadow-elegant`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded-full font-bold text-xs ${
                       item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
                       item.yourChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
                       'bg-wine/20 text-wine-light'
                     }`}>
                       {item.yourChoice}
                     </span>
-                  </div>
-
-                  {/* Their Choice */}
-                  <div className="flex items-center gap-3 md:w-1/4">
-                    <span className="text-sm text-muted-foreground">Outra Pessoa:</span>
-                    <span className={`px-3 py-1 rounded-full font-semibold text-sm ${
+                    <span className="text-muted-foreground">+</span>
+                    <span className={`px-3 py-1 rounded-full font-bold text-xs ${
                       item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
                       item.theirChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
-                      'bg-wine/20 text-wine-light'
+                      'bg-muted text-muted-foreground'
                     }`}>
                       {item.theirChoice}
                     </span>
                   </div>
-
-                  {/* Arrow */}
-                  <div className="hidden md:flex items-center justify-center">
-                    <div className="w-8 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
-                  </div>
-
-                  {/* Result */}
-                  <div className="flex items-center gap-3 md:flex-1">
-                    <div className={`w-10 h-10 rounded-full ${item.bgColor} flex items-center justify-center`}>
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                    </div>
-                    <div>
-                      <span className={`font-serif font-bold ${item.color}`}>{item.result}</span>
-                      <p className="text-xs text-muted-foreground">{item.description}</p>
-                    </div>
+                  <div className={`w-10 h-10 rounded-full ${item.bgColor} flex items-center justify-center`}>
+                    <item.icon className={`w-5 h-5 ${item.color}`} />
                   </div>
                 </div>
+                <h4 className={`font-serif text-lg font-bold ${item.color} mb-2`}>{item.result}</h4>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
               </div>
             ))}
           </div>
@@ -115,7 +162,7 @@ export const MatchLogicSection = () => {
           <div className="mt-8 p-6 rounded-xl bg-gold/5 border border-gold/20 text-center">
             <p className="text-foreground/80 text-sm">
               <strong className="text-gold">Nota Importante:</strong> O contato só é liberado se houver SIM ou TALVEZ mútuo. 
-              Qualquer escolha com NÃO resulta em nenhum contato trocado.
+              Qualquer escolha com NÃO resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
             </p>
           </div>
         </div>
