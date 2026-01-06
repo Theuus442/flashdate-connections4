@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
+import { useState } from 'react';
 
 export const NextEventSection = () => {
   return (
