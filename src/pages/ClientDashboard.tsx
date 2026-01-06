@@ -76,6 +76,15 @@ export default function ClientDashboard() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              <Button
+                variant="hero"
+                size="sm"
+                onClick={() => navigate('/event-selection')}
+                className="hidden sm:flex items-center gap-2"
+              >
+                <Heart size={16} />
+                Selecionar Matches
+              </Button>
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{clientUser.name}</span>
               </span>
