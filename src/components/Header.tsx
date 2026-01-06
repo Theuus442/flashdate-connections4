@@ -90,7 +90,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-background/98 backdrop-blur-xl border-t border-border">
+        <div className="lg:hidden bg-background backdrop-blur-xl border-t border-border">
           <nav className="container mx-auto px-6 py-6 flex flex-col gap-4">
             {navLinks.map((link) => {
               const sectionId = link.href.slice(1);
@@ -103,7 +103,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   className={`text-base font-medium transition-colors duration-300 py-2 ${
                     isActive
                       ? 'text-gold font-semibold'
-                      : 'text-foreground/80 hover:text-gold'
+                      : 'text-foreground hover:text-gold'
                   }`}
                 >
                   {link.label}
