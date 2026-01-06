@@ -25,7 +25,7 @@ const characteristics = [
 
 export const WhoAttendsSection = () => {
   return (
-    <section className="h-screen bg-background relative overflow-hidden flex flex-col">
+    <section className="h-full bg-background relative overflow-hidden flex flex-col">
       <div className="absolute -top-20 -right-20 w-80 h-80 bg-wine/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gold/5 rounded-full blur-3xl" />
 
