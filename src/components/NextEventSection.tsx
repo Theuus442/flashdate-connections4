@@ -42,7 +42,7 @@ export const NextEventSection = () => {
         <div className="max-w-5xl mx-auto mb-16">
           <div className="bg-card-gradient rounded-3xl border border-gold/20 overflow-hidden shadow-elegant">
             {/* Venue Image */}
-            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '475/633'}}>
+            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
               <img
                 src={venueImage}
                 alt="Armazém São Caetano"
