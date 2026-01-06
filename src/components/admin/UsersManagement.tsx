@@ -9,6 +9,8 @@ interface User {
   email: string;
   whatsapp: string;
   profession: string;
+  username: string;
+  password: string;
 }
 
 export const UsersManagement = () => {
