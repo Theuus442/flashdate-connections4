@@ -43,7 +43,7 @@ export const NextEventSection = () => {
             {/* Venue Image */}
             <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '475/633'}}>
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1"
+                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1?format=jpg&quality=100"
                 alt="Armazém São Caetano"
                 className="w-full h-full object-cover"
               />
