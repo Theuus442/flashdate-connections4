@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
@@ -34,12 +34,6 @@ export const HeroSection = () => {
                 alt="Flashdate Logo"
                 className="h-20 w-auto mx-auto mb-6"
               />
-            </div>
-
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold/30 bg-background/30 backdrop-blur-sm mb-8 animate-fade-up">
-              <Sparkles className="w-4 h-4 text-gold" />
-              <span className="text-sm text-gold font-medium">Powered by AI</span>
             </div>
 
             {/* Main Title */}
