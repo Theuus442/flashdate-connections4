@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus, Eye } from 'lucide-react';
+import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
 
 interface User {
   id: string;
@@ -25,6 +25,7 @@ export const UsersManagement = () => {
       profession: 'Advogada',
       username: 'maria.silva',
       password: '123456',
+      profileImage: undefined,
     },
     {
       id: '2',
@@ -35,6 +36,7 @@ export const UsersManagement = () => {
       profession: 'Engenheiro',
       username: 'joao.santos',
       password: '123456',
+      profileImage: undefined,
     },
   ]);
 
