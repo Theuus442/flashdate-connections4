@@ -22,7 +22,7 @@ export const NextEventSection = () => {
   };
 
   return (
-    <section id="proximo-evento" className="h-full bg-background relative overflow-hidden flex flex-col">
+    <section id="proximo-evento" className="min-h-full bg-background relative flex flex-col">
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-wine/15 via-transparent to-transparent" />
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
