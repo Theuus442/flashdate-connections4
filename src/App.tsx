@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import AdminPanel from "./pages/AdminPanel";
 import ClientDashboard from "./pages/ClientDashboard";
+import EventUserSelection from "./pages/EventUserSelection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
