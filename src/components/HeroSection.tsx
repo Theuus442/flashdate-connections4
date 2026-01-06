@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
