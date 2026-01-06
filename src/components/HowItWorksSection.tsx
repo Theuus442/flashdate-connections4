@@ -55,8 +55,8 @@ export const HowItWorksSection = () => {
   return (
     <section id="como-funciona" className="min-h-full bg-background relative flex flex-col">
       {/* Background Decoration */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-400/8 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300/5 rounded-full blur-3xl" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-4">
         {/* Section Header */}
@@ -91,12 +91,12 @@ export const HowItWorksSection = () => {
                 className="group relative bg-card rounded-2xl p-8 border border-border hover:border-secondary/40 transition-all duration-500 shadow-elegant"
               >
                 {/* Step Number Badge */}
-                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center shadow-lg" style={{boxShadow: '0 10px 25px -5px hsl(var(--secondary) / 0.3)'}}>
                   <span className="font-serif text-sm font-bold text-white">{step.number}</span>
                 </div>
 
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
                   <step.icon className="w-7 h-7 text-white" />
                 </div>
 

@@ -26,7 +26,7 @@ export const NewsletterSection = () => {
 
   return (
     <section id="contato" className="min-h-full bg-background relative flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-300/5 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-secondary/5 via-muted/5 to-transparent" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}

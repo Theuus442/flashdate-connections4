@@ -6,9 +6,9 @@ const matchLogic = [
     theirChoice: 'SIM',
     result: 'MATCH',
     icon: Heart,
-    color: 'text-green-400',
-    bgColor: 'bg-green-500/20',
-    borderColor: 'border-green-500/30',
+    color: 'text-secondary',
+    bgColor: 'bg-secondary/20',
+    borderColor: 'border-secondary/30',
     description: 'Conexão perfeita! Vocês receberão os contatos um do outro.',
   },
   {
@@ -46,7 +46,7 @@ const matchLogic = [
 export const MatchLogicSection = () => {
   return (
     <section className="min-h-full bg-background relative flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-200/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-muted/15 via-transparent to-transparent" />
       
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}

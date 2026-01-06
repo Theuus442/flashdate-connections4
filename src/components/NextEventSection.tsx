@@ -24,8 +24,8 @@ export const NextEventSection = () => {
   return (
     <section id="proximo-evento" className="min-h-full bg-background relative flex flex-col">
       {/* Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-400/10 via-transparent to-transparent" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-yellow-300/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent" />
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -52,7 +52,7 @@ export const NextEventSection = () => {
             </div>
 
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 p-6 text-center">
+            <div className="bg-gradient-to-r from-primary via-primary-light to-primary p-6 text-center">
               <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
                 Armazém São Caetano
               </h3>

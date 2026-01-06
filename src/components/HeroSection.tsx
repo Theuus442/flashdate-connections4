@@ -18,8 +18,8 @@ export const HeroSection = () => {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-1/4 left-10 w-64 h-64 bg-red-400/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-blue-300/8 rounded-full blur-3xl animate-float delay-300" />
+      <div className="absolute top-1/4 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
@@ -36,10 +36,14 @@ export const HeroSection = () => {
 
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
-              <span className="text-white drop-shadow-md">Flashdate:</span>{' '}
-              <span className="text-gradient-gold">Encontros Reais</span>
-              <span className="text-white drop-shadow-md">, Inteligência Artificial,</span>{' '}
-              <span className="text-gradient-wine">Conexões Verdadeiras.</span>
+              <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
+              <span className="text-white drop-shadow-md">
+                <span className="text-gradient-gold">Encontros Reais</span>, utilizando
+              </span>
+              <br />
+              <span className="text-gradient-wine block mt-2">Inteligência Artificial</span>
+              <br />
+              <span className="text-white drop-shadow-md">para conexões verdadeiras</span>
             </h1>
 
             {/* Subtitle */}
