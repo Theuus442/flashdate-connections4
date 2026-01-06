@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 interface Credentials {
   email: string;
+  username?: string;
   password: string;
   role: 'admin' | 'client';
   label: string;
@@ -14,12 +15,14 @@ interface Credentials {
 const TEST_CREDENTIALS: Credentials[] = [
   {
     email: 'admin@flashdate.com',
+    username: 'admin',
     password: 'admin123',
     role: 'admin',
     label: 'Admin - Painel de Administração',
   },
   {
     email: 'cliente@flashdate.com',
+    username: 'cliente',
     password: 'cliente123',
     role: 'client',
     label: 'Cliente - Perfil e Seleções',
