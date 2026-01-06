@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, Settings } from 'lucide-react';
+import { LogOut, User, Calendar, Settings, Upload, X } from 'lucide-react';
 
 interface ClientUser {
   id: string;
@@ -11,6 +11,7 @@ interface ClientUser {
   email: string;
   whatsapp: string;
   profession: string;
+  profileImage?: string;
 }
 
 export default function ClientDashboard() {
