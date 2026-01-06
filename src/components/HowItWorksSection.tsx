@@ -24,18 +24,26 @@ const steps = [
       'Chave Pix: 11 97032 9710',
       'Envie comprovante via email ou WhatsApp',
       'Email: contato@flashdate.com.br',
-      'WhatsApp: (11) 97032-9710'
+      'WhatsApp: (11) 97032-9710',
+      'Informações necessárias: Nome, Data de Nascimento, Sexo, E-mail, Celular com DDD, Data do Evento'
     ],
   },
   {
     number: '04',
+    icon: CalendarCheck,
+    title: 'O Evento',
+    description: 'Compareça com 15 a 30 minutos de antecedência para o check-in. As mulheres ficam fixas nas mesas enquanto os homens rotacionam.',
+    details: ['Conversas de 5 a 10 minutos por mesa', 'Sinal do sino indica rotação', 'Duração total: ~2 horas', 'Após evento: aproveite para comer, beber e conversar livremente'],
+  },
+  {
+    number: '05',
     icon: Smartphone,
     title: 'Seleção Digital',
     description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante selecionar todos e enviar sua seleção.',
     details: ['Opções: SIM, TALVEZ ou NÃO', 'A seleção determina os matches', 'Ambos devem selecionar SIM para match confirmado'],
   },
   {
-    number: '05',
+    number: '06',
     icon: Mail,
     title: 'Resultados',
     description: 'Você recebe o resultado via e-mail em até 24 horas com seus matches confirmados e contatos trocados.',
