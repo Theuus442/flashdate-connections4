@@ -42,7 +42,6 @@ export const HowItWorksSection = () => {
   return (
     <section id="como-funciona" className="py-24 bg-background relative overflow-hidden">
       {/* Background Decoration */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-background/50 to-transparent" />
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-wine/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold/5 rounded-full blur-3xl" />
 
@@ -60,53 +59,66 @@ export const HowItWorksSection = () => {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="relative">
-          {/* Connection Line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-gold/50 via-wine/50 to-gold/50" />
-
-          <div className="space-y-12 lg:space-y-0">
-            {steps.map((step, index) => (
+        {/* Steps Grid */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            {steps.slice(0, 3).map((step, index) => (
               <div
                 key={step.number}
-                className={`lg:flex items-center gap-8 ${
-                  index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                }`}
+                className="group relative bg-card rounded-2xl p-8 border border-border hover:border-gold/40 transition-all duration-500 shadow-elegant"
               >
-                {/* Content Card */}
-                <div className={`lg:w-5/12 ${index % 2 === 0 ? 'lg:text-right' : 'lg:text-left'}`}>
-                  <div className="bg-card-gradient rounded-2xl p-8 border border-border hover:border-gold/30 transition-all duration-500 shadow-elegant">
-                    <div className={`flex items-center gap-4 mb-4 ${index % 2 === 0 ? 'lg:justify-end' : ''}`}>
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center">
-                        <step.icon className="w-6 h-6 text-gold" />
-                      </div>
-                      <h3 className="font-serif text-2xl font-bold text-foreground">
-                        {step.title}
-                      </h3>
-                    </div>
-                    <p className="text-muted-foreground mb-4">{step.description}</p>
-                    {step.details.length > 0 && (
-                      <ul className={`space-y-2 ${index % 2 === 0 ? 'lg:text-right' : ''}`}>
-                        {step.details.map((detail, i) => (
-                          <li key={i} className="text-sm text-foreground/70 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                {/* Step Number Badge */}
+                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-gold-glow">
+                  <span className="font-serif text-sm font-bold text-background">{step.number}</span>
                 </div>
 
-                {/* Step Number */}
-                <div className="hidden lg:flex lg:w-2/12 justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-gold-glow">
-                    <span className="font-serif text-xl font-bold text-background">{step.number}</span>
-                  </div>
+                {/* Icon */}
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+                  <step.icon className="w-7 h-7 text-gold" />
                 </div>
 
-                {/* Spacer */}
-                <div className="hidden lg:block lg:w-5/12" />
+                {/* Content */}
+                <h3 className="font-serif text-xl font-bold text-foreground mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{step.description}</p>
+                
+                {step.details.length > 0 && (
+                  <ul className="space-y-2">
+                    {step.details.map((detail, i) => (
+                      <li key={i} className="text-sm text-foreground/70 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom row centered */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {steps.slice(3).map((step) => (
+              <div
+                key={step.number}
+                className="group relative bg-card rounded-2xl p-8 border border-border hover:border-gold/40 transition-all duration-500 shadow-elegant"
+              >
+                {/* Step Number Badge */}
+                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-gold-glow">
+                  <span className="font-serif text-sm font-bold text-background">{step.number}</span>
+                </div>
+
+                {/* Icon */}
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+                  <step.icon className="w-7 h-7 text-gold" />
+                </div>
+
+                {/* Content */}
+                <h3 className="font-serif text-xl font-bold text-foreground mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
