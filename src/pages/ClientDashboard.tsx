@@ -18,7 +18,7 @@ export default function ClientDashboard() {
   const navigate = useNavigate();
 
   // Mock user data - in real app this would come from auth context
-  const [clientUser] = useState<ClientUser>({
+  const [clientUser, setClientUser] = useState<ClientUser>({
     id: '1',
     name: 'Maria Silva',
     username: 'maria.silva',
@@ -26,9 +26,34 @@ export default function ClientDashboard() {
     email: 'maria@example.com',
     whatsapp: '(11) 98765-4321',
     profession: 'Advogada',
+    profileImage: undefined,
   });
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
+  const [isEditingImage, setIsEditingImage] = useState(false);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageUrl = reader.result as string;
+        setClientUser(prev => ({
+          ...prev,
+          profileImage: imageUrl,
+        }));
+        setIsEditingImage(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setClientUser(prev => ({
+      ...prev,
+      profileImage: undefined,
+    }));
+  };
 
   const handleLogout = () => {
     navigate('/login');
