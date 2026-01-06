@@ -121,16 +121,6 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
             })}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               <Button
-                variant="ghost"
-                className="w-full justify-start text-xs text-muted-foreground hover:text-foreground"
-                onClick={() => {
-                  navigate('/admin');
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Admin
-              </Button>
-              <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => {
