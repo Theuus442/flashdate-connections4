@@ -380,6 +380,7 @@ export const UsersManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/30">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Foto</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Nome</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Usuário</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Idade</th>
