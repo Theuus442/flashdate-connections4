@@ -1,20 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, X, Upload, LogOut, Camera } from 'lucide-react';
+import { Heart, Users, X, LogOut, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-interface User {
-  id: string;
-  name: string;
-  age: number;
-  email: string;
-  whatsapp: string;
-  profession: string;
-  username: string;
-  password: string;
-  profileImage?: string;
-}
+import { useUsers, type User } from '@/context/UsersContext';
 
 interface UserSelection {
   userId: string;
@@ -23,78 +12,11 @@ interface UserSelection {
 
 export default function UserProfile() {
   const navigate = useNavigate();
+  const { users: allUsers, updateUser } = useUsers();
 
-  // Mock current user (loaded from admin)
-  const [currentUser, setCurrentUser] = useState<User>({
-    id: 'current-user-1',
-    name: 'Maria Silva',
-    age: 32,
-    email: 'maria@example.com',
-    whatsapp: '(11) 98765-4321',
-    profession: 'Advogada',
-    username: 'maria.silva',
-    password: '123456',
-    profileImage: undefined,
-  });
-
-  // Mock all users from admin panel
-  const [allUsers, setAllUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'João Santos',
-      age: 35,
-      email: 'joao@example.com',
-      whatsapp: '(11) 99876-5432',
-      profession: 'Engenheiro de Software',
-      username: 'joao.santos',
-      password: '123456',
-      profileImage: undefined,
-    },
-    {
-      id: '2',
-      name: 'Ana Costa',
-      age: 28,
-      email: 'ana@example.com',
-      whatsapp: '(11) 98765-5321',
-      profession: 'Designer Gráfico',
-      username: 'ana.costa',
-      password: '123456',
-      profileImage: undefined,
-    },
-    {
-      id: '3',
-      name: 'Carlos Mendes',
-      age: 38,
-      email: 'carlos@example.com',
-      whatsapp: '(11) 97654-3210',
-      profession: 'Médico',
-      username: 'carlos.mendes',
-      password: '123456',
-      profileImage: undefined,
-    },
-    {
-      id: '4',
-      name: 'Beatriz Lima',
-      age: 30,
-      email: 'beatriz@example.com',
-      whatsapp: '(11) 96543-2109',
-      profession: 'Psicóloga',
-      username: 'beatriz.lima',
-      password: '123456',
-      profileImage: undefined,
-    },
-    {
-      id: '5',
-      name: 'Roberto Alves',
-      age: 36,
-      email: 'roberto@example.com',
-      whatsapp: '(11) 95432-1098',
-      profession: 'Advogado',
-      username: 'roberto.alves',
-      password: '123456',
-      profileImage: undefined,
-    },
-  ]);
+  // Use the first user as the current user (in a real app, this would be the logged-in user)
+  const currentUserData = allUsers.length > 0 ? allUsers[0] : null;
+  const [currentUser, setCurrentUser] = useState<User | null>(currentUserData || null);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser.profileImage);
   const [selections, setSelections] = useState<UserSelection[]>([]);
