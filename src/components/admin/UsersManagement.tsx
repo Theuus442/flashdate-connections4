@@ -43,6 +43,8 @@ export const UsersManagement = () => {
     email: '',
     whatsapp: '',
     profession: '',
+    username: '',
+    password: '',
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
