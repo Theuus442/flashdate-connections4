@@ -59,6 +59,16 @@ export const HowItWorksSection = () => {
           </p>
         </div>
 
+        {/* Introduction */}
+        <div className="bg-card/50 border border-border/30 rounded-2xl p-8 md:p-12 mb-16 backdrop-blur-sm">
+          <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+            <span className="text-gold font-semibold">Flashdate</span> é a plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar o seu match com maior potencial. Com o Flashdate, você otimiza suas chances de encontrar um(a) parceiro(a) compatível, aumentando significativamente as perspectivas de um relacionamento agradável e duradouro.
+          </p>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Acreditamos que há alguém procurando exatamente por você. Nosso processo usa tecnologia avançada para conectar pessoas com verdaeiro potencial de compatibilidade.
+          </p>
+        </div>
+
         {/* Steps Grid */}
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
