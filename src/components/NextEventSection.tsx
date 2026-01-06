@@ -336,7 +336,7 @@ export const NextEventSection = () => {
 
           {selectedCities.length > 0 && (
             <div className="text-center mt-8">
-              <Button variant="hero" size="lg" asChild>
+              <Button variant="hero" size="lg" className="w-full sm:w-auto" asChild>
                 <a href="mailto:contato@flashdate.com.br?subject=Cadastro%20para%20Próximos%20Eventos">
                   Enviar Cadastro
                 </a>
