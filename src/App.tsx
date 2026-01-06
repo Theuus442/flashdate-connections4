@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/dashboard" element={<ClientDashboard />} />
           <Route path="/event-selection" element={<EventUserSelection />} />
+          <Route path="/user-profile" element={<UserProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
