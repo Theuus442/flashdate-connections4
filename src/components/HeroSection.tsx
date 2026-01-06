@@ -63,16 +63,6 @@ export const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator - Fixed at bottom */}
-      <div className="relative z-10 pb-8">
-        <a 
-          href="#como-funciona" 
-          className="flex flex-col items-center gap-2 text-gold/60 hover:text-gold transition-colors animate-bounce"
-        >
-          <span className="text-xs uppercase tracking-widest">Descubra</span>
-          <ChevronDown className="w-5 h-5" />
-        </a>
-      </div>
     </section>
   );
 };
