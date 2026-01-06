@@ -134,12 +134,17 @@
 @layer components {
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(45 100% 65%) 0%, hsl(45 96% 53%) 50%, hsl(45 85% 40%) 100%);
+    background-image: var(--gradient-gold);
   }
 
   .text-gradient-wine {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(0 84% 65%) 0%, hsl(0 84% 54%) 100%);
+    background-image: var(--gradient-wine);
+  }
+
+  .text-gradient-sky {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-sky);
   }
 
   .bg-hero-gradient {
@@ -162,6 +167,10 @@
     border-color: hsl(var(--wine));
   }
 
+  .border-sky {
+    border-color: hsl(var(--sky));
+  }
+
   .shadow-elegant {
     box-shadow: var(--shadow-elegant);
   }
@@ -170,16 +179,24 @@
     box-shadow: var(--shadow-gold);
   }
 
+  .shadow-sky-glow {
+    box-shadow: var(--shadow-sky);
+  }
+
   .glass-card {
     @apply backdrop-blur-xl bg-card/80 border border-border/50;
   }
 
   .wine-glow {
-    box-shadow: 0 0 60px hsl(350 55% 28% / 0.2), 0 0 100px hsl(350 55% 28% / 0.1);
+    box-shadow: 0 0 60px hsl(var(--wine) / 0.15), 0 0 100px hsl(var(--wine) / 0.08);
   }
 
   .gold-glow {
-    box-shadow: 0 0 40px hsl(40 45% 55% / 0.2);
+    box-shadow: 0 0 40px hsl(var(--gold) / 0.2);
+  }
+
+  .sky-glow {
+    box-shadow: 0 0 40px hsl(var(--sky) / 0.2);
   }
 }
 
