@@ -14,6 +14,9 @@ export const AboutSection = () => {
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
             Sobre <span className="text-gradient-gold">Nós</span>
           </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Speed Dating Premium
+          </p>
         </div>
 
         <div className="max-w-5xl mx-auto">
