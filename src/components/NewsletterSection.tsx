@@ -25,7 +25,7 @@ export const NewsletterSection = () => {
   };
 
   return (
-    <section id="contato" className="py-24 bg-elegant-gradient relative overflow-hidden">
+    <section id="contato" className="h-screen bg-elegant-gradient relative overflow-hidden flex flex-col">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold/5 via-transparent to-transparent" />
 
       <div className="container mx-auto px-6 relative z-10">
