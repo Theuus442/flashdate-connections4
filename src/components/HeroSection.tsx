@@ -14,13 +14,12 @@ export const HeroSection = () => {
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
-        <div className="absolute inset-0 bg-hero-gradient opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/20" />
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-1/4 left-10 w-64 h-64 bg-wine/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-gold/10 rounded-full blur-3xl animate-float delay-300" />
+      <div className="absolute top-1/4 left-10 w-64 h-64 bg-red-400/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-blue-300/8 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
@@ -36,16 +35,16 @@ export const HeroSection = () => {
             </div>
 
             {/* Main Title */}
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100">
-              <span className="text-foreground">Flashdate:</span>{' '}
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
+              <span className="text-white drop-shadow-md">Flashdate:</span>{' '}
               <span className="text-gradient-gold">Encontros Reais</span>
-              <span className="text-foreground">, Inteligência Artificial,</span>{' '}
+              <span className="text-white drop-shadow-md">, Inteligência Artificial,</span>{' '}
               <span className="text-gradient-wine">Conexões Verdadeiras.</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200">
-              A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match 
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 drop-shadow-md">
+              A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match
               com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
 

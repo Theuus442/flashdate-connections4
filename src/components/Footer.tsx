@@ -4,7 +4,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-graphite-light border-t border-border">
+    <footer className="bg-blue-100 border-t border-border">
       {/* Main Footer */}
       <div className="container mx-auto px-6 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -72,9 +72,9 @@ export const Footer = () => {
         </div>
 
         {/* Notice */}
-        <div className="mt-12 p-6 rounded-2xl bg-wine/10 border border-wine/20">
+        <div className="mt-12 p-6 rounded-2xl bg-red-400/10 border border-red-400/20">
           <div className="flex items-start gap-4">
-            <AlertCircle className="w-6 h-6 text-wine-light flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
             <div>
               <h5 className="font-semibold text-foreground mb-2">Aviso Importante</h5>
               <p className="text-muted-foreground text-sm">
@@ -91,7 +91,7 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>© {currentYear} Flashdate. Todos os direitos reservados.</p>
             <p className="flex items-center gap-2">
-              Feito com <Heart className="w-4 h-4 text-wine" /> para conectar corações
+              Feito com <Heart className="w-4 h-4 text-primary" /> para conectar corações
             </p>
           </div>
         </div>

@@ -45,8 +45,8 @@ const matchLogic = [
 
 export const MatchLogicSection = () => {
   return (
-    <section className="min-h-full bg-elegant-gradient relative flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-wine/10 via-transparent to-transparent" />
+    <section className="min-h-full bg-background relative flex flex-col">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-200/10 via-transparent to-transparent" />
       
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -67,18 +67,18 @@ export const MatchLogicSection = () => {
           {/* Desktop Table */}
           <div className="hidden md:block bg-card rounded-2xl border border-border overflow-hidden shadow-elegant">
             {/* Table Header */}
-            <div className="grid grid-cols-4 gap-4 p-6 bg-muted/30 border-b border-border">
+            <div className="grid grid-cols-4 gap-4 p-6 bg-secondary/10 border-b border-border">
               <div className="text-center">
-                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Sua Escolha</span>
+                <span className="text-sm font-semibold text-secondary uppercase tracking-wider">Sua Escolha</span>
               </div>
               <div className="text-center">
-                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Outra Pessoa</span>
+                <span className="text-sm font-semibold text-secondary uppercase tracking-wider">Outra Pessoa</span>
               </div>
               <div className="text-center">
-                <span className="text-sm font-semibold text-gold uppercase tracking-wider">Resultado</span>
+                <span className="text-sm font-semibold text-secondary uppercase tracking-wider">Resultado</span>
               </div>
               <div className="text-center">
-                <span className="text-sm font-semibold text-gold uppercase tracking-wider">O que acontece</span>
+                <span className="text-sm font-semibold text-secondary uppercase tracking-wider">O que acontece</span>
               </div>
             </div>
 
@@ -93,8 +93,8 @@ export const MatchLogicSection = () => {
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
                     item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.yourChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
-                    'bg-wine/20 text-wine-light'
+                    item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                    'bg-primary/20 text-primary'
                   }`}>
                     {item.yourChoice}
                   </span>
@@ -102,7 +102,7 @@ export const MatchLogicSection = () => {
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
                     item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.theirChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
+                    item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
                     'bg-muted text-muted-foreground'
                   }`}>
                     {item.theirChoice}
@@ -134,15 +134,15 @@ export const MatchLogicSection = () => {
                   <div className="flex items-center gap-2">
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
                       item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.yourChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
-                      'bg-wine/20 text-wine-light'
+                      item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                      'bg-primary/20 text-primary'
                     }`}>
                       {item.yourChoice}
                     </span>
                     <span className="text-muted-foreground">+</span>
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
                       item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.theirChoice === 'TALVEZ' ? 'bg-gold/20 text-gold' :
+                      item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
                       'bg-muted text-muted-foreground'
                     }`}>
                       {item.theirChoice}
@@ -159,9 +159,9 @@ export const MatchLogicSection = () => {
           </div>
 
           {/* Note */}
-          <div className="mt-8 p-6 rounded-xl bg-gold/5 border border-gold/20 text-center">
+          <div className="mt-8 p-6 rounded-xl bg-secondary/5 border border-secondary/20 text-center">
             <p className="text-foreground/80 text-sm">
-              <strong className="text-gold">Nota Importante:</strong> O contato só é liberado se houver SIM ou TALVEZ mútuo. 
+              <strong className="text-secondary">Nota Importante:</strong> O contato só é liberado se houver SIM ou TALVEZ mútuo.
               Qualquer escolha com NÃO resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
             </p>
           </div>

@@ -233,7 +233,7 @@ const faqData = [
 export const FAQSection = () => {
   return (
     <section id="faq" className="min-h-full bg-background relative flex flex-col">
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-wine/5 rounded-full blur-3xl" />
+      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-400/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -253,8 +253,8 @@ export const FAQSection = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           {faqData.map((category, categoryIndex) => (
             <div key={categoryIndex}>
-              <h3 className="font-serif text-xl font-bold text-gold mb-4 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-sm">
+              <h3 className="font-serif text-xl font-bold text-secondary mb-4 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-sm">
                   {categoryIndex + 1}
                 </span>
                 {category.category}

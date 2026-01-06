@@ -98,11 +98,11 @@ export const LGBTSection = () => {
   };
 
   return (
-    <section id="lgbtq" className="min-h-full bg-elegant-gradient relative flex flex-col">
+    <section id="lgbtq" className="min-h-full bg-background relative flex flex-col">
       {/* Rainbow Gradient Accent */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
-      
-      <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 rounded-full blur-3xl" />
+
+      <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-blue-300/10 via-pink-400/10 to-yellow-300/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto">

@@ -12,7 +12,11 @@ const navLinks = [
   { href: '#contato', label: 'Contato' },
 ];
 
-export const Header = () => {
+interface HeaderProps {
+  currentSectionId?: string;
+}
+
+export const Header = ({ currentSectionId }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -48,15 +52,23 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-foreground/80 hover:text-gold transition-colors duration-300"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const sectionId = link.href.slice(1);
+              const isActive = currentSectionId === sectionId;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors duration-300 ${
+                    isActive
+                      ? 'text-gold font-semibold'
+                      : 'text-foreground/80 hover:text-gold'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </nav>
 
           {/* CTA Button */}
@@ -80,16 +92,24 @@ export const Header = () => {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-background/98 backdrop-blur-xl border-t border-border">
           <nav className="container mx-auto px-6 py-6 flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-base font-medium text-foreground/80 hover:text-gold transition-colors duration-300 py-2"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const sectionId = link.href.slice(1);
+              const isActive = currentSectionId === sectionId;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-base font-medium transition-colors duration-300 py-2 ${
+                    isActive
+                      ? 'text-gold font-semibold'
+                      : 'text-foreground/80 hover:text-gold'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
             <Button variant="gold" className="mt-4" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
