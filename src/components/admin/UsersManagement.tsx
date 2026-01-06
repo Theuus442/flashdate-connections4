@@ -393,6 +393,19 @@ export const UsersManagement = () => {
             <tbody className="divide-y divide-border">
               {users.map(user => (
                 <tr key={user.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-6 py-4 text-sm">
+                    <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center overflow-hidden">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold text-gold">{user.name.charAt(0)}</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-sm text-foreground">{user.name}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.username}</td>
                   <td className="px-6 py-4 text-sm text-foreground">{user.age}</td>
