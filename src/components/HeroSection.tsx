@@ -36,10 +36,14 @@ export const HeroSection = () => {
 
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
-              <span className="text-white drop-shadow-md">Flashdate:</span>{' '}
-              <span className="text-gradient-gold">Encontros Reais</span>
-              <span className="text-white drop-shadow-md">, Inteligência Artificial,</span>{' '}
-              <span className="text-gradient-wine">Conexões Verdadeiras.</span>
+              <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
+              <span className="text-white drop-shadow-md">
+                <span className="text-gradient-gold">Encontros Reais</span>, utilizando
+              </span>
+              <br />
+              <span className="text-gradient-wine block mt-2">Inteligência Artificial</span>
+              <br />
+              <span className="text-white drop-shadow-md">para conexões verdadeiras</span>
             </h1>
 
             {/* Subtitle */}
