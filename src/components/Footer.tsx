@@ -72,9 +72,9 @@ export const Footer = () => {
         </div>
 
         {/* Notice */}
-        <div className="mt-12 p-6 rounded-2xl bg-red-400/10 border border-red-400/20">
+        <div className="mt-12 p-6 rounded-2xl bg-primary/10 border border-primary/20">
           <div className="flex items-start gap-4">
-            <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
             <div>
               <h5 className="font-semibold text-foreground mb-2">Aviso Importante</h5>
               <p className="text-muted-foreground text-sm">
