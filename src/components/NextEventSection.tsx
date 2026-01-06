@@ -177,20 +177,20 @@ export const NextEventSection = () => {
 
               {/* Contact Info */}
               <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-secondary" />
-                  <div>
+                <div className="flex items-start gap-3 min-w-0">
+                  <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Email</p>
-                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors">
+                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
                       contato@flashdate.com.br
                     </a>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-secondary" />
-                  <div>
+                <div className="flex items-start gap-3 min-w-0">
+                  <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors">
+                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
                       (11) 97032-9710
                     </a>
                   </div>
