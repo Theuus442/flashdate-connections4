@@ -98,7 +98,7 @@ export const LGBTSection = () => {
   };
 
   return (
-    <section id="lgbtq" className="h-screen bg-elegant-gradient relative overflow-hidden flex flex-col">
+    <section id="lgbtq" className="h-full bg-elegant-gradient relative overflow-hidden flex flex-col">
       {/* Rainbow Gradient Accent */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
       
