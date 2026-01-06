@@ -35,12 +35,17 @@ export const Header = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2">
+          <a href="#home" className="flex items-center gap-3">
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
               alt="Flashdate Logo"
               className="h-10 w-auto"
             />
+            <div className="hidden sm:flex items-center gap-1">
+              <span className="font-bold text-lg text-foreground">Flash</span>
+              <span className="text-gold text-xl">⚡</span>
+              <span className="font-bold text-lg text-foreground">DATE</span>
+            </div>
           </a>
 
           {/* Desktop Navigation */}
