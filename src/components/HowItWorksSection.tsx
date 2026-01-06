@@ -53,12 +53,12 @@ const steps = [
 
 export const HowItWorksSection = () => {
   return (
-    <section id="como-funciona" className="h-screen bg-background relative overflow-hidden flex flex-col">
+    <section id="como-funciona" className="h-full bg-background relative overflow-hidden flex flex-col">
       {/* Background Decoration */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-wine/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold/5 rounded-full blur-3xl" />
 
-      <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-6">
+      <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
