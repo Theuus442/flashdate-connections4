@@ -1,14 +1,49 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Copy, Check } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface Credentials {
+  email: string;
+  password: string;
+  role: 'admin' | 'client';
+  label: string;
+}
+
+const TEST_CREDENTIALS: Credentials[] = [
+  {
+    email: 'admin@flashdate.com',
+    password: 'admin123',
+    role: 'admin',
+    label: 'Admin - Painel de Administração',
+  },
+  {
+    email: 'cliente@flashdate.com',
+    password: 'cliente123',
+    role: 'client',
+    label: 'Cliente - Perfil e Seleções',
+  },
+];
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const handleCopyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleAutoFill = (credentials: Credentials) => {
+    setEmail(credentials.email);
+    setPassword(credentials.password);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +51,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simulated login logic - replace with actual API call
+      // Validate form
       if (!email || !password) {
         setError('Por favor, preencha todos os campos');
         setIsLoading(false);
@@ -29,11 +64,28 @@ export default function LoginPage() {
         return;
       }
 
+      // Check credentials
+      const credential = TEST_CREDENTIALS.find(
+        c => c.email === email && c.password === password
+      );
+
+      if (!credential) {
+        setError('Email ou senha inválidos');
+        setIsLoading(false);
+        return;
+      }
+
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Success - redirect to home
-      navigate('/');
+      // Success - redirect based on role
+      toast.success(`Bem-vindo de volta, ${credential.role === 'admin' ? 'Administrador' : 'Cliente'}!`);
+
+      if (credential.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/user-profile');
+      }
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
