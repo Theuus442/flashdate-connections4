@@ -11,6 +11,7 @@ interface User {
   profession: string;
   username: string;
   password: string;
+  profileImage?: string;
 }
 
 export const UsersManagement = () => {
