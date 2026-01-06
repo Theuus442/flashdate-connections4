@@ -19,20 +19,22 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <UsersProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/dashboard" element={<ClientDashboard />} />
-            <Route path="/event-selection" element={<EventUserSelection />} />
-            <Route path="/user-profile" element={<UserProfile />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <SelectionsProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/dashboard" element={<ClientDashboard />} />
+              <Route path="/event-selection" element={<EventUserSelection />} />
+              <Route path="/user-profile" element={<UserProfile />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </SelectionsProvider>
       </UsersProvider>
     </TooltipProvider>
   </QueryClientProvider>
