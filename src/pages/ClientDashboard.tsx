@@ -149,11 +149,74 @@ export default function ClientDashboard() {
                   {/* Profile Card */}
                   <div className="bg-card border border-border rounded-2xl p-8">
                     <div className="flex flex-col items-center text-center mb-6">
-                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-4">
-                        <span className="text-3xl font-bold text-secondary-foreground">
-                          {clientUser.name.charAt(0)}
-                        </span>
+                      {/* Profile Image Section */}
+                      <div className="relative mb-4">
+                        {clientUser.profileImage ? (
+                          <>
+                            <img
+                              src={clientUser.profileImage}
+                              alt={clientUser.name}
+                              className="w-32 h-32 rounded-full object-cover border-4 border-gold shadow-lg"
+                            />
+                            {isEditingImage && (
+                              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => document.getElementById('profileImageInput')?.click()}
+                                  className="p-2 bg-gold rounded-full text-secondary-foreground hover:bg-gold-dark transition-colors"
+                                >
+                                  <Upload size={20} />
+                                </button>
+                                <button
+                                  onClick={handleRemoveImage}
+                                  className="p-2 bg-destructive rounded-full text-white hover:bg-destructive/90 transition-colors"
+                                >
+                                  <X size={20} />
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-0">
+                            <span className="text-5xl font-bold text-secondary-foreground">
+                              {clientUser.name.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        {!isEditingImage && (
+                          <button
+                            onClick={() => setIsEditingImage(true)}
+                            className="absolute bottom-0 right-0 p-2 bg-gold rounded-full text-secondary-foreground hover:bg-gold-dark transition-colors shadow-lg"
+                          >
+                            <Upload size={18} />
+                          </button>
+                        )}
                       </div>
+
+                      {/* Hidden File Input */}
+                      <input
+                        id="profileImageInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+
+                      {isEditingImage && !clientUser.profileImage && (
+                        <button
+                          onClick={() => document.getElementById('profileImageInput')?.click()}
+                          className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
+                        >
+                          Escolher Foto
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => setIsEditingImage(!isEditingImage)}
+                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2"
+                      >
+                        {isEditingImage ? 'Cancelar' : 'Editar Foto'}
+                      </button>
+
                       <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser.name}</h2>
                       <p className="text-muted-foreground text-sm">@{clientUser.username}</p>
                     </div>
