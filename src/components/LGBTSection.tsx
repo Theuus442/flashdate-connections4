@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Heart, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import lgbtLogo from '@/assets/Gemini_Generated_Image_667hnk667hnk667h.png';
 
 export const LGBTSection = () => {
   const [formData, setFormData] = useState({
