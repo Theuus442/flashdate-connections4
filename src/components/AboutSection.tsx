@@ -2,7 +2,7 @@ import { GraduationCap, Globe, Heart, Sparkles } from 'lucide-react';
 
 export const AboutSection = () => {
   return (
-    <section id="sobre" className="h-screen bg-elegant-gradient relative overflow-hidden flex flex-col">
+    <section id="sobre" className="h-full bg-elegant-gradient relative overflow-hidden flex flex-col">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-wine/15 via-transparent to-transparent" />
 
       <div className="container mx-auto px-6 relative z-10">
