@@ -52,10 +52,14 @@ export default function UserProfile() {
 
   const matchCount = getSelectionsByType('match').length;
   const friendshipCount = getSelectionsByType('friendship').length;
-  const selections = getSelectionsByType('match').concat(
+  const allSelections = getSelectionsByType('match').concat(
     getSelectionsByType('friendship'),
     getSelectionsByType('no-interest')
   );
+
+  const getSelectionForUser = (userId: string) => {
+    return allSelections.find(s => s.userId === userId);
+  };
 
   if (!currentUser) {
     return (
