@@ -137,6 +137,8 @@ export const UsersManagement = () => {
       email: '',
       whatsapp: '',
       profession: '',
+      username: '',
+      password: '',
     });
   };
 
