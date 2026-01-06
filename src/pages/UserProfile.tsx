@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, Users, X, LogOut, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -15,14 +15,16 @@ export default function UserProfile() {
   const { users: allUsers, updateUser } = useUsers();
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
-  const currentUserData = allUsers.length > 0 ? allUsers[0] : null;
-  const [currentUser, setCurrentUser] = useState<User | null>(currentUserData || null);
+  const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selections, setSelections] = useState<UserSelection[]>([]);
 
   // Filter users excluding the current user
-  const otherUsers = currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers;
+  const otherUsers = useMemo(() => 
+    currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers,
+    [currentUser, allUsers]
+  );
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -32,7 +34,6 @@ export default function UserProfile() {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
         const updatedUser = { ...currentUser, profileImage: imageUrl };
-        setCurrentUser(updatedUser);
         updateUser(currentUser.id, updatedUser);
         toast.success('Foto atualizada com sucesso!');
       };
@@ -44,7 +45,6 @@ export default function UserProfile() {
     if (currentUser) {
       setImagePreview(undefined);
       const updatedUser = { ...currentUser, profileImage: undefined };
-      setCurrentUser(updatedUser);
       updateUser(currentUser.id, updatedUser);
       toast.success('Foto removida');
     }
@@ -55,16 +55,13 @@ export default function UserProfile() {
 
     if (existingSelection) {
       if (existingSelection.type === type) {
-        // Remove selection if clicking the same button
         setSelections(selections.filter(s => s.userId !== userId));
       } else {
-        // Update selection
         setSelections(selections.map(s =>
           s.userId === userId ? { ...s, type } : s
         ));
       }
     } else {
-      // Add new selection
       setSelections([...selections, { userId, type }]);
     }
   };
@@ -75,6 +72,17 @@ export default function UserProfile() {
 
   const matchCount = selections.filter(s => s.type === 'match').length;
   const friendshipCount = selections.filter(s => s.type === 'friendship').length;
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Nenhum usuário disponível</p>
+          <Button onClick={() => navigate('/')} variant="gold">Voltar à Página Inicial</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -93,11 +101,9 @@ export default function UserProfile() {
               </span>
             </a>
             <div className="flex items-center gap-4">
-              {currentUser && (
-                <span className="hidden sm:inline text-sm text-muted-foreground">
-                  Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
-                </span>
-              )}
+              <span className="hidden sm:inline text-sm text-muted-foreground">
+                Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
