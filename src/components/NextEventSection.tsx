@@ -177,20 +177,20 @@ export const NextEventSection = () => {
 
               {/* Contact Info */}
               <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-secondary" />
-                  <div>
+                <div className="flex items-start gap-3 min-w-0">
+                  <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Email</p>
-                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors">
+                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
                       contato@flashdate.com.br
                     </a>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-secondary" />
-                  <div>
+                <div className="flex items-start gap-3 min-w-0">
+                  <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors">
+                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
                       (11) 97032-9710
                     </a>
                   </div>
@@ -206,11 +206,13 @@ export const NextEventSection = () => {
                 <div className="mb-6">
                   <span className="font-serif text-5xl font-bold text-gradient-gold">R$ 40</span>
                 </div>
-                <Button variant="hero" size="xl" asChild>
-                  <a href="https://wa.me/5511970329710?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.">
-                    Garantir Minha Vaga
-                  </a>
-                </Button>
+                <div className="flex justify-center">
+                  <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
+                    <a href="https://wa.me/5511970329710?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.">
+                      Garantir Minha Vaga
+                    </a>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -334,7 +336,7 @@ export const NextEventSection = () => {
 
           {selectedCities.length > 0 && (
             <div className="text-center mt-8">
-              <Button variant="hero" size="lg" asChild>
+              <Button variant="hero" size="lg" className="w-full sm:w-auto" asChild>
                 <a href="mailto:contato@flashdate.com.br?subject=Cadastro%20para%20Próximos%20Eventos">
                   Enviar Cadastro
                 </a>

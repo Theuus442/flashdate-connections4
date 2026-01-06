@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, Settings, Upload, X } from 'lucide-react';
+import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
 
 interface ClientUser {
   id: string;
@@ -76,6 +76,15 @@ export default function ClientDashboard() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              <Button
+                variant="hero"
+                size="sm"
+                onClick={() => navigate('/event-selection')}
+                className="hidden sm:flex items-center gap-2"
+              >
+                <Heart size={16} />
+                Selecionar Matches
+              </Button>
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{clientUser.name}</span>
               </span>
@@ -130,6 +139,15 @@ export default function ClientDashboard() {
             >
               <Settings size={20} />
               <span>Meus Matches</span>
+            </button>
+
+            {/* CTA Button for Mobile */}
+            <button
+              onClick={() => navigate('/event-selection')}
+              className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-gold to-gold-dark text-secondary-foreground hover:from-gold-light hover:to-gold transition-colors shadow-gold-glow"
+            >
+              <Heart size={20} />
+              <span>Selecionar Matches</span>
             </button>
           </div>
         </aside>

@@ -41,29 +41,29 @@ export default function AdminPanel() {
       {/* Admin Content */}
       <div className="flex-1 pt-20 flex flex-col">
         {/* Tab Navigation */}
-        <div className="border-b border-border bg-card/50">
+        <div className="border-b border-border bg-card/50 overflow-x-auto">
           <div className="container mx-auto px-6">
-            <div className="flex gap-0">
+            <div className="flex gap-0 min-w-max sm:min-w-full">
               <button
                 onClick={() => setActiveTab('users')}
-                className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 text-sm sm:text-base whitespace-nowrap ${
                   activeTab === 'users'
                     ? 'border-gold text-gold'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Users size={20} />
+                <Users size={18} />
                 <span className="hidden sm:inline">Usuários</span>
               </button>
               <button
                 onClick={() => setActiveTab('events')}
-                className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 text-sm sm:text-base whitespace-nowrap ${
                   activeTab === 'events'
                     ? 'border-gold text-gold'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Calendar size={20} />
+                <Calendar size={18} />
                 <span className="hidden sm:inline">Eventos</span>
               </button>
             </div>
