@@ -171,7 +171,7 @@ export const HowItWorksSection = () => {
             </div>
             <div className="px-6 py-4 bg-foreground/5 border-t border-border">
               <p className="text-sm text-muted-foreground">
-                <span className="text-gold font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-gold font-medium">SIM</span> ou <span className="text-gold font-medium">TALVEZ</span>.
+                <span className="text-secondary font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-secondary font-medium">SIM</span> ou <span className="text-secondary font-medium">TALVEZ</span>.
               </p>
             </div>
           </div>
@@ -185,11 +185,11 @@ export const HowItWorksSection = () => {
             <p className="text-muted-foreground mb-4">Adote um visual que combine com:</p>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="w-2 h-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                <span className="w-2 h-2 rounded-full bg-secondary flex-shrink-0 mt-2" />
                 <span className="text-foreground">Esporte fino</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="w-2 h-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                <span className="w-2 h-2 rounded-full bg-secondary flex-shrink-0 mt-2" />
                 <span className="text-foreground">Casual elegante</span>
               </li>
             </ul>
