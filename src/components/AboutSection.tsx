@@ -2,8 +2,8 @@ import { GraduationCap, Globe, Heart, Sparkles } from 'lucide-react';
 
 export const AboutSection = () => {
   return (
-    <section id="sobre" className="min-h-full bg-elegant-gradient relative flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-wine/15 via-transparent to-transparent" />
+    <section id="sobre" className="min-h-full bg-background relative flex flex-col">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-200/10 via-transparent to-transparent" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -24,8 +24,8 @@ export const AboutSection = () => {
             {/* Founder Info */}
             <div className="lg:col-span-2">
               <div className="bg-card rounded-3xl p-8 border border-border shadow-elegant text-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center mx-auto mb-6">
-                  <span className="font-serif text-3xl text-gold font-bold">SN</span>
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mx-auto mb-6">
+                  <span className="font-serif text-3xl text-white font-bold">SN</span>
                 </div>
                 <h3 className="font-serif text-2xl font-bold text-foreground mb-2">
                   Sidnei Nunes
@@ -91,11 +91,11 @@ export const AboutSection = () => {
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-wine/20 to-gold/10 border border-gold/20">
+              <div className="p-6 rounded-2xl bg-gradient-to-r from-red-400/10 to-yellow-400/10 border border-secondary/20">
                 <blockquote className="font-serif text-lg text-foreground italic">
                   "Somos a ponte que une o calor do encontro presencial à precisão da tecnologia mais avançada."
                 </blockquote>
-                <p className="text-gold text-sm mt-3 font-medium">— Sidnei Nunes, Fundador</p>
+                <p className="text-secondary text-sm mt-3 font-medium">— Sidnei Nunes, Fundador</p>
               </div>
             </div>
           </div>
