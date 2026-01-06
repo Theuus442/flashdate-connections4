@@ -174,7 +174,9 @@ export const UsersManagement = () => {
       profession: '',
       username: '',
       password: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
   };
 
   return (
