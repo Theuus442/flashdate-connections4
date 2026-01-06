@@ -103,8 +103,8 @@ export const NextEventSection = () => {
                 {/* Details */}
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Music className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                    <Music className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Ambiente</h4>
@@ -116,8 +116,8 @@ export const NextEventSection = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Shirt className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Shirt className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Dress Code</h4>
@@ -126,8 +126,8 @@ export const NextEventSection = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Estacionamento</h4>
@@ -142,16 +142,16 @@ export const NextEventSection = () => {
 
               {/* Important Warnings */}
               <div className="space-y-4 mb-10">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gold/10 border border-gold/20">
-                  <AlertCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                  <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <p className="font-semibold text-foreground mb-1">Valor Promocional: R$40,00</p>
                     <p className="text-muted-foreground">(não reembolsável por desistência)</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-wine/10 border border-wine/20">
-                  <AlertCircle className="w-5 h-5 text-wine flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                  <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <p className="font-semibold text-foreground mb-1">Garanta sua Vaga até 25/01/2026</p>
                     <p className="text-muted-foreground">Vagas limitadas. Pix: (11) 97032-9710</p>
@@ -166,8 +166,8 @@ export const NextEventSection = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gold/10 border border-gold/20">
-                  <Clock8 className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                  <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <p className="font-semibold text-foreground mb-1">Dica Extra: Música ao Vivo!</p>
                     <p className="text-muted-foreground">Após o evento, aproveite a música ao vivo a partir das 19h com seus matches</p>
@@ -178,7 +178,7 @@ export const NextEventSection = () => {
               {/* Contact Info */}
               <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
                 <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-gold" />
+                  <Mail className="w-5 h-5 text-secondary" />
                   <div>
                     <p className="text-xs text-muted-foreground">Email</p>
                     <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors">
@@ -187,7 +187,7 @@ export const NextEventSection = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-gold" />
+                  <Phone className="w-5 h-5 text-secondary" />
                   <div>
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
                     <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors">
@@ -200,7 +200,7 @@ export const NextEventSection = () => {
               {/* Price & CTA */}
               <div className="text-center border-t border-border pt-8">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <CreditCard className="w-5 h-5 text-gold" />
+                  <CreditCard className="w-5 h-5 text-secondary" />
                   <span className="text-sm text-muted-foreground">Valor Promocional</span>
                 </div>
                 <div className="mb-6">
@@ -217,7 +217,7 @@ export const NextEventSection = () => {
         </div>
 
         {/* Newsletter Section */}
-        <div className="max-w-5xl mx-auto bg-gradient-to-r from-wine/15 to-gold/15 rounded-3xl border border-border/30 p-8 md:p-12">
+        <div className="max-w-5xl mx-auto bg-gradient-to-r from-red-400/10 to-yellow-300/10 rounded-3xl border border-border/30 p-8 md:p-12">
           <h3 className="font-serif text-3xl font-bold text-foreground mb-4 text-center">
             Cadastre seu Email
           </h3>
@@ -233,8 +233,8 @@ export const NextEventSection = () => {
                 onClick={() => toggleCity(city.id)}
                 className={`p-4 rounded-xl border-2 transition-all duration-300 font-semibold ${
                   selectedCities.includes(city.id)
-                    ? 'border-gold bg-gold/20 text-gold'
-                    : 'border-border bg-card hover:border-gold/50 text-foreground'
+                    ? 'border-secondary bg-secondary/20 text-secondary'
+                    : 'border-border bg-card hover:border-secondary/50 text-foreground'
                 }`}
               >
                 {city.name}
