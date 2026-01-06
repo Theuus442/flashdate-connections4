@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Calendar } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, Heart } from 'lucide-react';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { EventsManagement } from '@/components/admin/EventsManagement';
+import { SelectionsManagement } from '@/components/admin/SelectionsManagement';
 
-type AdminTab = 'users' | 'events';
+type AdminTab = 'users' | 'events' | 'selections';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
@@ -66,6 +67,17 @@ export default function AdminPanel() {
                 <Calendar size={18} />
                 <span className="hidden sm:inline">Eventos</span>
               </button>
+              <button
+                onClick={() => setActiveTab('selections')}
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 text-sm sm:text-base whitespace-nowrap ${
+                  activeTab === 'selections'
+                    ? 'border-gold text-gold'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Heart size={18} />
+                <span className="hidden sm:inline">Seleções</span>
+              </button>
             </div>
           </div>
         </div>
@@ -75,6 +87,7 @@ export default function AdminPanel() {
           <div className="container mx-auto px-6 py-8">
             {activeTab === 'users' && <UsersManagement />}
             {activeTab === 'events' && <EventsManagement />}
+            {activeTab === 'selections' && <SelectionsManagement />}
           </div>
         </div>
       </div>

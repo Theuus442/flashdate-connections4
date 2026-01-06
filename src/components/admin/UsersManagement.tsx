@@ -1,42 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus, Eye } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  age: number;
-  email: string;
-  whatsapp: string;
-  profession: string;
-  username: string;
-  password: string;
-  profileImage?: string;
-}
+import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
+import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'Maria Silva',
-      age: 32,
-      email: 'maria@example.com',
-      whatsapp: '(11) 98765-4321',
-      profession: 'Advogada',
-      username: 'maria.silva',
-      password: '123456',
-    },
-    {
-      id: '2',
-      name: 'João Santos',
-      age: 35,
-      email: 'joao@example.com',
-      whatsapp: '(11) 99876-5432',
-      profession: 'Engenheiro',
-      username: 'joao.santos',
-      password: '123456',
-    },
-  ]);
+  const { users, addUser, updateUser, deleteUser } = useUsers();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -46,8 +14,10 @@ export const UsersManagement = () => {
     profession: '',
     username: '',
     password: '',
+    profileImage: undefined as string | undefined,
   });
 
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -56,6 +26,30 @@ export const UsersManagement = () => {
     setFormData(prev => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageUrl = reader.result as string;
+        setImagePreview(imageUrl);
+        setFormData(prev => ({
+          ...prev,
+          profileImage: imageUrl,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(undefined);
+    setFormData(prev => ({
+      ...prev,
+      profileImage: undefined,
     }));
   };
 
@@ -68,20 +62,18 @@ export const UsersManagement = () => {
     }
 
     if (editingId) {
-      setUsers(users.map(user =>
-        user.id === editingId
-          ? {
-              ...user,
-              name: formData.name,
-              age: parseInt(formData.age),
-              email: formData.email,
-              whatsapp: formData.whatsapp,
-              profession: formData.profession,
-              username: formData.username,
-              password: formData.password,
-            }
-          : user
-      ));
+      const updatedUser: User = {
+        id: editingId,
+        name: formData.name,
+        age: parseInt(formData.age),
+        email: formData.email,
+        whatsapp: formData.whatsapp,
+        profession: formData.profession,
+        username: formData.username,
+        password: formData.password,
+        profileImage: formData.profileImage,
+      };
+      updateUser(editingId, updatedUser);
       setEditingId(null);
     } else {
       const newUser: User = {
@@ -93,8 +85,9 @@ export const UsersManagement = () => {
         profession: formData.profession,
         username: formData.username,
         password: formData.password,
+        profileImage: formData.profileImage,
       };
-      setUsers([...users, newUser]);
+      addUser(newUser);
     }
 
     setFormData({
@@ -105,7 +98,9 @@ export const UsersManagement = () => {
       profession: '',
       username: '',
       password: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
     setShowForm(false);
   };
 
@@ -118,14 +113,16 @@ export const UsersManagement = () => {
       profession: user.profession,
       username: user.username,
       password: user.password,
+      profileImage: user.profileImage,
     });
+    setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
 
   const handleDelete = (id: string) => {
     if (confirm('Tem certeza que deseja deletar este usuário?')) {
-      setUsers(users.filter(user => user.id !== id));
+      deleteUser(id);
     }
   };
 
@@ -140,7 +137,9 @@ export const UsersManagement = () => {
       profession: '',
       username: '',
       password: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
   };
 
   return (
@@ -170,7 +169,53 @@ export const UsersManagement = () => {
             {editingId ? 'Editar Usuário' : 'Novo Usuário'}
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Image Upload Section */}
+            <div className="space-y-4 pb-6 border-b border-border">
+              <label className="block text-sm font-medium text-foreground">Foto de Perfil</label>
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="flex-1">
+                  {imagePreview ? (
+                    <div className="relative w-full h-48 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center">
+                      <img
+                        src={imagePreview}
+                        alt="Prévia do perfil"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white p-2 rounded-lg transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 rounded-lg border-2 border-dashed border-border bg-muted/30 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-5xl font-bold text-gold/30 mb-2">👤</div>
+                        <p className="text-sm text-muted-foreground">Nenhuma imagem selecionada</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="md:w-64 flex flex-col justify-center">
+                  <label className="flex items-center justify-center w-full h-32 px-4 py-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <Upload className="w-6 h-6 text-muted-foreground mb-2" />
+                      <span className="text-sm font-medium text-foreground">Carregar foto</span>
+                      <span className="text-xs text-muted-foreground">PNG, JPG até 5MB</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
             <div className="grid md:grid-cols-2 gap-6">
               {/* Name */}
               <div>
@@ -298,6 +343,7 @@ export const UsersManagement = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/30">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Foto</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Nome</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Usuário</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Idade</th>
@@ -310,6 +356,19 @@ export const UsersManagement = () => {
             <tbody className="divide-y divide-border">
               {users.map(user => (
                 <tr key={user.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-6 py-4 text-sm">
+                    <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center overflow-hidden">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold text-gold">{user.name.charAt(0)}</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-sm text-foreground">{user.name}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.username}</td>
                   <td className="px-6 py-4 text-sm text-foreground">{user.age}</td>
