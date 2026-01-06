@@ -115,6 +115,8 @@ export const UsersManagement = () => {
       email: user.email,
       whatsapp: user.whatsapp,
       profession: user.profession,
+      username: user.username,
+      password: user.password,
     });
     setEditingId(user.id);
     setShowForm(true);
