@@ -119,9 +119,23 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                 </a>
               );
             })}
-            <Button variant="gold" className="mt-4" asChild>
-              <a href="#proximo-evento">Inscreva-se</a>
-            </Button>
+            <div className="flex flex-col gap-2 pt-4 border-t border-border">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  navigate('/login');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Entrar
+              </Button>
+              <Button variant="gold" className="w-full" asChild>
+                <a href="#proximo-evento" onClick={() => setIsMobileMenuOpen(false)}>
+                  Inscreva-se
+                </a>
+              </Button>
+            </div>
           </nav>
         </div>
       )}
