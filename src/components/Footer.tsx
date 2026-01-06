@@ -10,7 +10,12 @@ export const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="#home" className="inline-block mb-6 flex items-center gap-2">
+            <a href="#home" className="inline-block mb-6 flex items-center gap-3">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+                alt="Flashdate Logo"
+                className="h-12 w-auto"
+              />
               <span className="font-bold text-2xl text-foreground">
                 Flash<span className="text-gold">⚡</span>Date
               </span>
