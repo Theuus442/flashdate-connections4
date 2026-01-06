@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# Flashdate - Encontros Reais com IA
 
-## Project info
+Uma plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar seu match com maior potencial de compatibilidade.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Sobre o Projeto
 
-## How can I edit this code?
+Flashdate é um evento de speed dating elegante e seguro que utiliza IA para conectar pessoas compatíveis. Diferente de aplicativos de namoro convencionais, oferecemos encontros presenciais estruturados em um ambiente controlado.
 
-There are several ways of editing your application.
+**Missão**: Unir casais compatíveis independente do sexo, proporcionando conexões verdadeiras e relacionamentos significativos.
 
-**Use Lovable**
+## Características
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- ✨ Inteligência Artificial para matchmaking
+- 🎯 Speed dating otimizado (5-10 minutos por encontro)
+- 🏳️‍🌈 Inclusividade para comunidade LGBT+
+- 🔒 Encontros seguros e verificados
+- 📊 Análise avançada de compatibilidade
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tecnologias Utilizadas
 
-**Use your preferred IDE**
+Este projeto é construído com:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Vite** - Build tool rápido e moderno
+- **React** - Framework UI
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **shadcn-ui** - Componentes UI
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Como Executar Localmente
 
-Follow these steps:
+### Pré-requisitos
+- Node.js & npm instalados ([instalar com nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+
+### Passos
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone o repositório
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Navegue até o diretório do projeto
+cd flashdate
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Instale as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Estrutura do Projeto
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+src/
+├── components/       # Componentes React reutilizáveis
+├── pages/           # Páginas da aplicação
+├── assets/          # Imagens e recursos
+└── main.tsx         # Entrada da aplicação
+```
 
-**Use GitHub Codespaces**
+## Componentes Principais
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Header** - Navegação e logo
+- **HeroSection** - Seção inicial com CTA
+- **HowItWorksSection** - Como funciona o Flashdate
+- **LGBTSection** - Área dedicada à comunidade LGBT+
+- **FAQSection** - Perguntas frequentes
+- **Footer** - Rodapé com informações de contato
 
-## What technologies are used for this project?
+## Contato
 
-This project is built with:
+- **Email**: contato@flashdate.com.br
+- **WhatsApp**: (11) 97032-9710
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Licença
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Todos os direitos reservados © 2024 Flashdate.

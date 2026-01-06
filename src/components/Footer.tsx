@@ -10,8 +10,15 @@ export const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="#home" className="inline-block mb-6">
-              <span className="font-serif text-3xl font-bold text-gradient-gold">Flashdate</span>
+            <a href="#home" className="inline-block mb-6 flex items-center gap-3">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+                alt="Flashdate Logo"
+                className="h-12 w-auto"
+              />
+              <span className="font-bold text-2xl text-foreground">
+                Flash<span className="text-gold">⚡</span>Date
+              </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar 
@@ -71,8 +78,7 @@ export const Footer = () => {
             <div>
               <h5 className="font-semibold text-foreground mb-2">Aviso Importante</h5>
               <p className="text-muted-foreground text-sm">
-                A transferência de ingresso é permitida até 5 dias antes do evento, 
-                desde que seja para pessoa do mesmo sexo. O valor do ingresso não é reembolsável.
+                A transferência de ingresso é permitida até 5 dias antes do evento, desde que seja para pessoa do mesmo gênero (homens para homens, mulheres para mulheres). Isso garante o equilíbrio necessário para o evento. O valor do ingresso não é reembolsável.
               </p>
             </div>
           </div>

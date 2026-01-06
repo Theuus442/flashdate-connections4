@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
 import { useState } from 'react';
+import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
@@ -41,9 +42,9 @@ export const NextEventSection = () => {
         <div className="max-w-5xl mx-auto mb-16">
           <div className="bg-card-gradient rounded-3xl border border-gold/20 overflow-hidden shadow-elegant">
             {/* Venue Image */}
-            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '475/633'}}>
+            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F899a0c36d368496cb6c11de240f68479?quality=100&format=auto"
+                src={venueImage}
                 alt="Armazém São Caetano"
                 className="w-full h-full object-cover"
               />

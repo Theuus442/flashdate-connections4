@@ -41,6 +41,9 @@ export const Header = () => {
               alt="Flashdate Logo"
               className="h-10 w-auto"
             />
+            <span className="hidden sm:inline font-bold text-lg text-foreground">
+              Flash<span className="text-gold">⚡</span>Date
+            </span>
           </a>
 
           {/* Desktop Navigation */}
