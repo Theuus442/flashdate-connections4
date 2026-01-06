@@ -41,13 +41,13 @@ export const NextEventSection = () => {
         <div className="max-w-5xl mx-auto mb-16">
           <div className="bg-card-gradient rounded-3xl border border-gold/20 overflow-hidden shadow-elegant">
             {/* Venue Image */}
-            <div className="relative w-full h-96 overflow-hidden rounded-t-3xl">
+            <div className="relative w-full aspect-video overflow-hidden rounded-t-3xl">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2Fed6496638edc48fc980631129da422c1?format=webp&width=1200"
                 alt="Armazém São Caetano"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
             </div>
 
             {/* Header Banner */}
