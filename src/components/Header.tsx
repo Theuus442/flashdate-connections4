@@ -36,9 +36,11 @@ export const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
-            <span className="font-serif text-2xl font-bold text-gradient-gold">
-              Flashdate
-            </span>
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+              alt="Flashdate Logo"
+              className="h-10 w-auto"
+            />
           </a>
 
           {/* Desktop Navigation */}
