@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Calendar } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, Heart } from 'lucide-react';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { EventsManagement } from '@/components/admin/EventsManagement';
+import { SelectionsManagement } from '@/components/admin/SelectionsManagement';
 
-type AdminTab = 'users' | 'events';
+type AdminTab = 'users' | 'events' | 'selections';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
