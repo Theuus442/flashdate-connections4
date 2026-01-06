@@ -22,6 +22,8 @@ export const UsersManagement = () => {
       email: 'maria@example.com',
       whatsapp: '(11) 98765-4321',
       profession: 'Advogada',
+      username: 'maria.silva',
+      password: '123456',
     },
     {
       id: '2',
@@ -30,6 +32,8 @@ export const UsersManagement = () => {
       email: 'joao@example.com',
       whatsapp: '(11) 99876-5432',
       profession: 'Engenheiro',
+      username: 'joao.santos',
+      password: '123456',
     },
   ]);
 
