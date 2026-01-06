@@ -26,15 +26,14 @@ export default function UserProfile() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && currentUser) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        setCurrentUser(prev => ({
-          ...prev,
-          profileImage: imageUrl,
-        }));
+        const updatedUser = { ...currentUser, profileImage: imageUrl };
+        setCurrentUser(updatedUser);
+        updateUser(currentUser.id, updatedUser);
         toast.success('Foto atualizada com sucesso!');
       };
       reader.readAsDataURL(file);
@@ -42,12 +41,13 @@ export default function UserProfile() {
   };
 
   const handleRemoveImage = () => {
-    setImagePreview(undefined);
-    setCurrentUser(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
-    toast.success('Foto removida');
+    if (currentUser) {
+      setImagePreview(undefined);
+      const updatedUser = { ...currentUser, profileImage: undefined };
+      setCurrentUser(updatedUser);
+      updateUser(currentUser.id, updatedUser);
+      toast.success('Foto removida');
+    }
   };
 
   const handleSelection = (userId: string, type: 'match' | 'friendship' | 'no-interest') => {
