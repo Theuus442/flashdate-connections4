@@ -47,27 +47,15 @@ export default function UserProfile() {
   };
 
   const handleSelection = (userId: string, type: 'match' | 'friendship' | 'no-interest') => {
-    const existingSelection = selections.find(s => s.userId === userId);
-
-    if (existingSelection) {
-      if (existingSelection.type === type) {
-        setSelections(selections.filter(s => s.userId !== userId));
-      } else {
-        setSelections(selections.map(s =>
-          s.userId === userId ? { ...s, type } : s
-        ));
-      }
-    } else {
-      setSelections([...selections, { userId, type }]);
-    }
+    updateSelection(userId, type);
   };
 
-  const handleRemoveSelection = (userId: string) => {
-    setSelections(selections.filter(s => s.userId !== userId));
-  };
-
-  const matchCount = selections.filter(s => s.type === 'match').length;
-  const friendshipCount = selections.filter(s => s.type === 'friendship').length;
+  const matchCount = getSelectionsByType('match').length;
+  const friendshipCount = getSelectionsByType('friendship').length;
+  const selections = getSelectionsByType('match').concat(
+    getSelectionsByType('friendship'),
+    getSelectionsByType('no-interest')
+  );
 
   if (!currentUser) {
     return (
