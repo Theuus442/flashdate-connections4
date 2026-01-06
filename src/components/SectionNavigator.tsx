@@ -45,7 +45,7 @@ export const SectionNavigator = ({ sections }: SectionNavigatorProps) => {
     <div className="fixed inset-0 flex flex-col bg-background">
       {/* Header - Fixed at top */}
       <div className="z-50 flex-shrink-0">
-        <Header />
+        <Header currentSectionId={sections[currentSection]?.id} />
       </div>
 
       {/* Sections Container - Full screen below header */}
