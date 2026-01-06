@@ -78,8 +78,7 @@ export const Footer = () => {
             <div>
               <h5 className="font-semibold text-foreground mb-2">Aviso Importante</h5>
               <p className="text-muted-foreground text-sm">
-                A transferência de ingresso é permitida até 5 dias antes do evento, 
-                desde que seja para pessoa do mesmo sexo. O valor do ingresso não é reembolsável.
+                A transferência de ingresso é permitida até 5 dias antes do evento, desde que seja para pessoa do mesmo gênero (homens para homens, mulheres para mulheres). Isso garante o equilíbrio necessário para o evento. O valor do ingresso não é reembolsável.
               </p>
             </div>
           </div>
