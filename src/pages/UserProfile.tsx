@@ -93,9 +93,11 @@ export default function UserProfile() {
               </span>
             </a>
             <div className="flex items-center gap-4">
-              <span className="hidden sm:inline text-sm text-muted-foreground">
-                Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
-              </span>
+              {currentUser && (
+                <span className="hidden sm:inline text-sm text-muted-foreground">
+                  Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
+                </span>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
