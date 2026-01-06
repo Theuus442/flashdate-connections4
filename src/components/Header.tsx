@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
@@ -19,6 +20,7 @@ interface HeaderProps {
 export const Header = ({ currentSectionId }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,8 +73,15 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
             })}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/login')}
+            >
+              Entrar
+            </Button>
             <Button variant="gold" size="sm" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
@@ -90,7 +99,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-background/98 backdrop-blur-xl border-t border-border">
+        <div className="lg:hidden bg-background backdrop-blur-xl border-t border-border">
           <nav className="container mx-auto px-6 py-6 flex flex-col gap-4">
             {navLinks.map((link) => {
               const sectionId = link.href.slice(1);
@@ -103,16 +112,30 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   className={`text-base font-medium transition-colors duration-300 py-2 ${
                     isActive
                       ? 'text-gold font-semibold'
-                      : 'text-foreground/80 hover:text-gold'
+                      : 'text-foreground hover:text-gold'
                   }`}
                 >
                   {link.label}
                 </a>
               );
             })}
-            <Button variant="gold" className="mt-4" asChild>
-              <a href="#proximo-evento">Inscreva-se</a>
-            </Button>
+            <div className="flex flex-col gap-2 pt-4 border-t border-border">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  navigate('/login');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Entrar
+              </Button>
+              <Button variant="gold" className="w-full" asChild>
+                <a href="#proximo-evento" onClick={() => setIsMobileMenuOpen(false)}>
+                  Inscreva-se
+                </a>
+              </Button>
+            </div>
           </nav>
         </div>
       )}
