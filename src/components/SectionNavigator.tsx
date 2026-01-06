@@ -60,7 +60,7 @@ export const SectionNavigator = ({ sections }: SectionNavigatorProps) => {
             }`}
             style={{ top: '80px' }} // Header height
           >
-            <div className="h-full w-full overflow-hidden">
+            <div className="h-full w-full overflow-y-auto overflow-x-hidden">
               {section.content}
             </div>
           </div>
