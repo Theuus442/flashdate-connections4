@@ -140,6 +140,15 @@ export default function ClientDashboard() {
               <Settings size={20} />
               <span>Meus Matches</span>
             </button>
+
+            {/* CTA Button for Mobile */}
+            <button
+              onClick={() => navigate('/event-selection')}
+              className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-gold to-gold-dark text-secondary-foreground hover:from-gold-light hover:to-gold transition-colors shadow-gold-glow"
+            >
+              <Heart size={20} />
+              <span>Selecionar Matches</span>
+            </button>
           </div>
         </aside>
 
