@@ -24,8 +24,8 @@ export const NextEventSection = () => {
   return (
     <section id="proximo-evento" className="min-h-full bg-background relative flex flex-col">
       {/* Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-wine/15 via-transparent to-transparent" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-400/10 via-transparent to-transparent" />
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-yellow-300/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -40,7 +40,7 @@ export const NextEventSection = () => {
 
         {/* Event Card */}
         <div className="max-w-5xl mx-auto mb-16">
-          <div className="bg-card-gradient rounded-3xl border border-gold/20 overflow-hidden shadow-elegant">
+          <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant">
             {/* Venue Image */}
             <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
               <img
@@ -52,11 +52,11 @@ export const NextEventSection = () => {
             </div>
 
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-wine via-wine-dark to-wine p-6 text-center">
-              <h3 className="font-serif text-2xl md:text-3xl font-bold text-primary-foreground mb-2">
+            <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 p-6 text-center">
+              <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
                 Armazém São Caetano
               </h3>
-              <p className="text-primary-foreground/80 text-sm">Encontros Presenciais com Inteligência Artificial</p>
+              <p className="text-white/80 text-sm">Encontros Presenciais com Inteligência Artificial</p>
             </div>
 
             {/* Content */}
@@ -65,8 +65,8 @@ export const NextEventSection = () => {
                 {/* Location & Date */}
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Local</h4>
@@ -78,19 +78,19 @@ export const NextEventSection = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Data</h4>
                       <p className="text-muted-foreground text-sm">Sábados com eventos regulares</p>
-                      <p className="text-gold font-semibold text-xs mt-1">Próximo: 25/01/2026</p>
+                      <p className="text-secondary font-semibold text-xs mt-1">Próximo: 25/01/2026</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Horário</h4>
