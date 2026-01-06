@@ -99,10 +99,10 @@ export const LGBTSection = () => {
 
   return (
     <section id="lgbtq" className="min-h-full bg-background relative flex flex-col">
-      {/* Rainbow Gradient Accent */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
+      {/* Rainbow Gradient Accent - LGBT Pride */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary via-muted to-primary-dark" />
 
-      <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-blue-300/10 via-pink-400/10 to-yellow-300/10 rounded-full blur-3xl" />
+      <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-muted/15 via-primary/10 to-secondary/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto">
@@ -117,7 +117,7 @@ export const LGBTSection = () => {
             </div>
             <span className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase mb-4">
               <span className="text-2xl">🏳️‍🌈</span>
-              <span className="bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-secondary via-muted to-primary-light bg-clip-text text-transparent">
                 Comunidade LGBT+
               </span>
             </span>
