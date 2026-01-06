@@ -14,15 +14,6 @@ export const SectionNavigator = ({ sections }: SectionNavigatorProps) => {
   const [currentSection, setCurrentSection] = useState(0);
 
   useEffect(() => {
-    // Disable all scroll events
-    const disableScroll = (e: Event) => {
-      e.preventDefault();
-    };
-
-    // Prevent scroll with wheel
-    document.addEventListener('wheel', disableScroll, { passive: false });
-    document.addEventListener('touchmove', disableScroll, { passive: false });
-
     // Get the section ID from the URL hash on mount
     const hash = window.location.hash.slice(1);
     if (hash) {
@@ -46,8 +37,6 @@ export const SectionNavigator = ({ sections }: SectionNavigatorProps) => {
     window.addEventListener('hashchange', handleHashChange);
 
     return () => {
-      document.removeEventListener('wheel', disableScroll);
-      document.removeEventListener('touchmove', disableScroll);
       window.removeEventListener('hashchange', handleHashChange);
     };
   }, [sections]);
