@@ -278,6 +278,36 @@ export const FAQSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Events Gallery */}
+        <div className="max-w-5xl mx-auto mt-20">
+          <div className="text-center mb-12">
+            <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Veja Nossos Eventos em <span className="text-gradient-gold">Ação</span>
+            </h3>
+            <p className="text-muted-foreground text-lg">
+              Confira como são nossos eventos de speed dating em ambientes elegantes e acolhedores
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F4c6a42da1a654661a002b9df6c0a40a4?format=webp&width=800"
+                alt="Evento Flashdate - Participantes em speed dating"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F308f5dc2d9da4ceda9523eb08cf3ba9c?format=webp&width=800"
+                alt="Evento Flashdate - Ambiente de encontros com mascote"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
