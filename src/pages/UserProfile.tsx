@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, X, LogOut, Camera } from 'lucide-react';
+import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
@@ -15,6 +15,7 @@ export default function UserProfile() {
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
+  const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
 
   // Filter users excluding the current user
   const otherUsers = useMemo(() => 
