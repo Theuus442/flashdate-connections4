@@ -42,7 +42,7 @@ export const Header = () => {
               className="h-10 w-auto"
             />
             <span className="hidden sm:inline font-bold text-lg text-foreground">
-              Flash<span className="text-gold">⚡</span>DATE
+              Flash<span className="text-gold">⚡</span>Date
             </span>
           </a>
 
