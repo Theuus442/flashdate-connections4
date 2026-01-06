@@ -150,7 +150,9 @@ export const UsersManagement = () => {
       profession: user.profession,
       username: user.username,
       password: user.password,
+      profileImage: user.profileImage,
     });
+    setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
