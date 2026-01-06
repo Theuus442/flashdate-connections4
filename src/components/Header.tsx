@@ -73,8 +73,15 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
             })}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/login')}
+            >
+              Entrar
+            </Button>
             <Button variant="gold" size="sm" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
