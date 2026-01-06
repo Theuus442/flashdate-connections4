@@ -24,7 +24,7 @@ export const AboutSection = () => {
             {/* Founder Info */}
             <div className="lg:col-span-2">
               <div className="bg-card rounded-3xl p-8 border border-border shadow-elegant text-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mx-auto mb-6">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mx-auto mb-6">
                   <span className="font-serif text-3xl text-white font-bold">SN</span>
                 </div>
                 <h3 className="font-serif text-2xl font-bold text-foreground mb-2">
