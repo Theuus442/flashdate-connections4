@@ -200,7 +200,7 @@ export default function UserProfile() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Total Seleções</span>
-                    <span className="text-lg font-bold text-foreground">{selections.length}</span>
+                    <span className="text-lg font-bold text-foreground">{allSelections.length}</span>
                   </div>
                 </div>
               </div>
