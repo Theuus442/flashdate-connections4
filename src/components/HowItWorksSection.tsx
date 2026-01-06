@@ -55,8 +55,8 @@ export const HowItWorksSection = () => {
   return (
     <section id="como-funciona" className="min-h-full bg-background relative flex flex-col">
       {/* Background Decoration */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-wine/10 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold/5 rounded-full blur-3xl" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-400/8 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-4">
         {/* Section Header */}
@@ -88,16 +88,16 @@ export const HowItWorksSection = () => {
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="group relative bg-card rounded-2xl p-8 border border-border hover:border-gold/40 transition-all duration-500 shadow-elegant"
+                className="group relative bg-card rounded-2xl p-8 border border-border hover:border-secondary/40 transition-all duration-500 shadow-elegant"
               >
                 {/* Step Number Badge */}
-                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-gold-glow">
-                  <span className="font-serif text-sm font-bold text-background">{step.number}</span>
+                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+                  <span className="font-serif text-sm font-bold text-white">{step.number}</span>
                 </div>
 
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
-                  <step.icon className="w-7 h-7 text-gold" />
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+                  <step.icon className="w-7 h-7 text-white" />
                 </div>
 
                 {/* Content */}
@@ -110,7 +110,7 @@ export const HowItWorksSection = () => {
                   <ul className="space-y-2">
                     {step.details.map((detail, i) => (
                       <li key={i} className="text-sm text-foreground/70 flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0 mt-1.5" />
                         <span>{detail}</span>
                       </li>
                     ))}
@@ -228,27 +228,27 @@ export const HowItWorksSection = () => {
 
             <div className="space-y-6">
               <div>
-                <h5 className="text-gold font-semibold mb-2">Duração</h5>
+                <h5 className="text-secondary font-semibold mb-2">Duração</h5>
                 <p className="text-foreground">Aproximadamente 2 horas</p>
               </div>
 
               <div>
-                <h5 className="text-gold font-semibold mb-2">Check-in</h5>
+                <h5 className="text-secondary font-semibold mb-2">Check-in</h5>
                 <p className="text-foreground">15 a 30 minutos antes do início (preferencialmente)</p>
               </div>
 
               <div>
-                <h5 className="text-gold font-semibold mb-2">Vagas Dinâmicas</h5>
+                <h5 className="text-secondary font-semibold mb-2">Vagas Dinâmicas</h5>
                 <p className="text-muted-foreground text-sm">O número de vagas é ajustado em tempo real conforme o fluxo de interessados e o equilíbrio entre os gêneros.</p>
               </div>
 
               <div>
-                <h5 className="text-gold font-semibold mb-2">Após o Evento</h5>
+                <h5 className="text-secondary font-semibold mb-2">Após o Evento</h5>
                 <p className="text-muted-foreground text-sm">Sinta-se à vontade para continuar no ambiente, comendo ou bebendo algo (consumo à parte) e conversando com quem desejar.</p>
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h5 className="text-gold font-semibold mb-2">Cancelamento/Reembolso</h5>
+                <h5 className="text-secondary font-semibold mb-2">Cancelamento/Reembolso</h5>
                 <p className="text-foreground text-sm mb-2">Confirmamos o evento apenas ao atingir o mínimo de <span className="font-semibold">10 pares inscritos</span>.</p>
                 <p className="text-muted-foreground text-sm">Se o limite não for alcançado, sua inscrição será totalmente reembolsada.</p>
                 <p className="text-destructive text-sm mt-3 font-semibold">O valor pago não é reembolsável por desistência, mas pode ser transferido para outra pessoa.</p>
@@ -258,7 +258,7 @@ export const HowItWorksSection = () => {
         </div>
 
         {/* Participant Profile Section */}
-        <div className="mt-20 bg-gradient-to-r from-wine/10 to-gold/10 border border-border/30 rounded-2xl p-8 md:p-12 max-w-5xl mx-auto">
+        <div className="mt-20 bg-gradient-to-r from-red-400/10 to-yellow-300/10 border border-border/30 rounded-2xl p-8 md:p-12 max-w-5xl mx-auto">
           <h3 className="font-serif text-3xl font-bold text-foreground mb-8">Quem Frequenta Nossos Eventos</h3>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -274,22 +274,22 @@ export const HowItWorksSection = () => {
             <div>
               <div className="space-y-4">
                 <div>
-                  <h5 className="text-gold font-semibold mb-2">Faixa Etária Predominante</h5>
+                  <h5 className="text-secondary font-semibold mb-2">Faixa Etária Predominante</h5>
                   <p className="text-foreground">Aproximadamente 30 a 50 anos</p>
                 </div>
 
                 <div>
-                  <h5 className="text-gold font-semibold mb-2">Inscrições Femininas</h5>
+                  <h5 className="text-secondary font-semibold mb-2">Inscrições Femininas</h5>
                   <p className="text-foreground">Tendem a esgotar rapidamente</p>
                 </div>
 
                 <div>
-                  <h5 className="text-gold font-semibold mb-2">Homens</h5>
+                  <h5 className="text-secondary font-semibold mb-2">Homens</h5>
                   <p className="text-foreground">Demonstram resistência inicial, mas se engajam rapidamente após a primeira experiência, tornando-se participantes frequentes e influenciadores positivos.</p>
                 </div>
 
                 <div className="pt-4 border-t border-border/30">
-                  <p className="text-sm text-gold font-semibold flex items-center gap-2">
+                  <p className="text-sm text-secondary font-semibold flex items-center gap-2">
                     <Check className="w-4 h-4" />
                     Alto índice de sucesso e recomendações
                   </p>
