@@ -10,8 +10,10 @@ export const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="#home" className="inline-block mb-6">
-              <span className="font-serif text-3xl font-bold text-gradient-gold">Flashdate</span>
+            <a href="#home" className="inline-block mb-6 flex items-center gap-2">
+              <span className="font-bold text-2xl text-foreground">
+                Flash<span className="text-gold">⚡</span>Date
+              </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar 
