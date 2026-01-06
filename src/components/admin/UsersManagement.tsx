@@ -62,21 +62,18 @@ export const UsersManagement = () => {
     }
 
     if (editingId) {
-      setUsers(users.map(user =>
-        user.id === editingId
-          ? {
-              ...user,
-              name: formData.name,
-              age: parseInt(formData.age),
-              email: formData.email,
-              whatsapp: formData.whatsapp,
-              profession: formData.profession,
-              username: formData.username,
-              password: formData.password,
-              profileImage: formData.profileImage,
-            }
-          : user
-      ));
+      const updatedUser: User = {
+        id: editingId,
+        name: formData.name,
+        age: parseInt(formData.age),
+        email: formData.email,
+        whatsapp: formData.whatsapp,
+        profession: formData.profession,
+        username: formData.username,
+        password: formData.password,
+        profileImage: formData.profileImage,
+      };
+      updateUser(editingId, updatedUser);
       setEditingId(null);
     } else {
       const newUser: User = {
@@ -90,7 +87,7 @@ export const UsersManagement = () => {
         password: formData.password,
         profileImage: formData.profileImage,
       };
-      setUsers([...users, newUser]);
+      addUser(newUser);
     }
 
     setFormData({
