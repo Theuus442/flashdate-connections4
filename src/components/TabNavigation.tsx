@@ -42,16 +42,16 @@ export const TabNavigation = ({ tabs }: TabNavigationProps) => {
         </div>
       </div>
 
-      {/* Tab Content - Scrollable area */}
+      {/* Tab Content - No scrolling */}
       <div className="flex-1 overflow-hidden relative">
         {tabs.map((tab, index) => (
           <div
             key={tab.id}
-            className={`absolute inset-0 transition-opacity duration-300 ${
+            className={`absolute inset-0 transition-opacity duration-300 overflow-hidden ${
               activeTab === index ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
           >
-            <div className="h-full w-full overflow-y-auto">
+            <div className="h-full w-full overflow-hidden flex flex-col">
               {tab.content}
             </div>
           </div>
