@@ -84,8 +84,8 @@ export const HowItWorksSection = () => {
 
         {/* Steps Grid */}
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {steps.slice(0, 3).map((step, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {steps.map((step) => (
               <div
                 key={step.number}
                 className="group relative bg-card rounded-2xl p-8 border border-border hover:border-gold/40 transition-all duration-500 shadow-elegant"
@@ -105,45 +105,9 @@ export const HowItWorksSection = () => {
                   {step.title}
                 </h3>
                 <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{step.description}</p>
-                
+
                 {step.details.length > 0 && (
                   <ul className="space-y-2">
-                    {step.details.map((detail, i) => (
-                      <li key={i} className="text-sm text-foreground/70 flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
-                        <span>{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom row centered */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {steps.slice(3).map((step) => (
-              <div
-                key={step.number}
-                className="group relative bg-card rounded-2xl p-8 border border-border hover:border-gold/40 transition-all duration-500 shadow-elegant"
-              >
-                {/* Step Number Badge */}
-                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-gold-glow">
-                  <span className="font-serif text-sm font-bold text-background">{step.number}</span>
-                </div>
-
-                {/* Icon */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-wine to-wine-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
-                  <step.icon className="w-7 h-7 text-gold" />
-                </div>
-
-                {/* Content */}
-                <h3 className="font-serif text-xl font-bold text-foreground mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
-                {step.details.length > 0 && (
-                  <ul className="mt-4 space-y-2">
                     {step.details.map((detail, i) => (
                       <li key={i} className="text-sm text-foreground/70 flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
