@@ -84,9 +84,9 @@ export const NewsletterSection = () => {
                   required
                 />
               </div>
-              <Button type="submit" variant="hero" size="lg" className="w-full h-auto">
-                <Send className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span className="text-center">Quero Receber Novidades de {cities.find(c => c.id === selectedCity)?.name}</span>
+              <Button type="submit" variant="hero" size="lg" className="w-full h-auto flex-wrap gap-2">
+                <Send className="w-4 h-4 flex-shrink-0" />
+                <span>Quero Receber Novidades de {cities.find(c => c.id === selectedCity)?.name}</span>
               </Button>
             </div>
           </form>
