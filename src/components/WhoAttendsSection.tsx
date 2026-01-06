@@ -26,8 +26,8 @@ const characteristics = [
 export const WhoAttendsSection = () => {
   return (
     <section className="min-h-full bg-background relative flex flex-col">
-      <div className="absolute -top-20 -right-20 w-80 h-80 bg-red-400/8 rounded-full blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-400/8 rounded-full blur-3xl" />
+      <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+      <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-muted/8 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -50,8 +50,8 @@ export const WhoAttendsSection = () => {
               key={index}
               className="bg-card-gradient rounded-2xl p-8 border border-border hover:border-secondary/30 transition-all duration-500 shadow-elegant group text-center"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <item.icon className="w-8 h-8 text-yellow-400" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <item.icon className="w-8 h-8 text-secondary" />
               </div>
               <h3 className="font-serif text-xl font-bold text-foreground mb-3">
                 {item.title}
