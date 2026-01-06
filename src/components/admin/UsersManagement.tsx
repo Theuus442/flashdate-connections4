@@ -61,7 +61,7 @@ export const UsersManagement = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.age || !formData.email || !formData.whatsapp || !formData.profession) {
+    if (!formData.name || !formData.age || !formData.email || !formData.whatsapp || !formData.profession || !formData.username || !formData.password) {
       alert('Por favor, preencha todos os campos');
       return;
     }
