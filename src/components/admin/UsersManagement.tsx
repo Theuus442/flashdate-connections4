@@ -202,6 +202,36 @@ export const UsersManagement = () => {
                 />
               </div>
 
+              {/* Username */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Nome do Usuário
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  placeholder="nome.usuario"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Senha
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                />
+              </div>
+
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
