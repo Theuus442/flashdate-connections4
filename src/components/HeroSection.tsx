@@ -41,8 +41,7 @@ export const HeroSection = () => {
                 <span className="text-gradient-gold">Encontros Reais</span>, utilizando
               </span>
               <br />
-              <span className="text-gradient-wine block mt-2">Inteligência Artificial</span>
-              <br />
+              <span className="text-gradient-wine block">Inteligência Artificial</span>
               <span className="text-white drop-shadow-md">para conexões verdadeiras</span>
             </h1>
 
