@@ -76,6 +76,14 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/admin')}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Admin
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={() => navigate('/login')}
