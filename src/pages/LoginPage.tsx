@@ -139,6 +139,47 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* Test Credentials Info */}
+            <div className="mb-8 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+              <p className="text-xs font-semibold text-secondary mb-3 uppercase tracking-wide">
+                📋 Credenciais de Teste
+              </p>
+              <div className="space-y-3">
+                {TEST_CREDENTIALS.map((cred, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-foreground">{cred.label}</p>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleAutoFill(cred)}
+                        className="text-xs"
+                      >
+                        Auto-preenchimento
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-background rounded-lg border border-border">
+                      <code className="flex-1 text-xs font-mono text-muted-foreground">
+                        {cred.email} / {cred.password}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyToClipboard(`${cred.email} / ${cred.password}`, `cred-${index}`)}
+                        className="p-1.5 hover:bg-muted rounded transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        {copiedField === `cred-${index}` ? (
+                          <Check size={16} className="text-gold" />
+                        ) : (
+                          <Copy size={16} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
