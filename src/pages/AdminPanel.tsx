@@ -67,6 +67,17 @@ export default function AdminPanel() {
                 <Calendar size={18} />
                 <span className="hidden sm:inline">Eventos</span>
               </button>
+              <button
+                onClick={() => setActiveTab('selections')}
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 text-sm sm:text-base whitespace-nowrap ${
+                  activeTab === 'selections'
+                    ? 'border-gold text-gold'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Heart size={18} />
+                <span className="hidden sm:inline">Seleções</span>
+              </button>
             </div>
           </div>
         </div>
