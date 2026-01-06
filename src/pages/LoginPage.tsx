@@ -44,7 +44,7 @@ export default function LoginPage() {
   };
 
   const handleAutoFill = (credentials: Credentials) => {
-    setEmail(credentials.email);
+    setEmail(credentials.username || credentials.email);
     setPassword(credentials.password);
   };
 
