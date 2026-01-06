@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
 import { useState } from 'react';
+import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
