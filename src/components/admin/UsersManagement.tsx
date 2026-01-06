@@ -48,8 +48,10 @@ export const UsersManagement = () => {
     profession: '',
     username: '',
     password: '',
+    profileImage: undefined as string | undefined,
   });
 
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
