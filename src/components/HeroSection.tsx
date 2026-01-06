@@ -36,12 +36,6 @@ export const HeroSection = () => {
               />
             </div>
 
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold/30 bg-background/30 backdrop-blur-sm mb-8 animate-fade-up">
-              <Sparkles className="w-4 h-4 text-gold" />
-              <span className="text-sm text-gold font-medium">Powered by AI</span>
-            </div>
-
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100">
               <span className="text-foreground">Flashdate:</span>{' '}
