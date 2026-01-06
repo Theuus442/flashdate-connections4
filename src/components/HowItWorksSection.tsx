@@ -1,4 +1,4 @@
-import { UserPlus, Brain, CalendarCheck, Smartphone, Mail } from 'lucide-react';
+import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X } from 'lucide-react';
 
 const steps = [
   {
@@ -6,35 +6,35 @@ const steps = [
     icon: UserPlus,
     title: 'Inscrição',
     description: 'Adquira o ingresso. Após a compra, envie para o e-mail contato@flashdate.com.br:',
-    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail', 'Celular com DDD', 'Data do Evento escolhido'],
+    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
   },
   {
     number: '02',
     icon: Brain,
     title: 'Análise de IA',
-    description: 'Você receberá um questionário de 15 perguntas por e-mail. Nossa IA processará seu perfil para encontrar a maior compatibilidade.',
+    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará seus dados para entender melhor seu perfil e encontrar o match mais compatível.',
     details: [],
   },
   {
     number: '03',
     icon: CalendarCheck,
     title: 'O Evento',
-    description: 'Check-in 15-30 minutos antes do início.',
-    details: ['Mulheres fixas nas mesas', 'Homens rotacionam a cada 5-10 minutos', 'Ao sinal do sino, a rotação acontece'],
+    description: 'Compareça com 15 a 30 minutos de antecedência para o check-in. As mulheres ficam fixas nas mesas enquanto os homens rotacionam.',
+    details: ['Conversas de 5 a 10 minutos por mesa', 'Sinal do sino indica rotação', 'Duração total: ~2 horas', 'Após evento: aproveite para comer, beber e conversar livremente'],
   },
   {
     number: '04',
     icon: Smartphone,
     title: 'Seleção Digital',
-    description: 'Durante o evento, você usará nosso app para selecionar seus parceiros preferidos.',
-    details: [],
+    description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante selecionar todos e enviar sua seleção.',
+    details: ['Opções: SIM, TALVEZ ou NÃO', 'A seleção determina os matches', 'Ambos devem selecionar SIM para match confirmado'],
   },
   {
     number: '05',
     icon: Mail,
     title: 'Resultados',
-    description: 'Em até 24 horas, você recebe o resultado via e-mail com seus matches confirmados.',
-    details: [],
+    description: 'Você recebe o resultado via e-mail em até 24 horas com seus matches confirmados e contatos trocados.',
+    details: ['Contatos apenas se ambos optarem por SIM ou TALVEZ', 'Possibilidade de amizade e outras conexões'],
   },
 ];
 
