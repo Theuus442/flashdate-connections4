@@ -18,12 +18,11 @@ export default function UserProfile() {
   const currentUserData = allUsers.length > 0 ? allUsers[0] : null;
   const [currentUser, setCurrentUser] = useState<User | null>(currentUserData || null);
 
-  const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser.profileImage);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selections, setSelections] = useState<UserSelection[]>([]);
-  const [showProfileForm, setShowProfileForm] = useState(false);
 
   // Filter users excluding the current user
-  const otherUsers = allUsers.filter(user => user.id !== currentUser.id);
+  const otherUsers = currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
