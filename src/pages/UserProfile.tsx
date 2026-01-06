@@ -204,6 +204,74 @@ export default function UserProfile() {
                     <span className="text-lg font-bold text-foreground">{allSelections.length}</span>
                   </div>
                 </div>
+
+                {/* Selections Detail Toggle */}
+                {allSelections.length > 0 && (
+                  <button
+                    onClick={() => setShowSelectionsDetail(!showSelectionsDetail)}
+                    className="w-full mt-6 pt-6 border-t border-border flex items-center justify-between text-foreground hover:text-gold transition-colors"
+                  >
+                    <span className="text-sm font-medium">Ver Detalhes</span>
+                    {showSelectionsDetail ? (
+                      <ChevronUp size={18} />
+                    ) : (
+                      <ChevronDown size={18} />
+                    )}
+                  </button>
+                )}
+
+                {/* Selections Detail */}
+                {showSelectionsDetail && allSelections.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-border space-y-4">
+                    {getSelectionsByType('match').length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gold mb-2 uppercase">Matches ({getSelectionsByType('match').length})</p>
+                        <div className="space-y-1">
+                          {getSelectionsByType('match').map(sel => {
+                            const user = allUsers.find(u => u.id === sel.userId);
+                            return (
+                              <p key={sel.userId} className="text-xs text-foreground">
+                                💕 {user?.name}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {getSelectionsByType('friendship').length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-secondary mb-2 uppercase">Amizades ({getSelectionsByType('friendship').length})</p>
+                        <div className="space-y-1">
+                          {getSelectionsByType('friendship').map(sel => {
+                            const user = allUsers.find(u => u.id === sel.userId);
+                            return (
+                              <p key={sel.userId} className="text-xs text-foreground">
+                                👥 {user?.name}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {getSelectionsByType('no-interest').length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-destructive mb-2 uppercase">Sem Interesse ({getSelectionsByType('no-interest').length})</p>
+                        <div className="space-y-1">
+                          {getSelectionsByType('no-interest').map(sel => {
+                            const user = allUsers.find(u => u.id === sel.userId);
+                            return (
+                              <p key={sel.userId} className="text-xs text-foreground">
+                                ❌ {user?.name}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
