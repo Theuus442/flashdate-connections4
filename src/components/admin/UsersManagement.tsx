@@ -76,6 +76,8 @@ export const UsersManagement = () => {
               email: formData.email,
               whatsapp: formData.whatsapp,
               profession: formData.profession,
+              username: formData.username,
+              password: formData.password,
             }
           : user
       ));
@@ -88,6 +90,8 @@ export const UsersManagement = () => {
         email: formData.email,
         whatsapp: formData.whatsapp,
         profession: formData.profession,
+        username: formData.username,
+        password: formData.password,
       };
       setUsers([...users, newUser]);
     }
@@ -98,6 +102,8 @@ export const UsersManagement = () => {
       email: '',
       whatsapp: '',
       profession: '',
+      username: '',
+      password: '',
     });
     setShowForm(false);
   };
