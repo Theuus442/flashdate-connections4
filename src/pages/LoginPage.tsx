@@ -67,13 +67,13 @@ export default function LoginPage() {
         return;
       }
 
-      // Check credentials
+      // Check credentials (accept both email and username)
       const credential = TEST_CREDENTIALS.find(
-        c => c.email === email && c.password === password
+        c => (c.email === email || c.username === email) && c.password === password
       );
 
       if (!credential) {
-        setError('Email ou senha inválidos');
+        setError('Usuário/Email ou senha inválidos');
         setIsLoading(false);
         return;
       }
