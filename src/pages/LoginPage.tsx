@@ -69,7 +69,7 @@ export default function LoginPage() {
       </header>
 
       {/* Login Container */}
-      <div className="flex-1 flex items-center justify-center pt-20 pb-8 px-6">
+      <div className="flex-1 flex items-center justify-center pt-40 pb-8 px-6">
         <div className="w-full max-w-md">
           {/* Decorative Elements */}
           <div className="absolute top-1/4 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
@@ -136,37 +136,7 @@ export default function LoginPage() {
               >
                 {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
-
-              {/* Forgot Password Link */}
-              <div className="text-center">
-                <a
-                  href="#"
-                  className="text-sm text-muted-foreground hover:text-gold transition-colors"
-                >
-                  Esqueceu sua senha?
-                </a>
-              </div>
             </form>
-
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-card text-muted-foreground">Ou</span>
-              </div>
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                Não tem uma conta?{' '}
-                <a href="#proximo-evento" className="text-gold font-medium hover:underline">
-                  Inscreva-se
-                </a>
-              </p>
-            </div>
           </div>
 
           {/* Footer Text */}
