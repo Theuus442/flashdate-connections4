@@ -122,7 +122,7 @@ export const UsersManagement = () => {
 
   const handleDelete = (id: string) => {
     if (confirm('Tem certeza que deseja deletar este usuário?')) {
-      setUsers(users.filter(user => user.id !== id));
+      deleteUser(id);
     }
   };
 
