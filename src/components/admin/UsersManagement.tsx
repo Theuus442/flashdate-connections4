@@ -107,6 +107,7 @@ export const UsersManagement = () => {
               profession: formData.profession,
               username: formData.username,
               password: formData.password,
+              profileImage: formData.profileImage,
             }
           : user
       ));
@@ -121,6 +122,7 @@ export const UsersManagement = () => {
         profession: formData.profession,
         username: formData.username,
         password: formData.password,
+        profileImage: formData.profileImage,
       };
       setUsers([...users, newUser]);
     }
@@ -133,7 +135,9 @@ export const UsersManagement = () => {
       profession: '',
       username: '',
       password: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
     setShowForm(false);
   };
 
