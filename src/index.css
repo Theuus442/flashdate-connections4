@@ -110,13 +110,11 @@
 
   html {
     scroll-behavior: smooth;
-    overflow: hidden;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: var(--font-sans);
-    overflow: hidden;
     height: 100vh;
   }
 
