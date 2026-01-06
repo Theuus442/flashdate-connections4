@@ -4,21 +4,17 @@ import { Heart, Users, X, LogOut, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
-
-interface UserSelection {
-  userId: string;
-  type: 'match' | 'friendship' | 'no-interest';
-}
+import { useSelections } from '@/context/SelectionsContext';
 
 export default function UserProfile() {
   const navigate = useNavigate();
   const { users: allUsers, updateUser } = useUsers();
+  const { updateSelection, getSelectionsByType } = useSelections();
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
-  const [selections, setSelections] = useState<UserSelection[]>([]);
 
   // Filter users excluding the current user
   const otherUsers = useMemo(() => 
