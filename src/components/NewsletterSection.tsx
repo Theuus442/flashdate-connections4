@@ -25,8 +25,8 @@ export const NewsletterSection = () => {
   };
 
   return (
-    <section id="contato" className="min-h-full bg-elegant-gradient relative flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold/5 via-transparent to-transparent" />
+    <section id="contato" className="min-h-full bg-background relative flex flex-col">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-300/5 via-transparent to-transparent" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -50,8 +50,8 @@ export const NewsletterSection = () => {
               onClick={() => setSelectedCity(city.id)}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                 selectedCity === city.id
-                  ? 'bg-gradient-to-r from-gold to-gold-dark text-background shadow-gold-glow'
-                  : 'bg-card border border-border text-foreground hover:border-gold/50'
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg shadow-yellow-500/30'
+                  : 'bg-card border border-border text-foreground hover:border-secondary/50'
               }`}
             >
               <MapPin className="w-4 h-4" />
@@ -84,7 +84,7 @@ export const NewsletterSection = () => {
                   required
                 />
               </div>
-              <Button type="submit" variant="gold" size="lg" className="w-full">
+              <Button type="submit" variant="hero" size="lg" className="w-full">
                 <Send className="w-4 h-4 mr-2" />
                 Quero Receber Novidades de {cities.find(c => c.id === selectedCity)?.name}
               </Button>
