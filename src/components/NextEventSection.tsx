@@ -206,11 +206,13 @@ export const NextEventSection = () => {
                 <div className="mb-6">
                   <span className="font-serif text-5xl font-bold text-gradient-gold">R$ 40</span>
                 </div>
-                <Button variant="hero" size="xl" asChild>
-                  <a href="https://wa.me/5511970329710?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.">
-                    Garantir Minha Vaga
-                  </a>
-                </Button>
+                <div className="flex justify-center">
+                  <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
+                    <a href="https://wa.me/5511970329710?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.">
+                      Garantir Minha Vaga
+                    </a>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
