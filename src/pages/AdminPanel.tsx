@@ -87,6 +87,7 @@ export default function AdminPanel() {
           <div className="container mx-auto px-6 py-8">
             {activeTab === 'users' && <UsersManagement />}
             {activeTab === 'events' && <EventsManagement />}
+            {activeTab === 'selections' && <SelectionsManagement />}
           </div>
         </div>
       </div>
