@@ -53,7 +53,7 @@ const steps = [
 
 export const HowItWorksSection = () => {
   return (
-    <section id="como-funciona" className="py-24 bg-background relative overflow-hidden">
+    <section id="como-funciona" className="h-full bg-background relative overflow-hidden flex flex-col">
       {/* Background Decoration */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-wine/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold/5 rounded-full blur-3xl" />
