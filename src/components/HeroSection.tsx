@@ -35,16 +35,16 @@ export const HeroSection = () => {
             </div>
 
             {/* Main Title */}
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100">
-              <span className="text-foreground">Flashdate:</span>{' '}
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
+              <span className="text-white drop-shadow-md">Flashdate:</span>{' '}
               <span className="text-gradient-gold">Encontros Reais</span>
-              <span className="text-foreground">, Inteligência Artificial,</span>{' '}
+              <span className="text-white drop-shadow-md">, Inteligência Artificial,</span>{' '}
               <span className="text-gradient-wine">Conexões Verdadeiras.</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200">
-              A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match 
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 drop-shadow-md">
+              A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match
               com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
 
