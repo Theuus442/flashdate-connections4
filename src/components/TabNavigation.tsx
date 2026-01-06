@@ -51,7 +51,7 @@ export const TabNavigation = ({ tabs }: TabNavigationProps) => {
               activeTab === index ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
           >
-            <div className="h-full overflow-y-auto overscroll-none">
+            <div className="h-full w-full overflow-y-auto">
               {tab.content}
             </div>
           </div>
