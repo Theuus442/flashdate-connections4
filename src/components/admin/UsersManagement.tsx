@@ -1,44 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  age: number;
-  email: string;
-  whatsapp: string;
-  profession: string;
-  username: string;
-  password: string;
-  profileImage?: string;
-}
+import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'Maria Silva',
-      age: 32,
-      email: 'maria@example.com',
-      whatsapp: '(11) 98765-4321',
-      profession: 'Advogada',
-      username: 'maria.silva',
-      password: '123456',
-      profileImage: undefined,
-    },
-    {
-      id: '2',
-      name: 'João Santos',
-      age: 35,
-      email: 'joao@example.com',
-      whatsapp: '(11) 99876-5432',
-      profession: 'Engenheiro',
-      username: 'joao.santos',
-      password: '123456',
-      profileImage: undefined,
-    },
-  ]);
+  const { users, addUser, updateUser, deleteUser } = useUsers();
 
   const [formData, setFormData] = useState({
     name: '',
