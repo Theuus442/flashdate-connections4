@@ -6,78 +6,86 @@
 
 @layer base {
   :root {
-    /* Flashdate Light Color Palette - Light Blue, White, Yellow, Red */
+    /* Flashdate Premium Color Palette - White (Predominant), Light Blue, Red, Yellow */
     --background: 0 0% 99%;
     --foreground: 210 25% 20%;
 
-    --card: 200 50% 95%;
+    --card: 200 35% 97%;
     --card-foreground: 210 25% 20%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 210 25% 20%;
 
-    /* Bright Red */
-    --primary: 0 84% 54%;
+    /* Refined Red - More Harmonious */
+    --primary: 0 75% 52%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 0 84% 65%;
-    --primary-dark: 0 84% 40%;
+    --primary-light: 0 75% 62%;
+    --primary-dark: 0 75% 38%;
 
-    /* Bright Yellow */
-    --secondary: 45 96% 53%;
+    /* Refined Yellow - More Harmonious */
+    --secondary: 45 85% 52%;
     --secondary-foreground: 210 25% 20%;
-    --secondary-light: 45 100% 65%;
-    --secondary-dark: 45 85% 40%;
+    --secondary-light: 45 85% 62%;
+    --secondary-dark: 45 85% 38%;
 
-    /* Light Blue variations */
-    --muted: 200 40% 85%;
+    /* Light Blue - Enhanced Presence */
+    --muted: 200 45% 88%;
     --muted-foreground: 210 25% 40%;
 
-    --accent: 45 96% 53%;
+    --accent: 45 85% 52%;
     --accent-foreground: 210 25% 20%;
 
-    --destructive: 0 84% 54%;
+    --destructive: 0 75% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 30% 88%;
-    --input: 200 30% 92%;
-    --ring: 45 96% 53%;
+    --border: 200 35% 90%;
+    --input: 200 35% 94%;
+    --ring: 45 85% 52%;
 
     --radius: 0.5rem;
 
-    /* Custom tokens */
-    --wine: 0 84% 54%;
-    --wine-light: 0 84% 65%;
-    --wine-dark: 0 84% 40%;
-    --gold: 45 96% 53%;
-    --gold-light: 45 100% 65%;
-    --gold-dark: 45 85% 40%;
-    --graphite: 200 50% 95%;
-    --graphite-light: 200 40% 90%;
+    /* Custom tokens - Refined */
+    --wine: 0 75% 52%;
+    --wine-light: 0 75% 62%;
+    --wine-dark: 0 75% 38%;
+    --gold: 45 85% 52%;
+    --gold-light: 45 85% 62%;
+    --gold-dark: 45 85% 38%;
 
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(200 60% 75%) 0%, hsl(0 84% 54%) 50%, hsl(45 96% 53%) 100%);
-    --gradient-wine: linear-gradient(135deg, hsl(0 84% 54%) 0%, hsl(0 84% 40%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(45 96% 53%) 0%, hsl(45 85% 40%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(200 50% 95%) 0%, hsl(200 40% 90%) 100%);
-    --gradient-elegant: linear-gradient(135deg, hsl(200 60% 85%) 0%, hsl(45 96% 65%) 50%, hsl(200 60% 85%) 100%);
+    /* Light Blue Token */
+    --sky: 200 45% 88%;
+    --sky-light: 200 45% 93%;
+    --sky-dark: 200 45% 75%;
 
-    /* Shadows */
-    --shadow-elegant: 0 25px 50px -12px hsl(0 84% 54% / 0.15);
-    --shadow-gold: 0 10px 40px -10px hsl(45 96% 53% / 0.2);
-    --shadow-card: 0 4px 30px hsl(0 0% 0% / 0.1);
+    --graphite: 200 35% 97%;
+    --graphite-light: 200 35% 96%;
+
+    /* Premium Gradients - Harmonious */
+    --gradient-hero: linear-gradient(135deg, hsl(200 45% 85%) 0%, hsl(0 75% 52%) 50%, hsl(45 85% 52%) 100%);
+    --gradient-wine: linear-gradient(135deg, hsl(0 75% 52%) 0%, hsl(0 75% 38%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(45 85% 52%) 0%, hsl(45 85% 38%) 100%);
+    --gradient-sky: linear-gradient(135deg, hsl(200 45% 88%) 0%, hsl(200 45% 75%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(200 35% 97%) 0%, hsl(200 45% 93%) 100%);
+    --gradient-elegant: linear-gradient(135deg, hsl(200 45% 90%) 0%, hsl(45 85% 62%) 50%, hsl(200 45% 90%) 100%);
+
+    /* Soft Shadows */
+    --shadow-elegant: 0 25px 50px -12px hsl(0 75% 52% / 0.12);
+    --shadow-gold: 0 10px 40px -10px hsl(45 85% 52% / 0.15);
+    --shadow-sky: 0 10px 40px -10px hsl(200 45% 75% / 0.15);
+    --shadow-card: 0 4px 30px hsl(0 0% 0% / 0.08);
 
     /* Fonts */
     --font-serif: 'Playfair Display', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
 
-    --sidebar-background: 200 50% 95%;
+    --sidebar-background: 200 35% 97%;
     --sidebar-foreground: 210 25% 20%;
-    --sidebar-primary: 0 84% 54%;
+    --sidebar-primary: 0 75% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 96% 53%;
+    --sidebar-accent: 45 85% 52%;
     --sidebar-accent-foreground: 210 25% 20%;
-    --sidebar-border: 200 30% 88%;
-    --sidebar-ring: 45 96% 53%;
+    --sidebar-border: 200 35% 90%;
+    --sidebar-ring: 45 85% 52%;
   }
 
   .dark {
