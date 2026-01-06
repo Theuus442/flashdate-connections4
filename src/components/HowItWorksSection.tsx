@@ -129,8 +129,197 @@ export const HowItWorksSection = () => {
                   {step.title}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                {step.details.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+                    {step.details.map((detail, i) => (
+                      <li key={i} className="text-sm text-foreground/70 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Match Logic Table */}
+        <div className="mt-20 max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Lógica de <span className="text-gradient-gold">Matches</span>
+            </h3>
+            <p className="text-muted-foreground">Como são determinados seus resultados após o evento</p>
+          </div>
+
+          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-elegant">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-wine/20 border-b border-border">
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Sua Escolha</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Escolha da Outra Pessoa</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Resultado</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Contatos</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr className="hover:bg-wine/5 transition-colors">
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-gold font-bold flex items-center gap-2">Match <Check className="w-4 h-4" /></span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
+                  </tr>
+                  <tr className="hover:bg-wine/5 transition-colors">
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">SIM ou TALVEZ</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
+                  </tr>
+                  <tr className="hover:bg-wine/5 transition-colors">
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">TALVEZ</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
+                  </tr>
+                  <tr className="hover:bg-wine/5 transition-colors">
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">NÃO</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM / TALVEZ / NÃO</span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-destructive font-semibold flex items-center gap-2">Nenhum <X className="w-4 h-4" /></span></td>
+                    <td className="px-4 md:px-6 py-4 text-sm text-muted-foreground">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="px-6 py-4 bg-foreground/5 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                <span className="text-gold font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-gold font-medium">SIM</span> ou <span className="text-gold font-medium">TALVEZ</span>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Event Details Section */}
+        <div className="mt-20 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* Dress Code */}
+          <div className="bg-card rounded-2xl p-8 border border-border shadow-elegant">
+            <h4 className="font-serif text-2xl font-bold text-foreground mb-6">Traje Recomendado</h4>
+            <p className="text-muted-foreground mb-4">Adote um visual que combine com:</p>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                <span className="text-foreground">Esporte fino</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                <span className="text-foreground">Casual elegante</span>
+              </li>
+            </ul>
+
+            <div className="mt-8 pt-8 border-t border-border">
+              <h5 className="font-semibold text-foreground mb-4">Evite:</h5>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  Roupas de academia
+                </li>
+                <li className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  Itens esportivos
+                </li>
+                <li className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  Camisetas de time
+                </li>
+                <li className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  Chinelos, regatas, bonés
+                </li>
+                <li className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                  Bermudas
+                </li>
+              </ul>
+              <p className="text-sm text-foreground/60 mt-4">Objetivo: manter um ambiente sofisticado</p>
+            </div>
+          </div>
+
+          {/* Event Information */}
+          <div className="bg-card rounded-2xl p-8 border border-border shadow-elegant">
+            <h4 className="font-serif text-2xl font-bold text-foreground mb-6">Detalhes do Evento</h4>
+
+            <div className="space-y-6">
+              <div>
+                <h5 className="text-gold font-semibold mb-2">Duração</h5>
+                <p className="text-foreground">Aproximadamente 2 horas</p>
+              </div>
+
+              <div>
+                <h5 className="text-gold font-semibold mb-2">Check-in</h5>
+                <p className="text-foreground">15 a 30 minutos antes do início (preferencialmente)</p>
+              </div>
+
+              <div>
+                <h5 className="text-gold font-semibold mb-2">Vagas Dinâmicas</h5>
+                <p className="text-muted-foreground text-sm">O número de vagas é ajustado em tempo real conforme o fluxo de interessados e o equilíbrio entre os gêneros.</p>
+              </div>
+
+              <div>
+                <h5 className="text-gold font-semibold mb-2">Após o Evento</h5>
+                <p className="text-muted-foreground text-sm">Sinta-se à vontade para continuar no ambiente, comendo ou bebendo algo (consumo à parte) e conversando com quem desejar.</p>
+              </div>
+
+              <div className="pt-4 border-t border-border">
+                <h5 className="text-gold font-semibold mb-2">Cancelamento/Reembolso</h5>
+                <p className="text-foreground text-sm mb-2">Confirmamos o evento apenas ao atingir o mínimo de <span className="font-semibold">10 pares inscritos</span>.</p>
+                <p className="text-muted-foreground text-sm">Se o limite não for alcançado, sua inscrição será totalmente reembolsada.</p>
+                <p className="text-destructive text-sm mt-3 font-semibold">O valor pago não é reembolsável por desistência, mas pode ser transferido para outra pessoa.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Participant Profile Section */}
+        <div className="mt-20 bg-gradient-to-r from-wine/10 to-gold/10 border border-border/30 rounded-2xl p-8 md:p-12 max-w-5xl mx-auto">
+          <h3 className="font-serif text-3xl font-bold text-foreground mb-8">Quem Frequenta Nossos Eventos</h3>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                Nossos encontros atraem predominantemente um público <span className="text-gold font-semibold">maduro</span>, com sólido background cultural e estabilidade profissional/financeira.
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                Este perfil de participante prioriza a busca por um <span className="text-gold font-semibold">vínculo amoroso duradouro</span>, tendo se distanciado da cena noturna agitada em busca de um formato de interação mais intencional e eficaz.
+              </p>
+            </div>
+
+            <div>
+              <div className="space-y-4">
+                <div>
+                  <h5 className="text-gold font-semibold mb-2">Faixa Etária Predominante</h5>
+                  <p className="text-foreground">Aproximadamente 30 a 50 anos</p>
+                </div>
+
+                <div>
+                  <h5 className="text-gold font-semibold mb-2">Inscrições Femininas</h5>
+                  <p className="text-foreground">Tendem a esgotar rapidamente</p>
+                </div>
+
+                <div>
+                  <h5 className="text-gold font-semibold mb-2">Homens</h5>
+                  <p className="text-foreground">Demonstram resistência inicial, mas se engajam rapidamente após a primeira experiência, tornando-se participantes frequentes e influenciadores positivos.</p>
+                </div>
+
+                <div className="pt-4 border-t border-border/30">
+                  <p className="text-sm text-gold font-semibold flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Alto índice de sucesso e recomendações
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">Muitos namoros se formam a partir de nossos eventos!</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
