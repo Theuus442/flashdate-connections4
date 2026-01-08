@@ -24,7 +24,7 @@ export const Footer = () => {
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar 
               seu match com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
-            <div className="flex items-center gap-2 text-gold">
+            <div className="flex items-center gap-2 text-wine">
               <Heart className="w-4 h-4" />
               <span className="text-sm">Encontre sua conexão verdadeira</span>
             </div>
