@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus } from 'lucide-react';
+import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
@@ -11,8 +11,10 @@ export const UsersManagement = () => {
     username: '',
     email: '',
     whatsapp: '',
+    profileImage: undefined as string | undefined,
   });
 
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -21,6 +23,30 @@ export const UsersManagement = () => {
     setFormData(prev => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageUrl = reader.result as string;
+        setImagePreview(imageUrl);
+        setFormData(prev => ({
+          ...prev,
+          profileImage: imageUrl,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(undefined);
+    setFormData(prev => ({
+      ...prev,
+      profileImage: undefined,
     }));
   };
 
@@ -40,6 +66,7 @@ export const UsersManagement = () => {
         username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
+        profileImage: formData.profileImage,
       };
       updateUser(editingId, updatedUser);
       setEditingId(null);
@@ -50,6 +77,7 @@ export const UsersManagement = () => {
         username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
+        profileImage: formData.profileImage,
       };
       addUser(newUser);
     }
@@ -59,7 +87,9 @@ export const UsersManagement = () => {
       username: '',
       email: '',
       whatsapp: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
     setShowForm(false);
   };
 
@@ -69,7 +99,9 @@ export const UsersManagement = () => {
       username: user.username,
       email: user.email,
       whatsapp: user.whatsapp,
+      profileImage: user.profileImage,
     });
+    setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
@@ -88,7 +120,9 @@ export const UsersManagement = () => {
       username: '',
       email: '',
       whatsapp: '',
+      profileImage: undefined,
     });
+    setImagePreview(undefined);
   };
 
   return (
