@@ -135,9 +135,9 @@ export const HowItWorksSection = () => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-wine/20 border-b border-border">
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Sua Escolha</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Escolha da Outra Pessoa</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Resultado</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Sua Escolha</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Escolha da Outra Pessoa</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Resultado</th>
                     <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Contatos</th>
                   </tr>
                 </thead>
