@@ -102,8 +102,8 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`text-base font-medium transition-colors duration-300 py-2 ${
                     isActive
-                      ? 'text-gold font-semibold'
-                      : 'text-foreground hover:text-gold'
+                      ? 'text-wine font-semibold'
+                      : 'text-foreground hover:text-wine'
                   }`}
                 >
                   {link.label}
