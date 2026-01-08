@@ -75,13 +75,6 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/login')}
-            >
-              Entrar
-            </Button>
             <Button variant="gold" size="sm" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
@@ -120,16 +113,6 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
               );
             })}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  navigate('/login');
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Entrar
-              </Button>
               <Button variant="gold" className="w-full" asChild>
                 <a href="#proximo-evento" onClick={() => setIsMobileMenuOpen(false)}>
                   Inscreva-se
