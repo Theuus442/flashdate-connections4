@@ -173,7 +173,7 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
                   return (
@@ -374,7 +374,7 @@ export default function UserProfile() {
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
               {getSelectionsByType('match').length > 0 ? (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {getSelectionsByType('match').map(sel => {
                     const user = allUsers.find(u => u.id === sel.userId);
                     if (!user) return null;
