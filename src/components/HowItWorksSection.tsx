@@ -91,8 +91,8 @@ export const HowItWorksSection = () => {
                 className="group relative bg-card rounded-2xl p-8 border border-border hover:border-secondary/40 transition-all duration-500 shadow-elegant"
               >
                 {/* Step Number Badge */}
-                <div className="absolute -top-6 left-8 w-16 h-16 rounded-full bg-gradient-to-br from-emerald to-emerald-dark flex items-center justify-center shadow-lg" style={{boxShadow: '0 10px 25px -5px hsl(var(--emerald) / 0.3)'}}>
-                  <span className="font-serif text-2xl font-bold text-white">{step.number}</span>
+                <div className="absolute -top-5 left-8 w-14 h-14 rounded-full bg-gradient-to-br from-emerald to-emerald-dark flex items-center justify-center shadow-lg" style={{boxShadow: '0 10px 25px -5px hsl(var(--emerald) / 0.3)'}}>
+                  <span className="font-serif text-xl font-bold text-white">{step.number}</span>
                 </div>
 
                 {/* Icon */}
