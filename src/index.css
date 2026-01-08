@@ -183,6 +183,10 @@
     box-shadow: var(--shadow-gold);
   }
 
+  .shadow-emerald-glow {
+    box-shadow: var(--shadow-emerald);
+  }
+
   .shadow-sky-glow {
     box-shadow: var(--shadow-sky);
   }
