@@ -23,7 +23,6 @@ export default function EventUserSelection() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selections, setSelections] = useState<Selection[]>([]);
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
   // Mock current user (from admin dashboard)
   const currentUser = {
