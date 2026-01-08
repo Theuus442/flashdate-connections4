@@ -143,16 +143,16 @@ export const MatchLogicSection = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
-                      item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                      item.yourChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                      item.yourChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                       'bg-primary/20 text-primary'
                     }`}>
                       {item.yourChoice}
                     </span>
                     <span className="text-muted-foreground">+</span>
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
-                      item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                      item.theirChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                      item.theirChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                       'bg-muted text-muted-foreground'
                     }`}>
                       {item.theirChoice}
