@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, MessageCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
@@ -145,7 +145,7 @@ export default function UserProfile() {
                   ) : (
                     <div className="w-full aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center mb-4">
                       <div className="text-center">
-                        <div className="text-6xl font-bold text-gold/30 mb-2">👤</div>
+                        <UserCircle2 size={80} className="text-gold/30 mb-2 mx-auto" />
                         <p className="text-sm text-muted-foreground">Sem foto ainda</p>
                       </div>
                     </div>
@@ -168,23 +168,19 @@ export default function UserProfile() {
                 {/* Profile Info */}
                 <div className="space-y-4 border-t border-border pt-6">
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Nome</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Nome Completo</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.name}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Idade</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.age} anos</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Profissão</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.profession}</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Apelido</p>
+                    <p className="text-sm font-semibold text-foreground">{currentUser.username}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Email</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.email}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">WhatsApp</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Telefone</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.whatsapp}</p>
                   </div>
                 </div>
@@ -230,8 +226,8 @@ export default function UserProfile() {
                           {getSelectionsByType('match').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                💕 {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <Heart size={12} className="text-gold" /> {user?.name}
                               </p>
                             );
                           })}
@@ -246,8 +242,8 @@ export default function UserProfile() {
                           {getSelectionsByType('friendship').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                👥 {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <Users size={12} className="text-secondary" /> {user?.name}
                               </p>
                             );
                           })}
@@ -262,8 +258,8 @@ export default function UserProfile() {
                           {getSelectionsByType('no-interest').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                ❌ {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <XCircle size={12} className="text-destructive" /> {user?.name}
                               </p>
                             );
                           })}
