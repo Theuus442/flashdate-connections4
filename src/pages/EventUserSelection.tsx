@@ -166,291 +166,127 @@ export default function EventUserSelection() {
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
         <div className="container mx-auto px-6 py-8 flex-1 flex flex-col">
-          {/* Header Section */}
-          <div className="mb-8">
-            <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Seleção de Participantes</h1>
-            <p className="text-muted-foreground">
-              Indique seu interesse: Match, Amizade ou Não Tenho Interesse
-            </p>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="bg-card border border-border rounded-xl p-4">
-              <p className="text-xs text-muted-foreground mb-1">Matches</p>
-              <p className="text-2xl font-bold text-gold">{matchCount}</p>
+          {/* Title Section */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="font-serif text-4xl font-bold text-foreground">Participantes</h1>
+              <p className="text-muted-foreground mt-2">Veja quem mais está participando</p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4">
-              <p className="text-xs text-muted-foreground mb-1">Amizades</p>
-              <p className="text-2xl font-bold text-secondary">{friendshipCount}</p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4">
-              <p className="text-xs text-muted-foreground mb-1">Visitados</p>
-              <p className="text-2xl font-bold text-foreground">{currentIndex + 1}/{participants.length}</p>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Total de participantes</p>
+              <p className="text-4xl font-bold text-gold">{participants.length}</p>
             </div>
           </div>
 
-          {/* Toggle View Mode */}
-          <div className="flex gap-2 mb-8">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                viewMode === 'cards'
-                  ? 'bg-gold text-secondary-foreground'
-                  : 'bg-card border border-border text-foreground hover:border-gold'
-              }`}
-            >
-              Visualização Cards
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-gold text-secondary-foreground'
-                  : 'bg-card border border-border text-foreground hover:border-gold'
-              }`}
-            >
-              Visualização Lista
-            </button>
-          </div>
+          {/* Main Card */}
+          <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+            <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-lg flex flex-col h-full">
+              {/* Image Section */}
+              <div className="relative w-full bg-gradient-to-br from-amber-100 to-amber-200 aspect-square flex items-center justify-center">
+                {currentParticipant.profileImage ? (
+                  <img
+                    src={currentParticipant.profileImage}
+                    alt={currentParticipant.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-9xl font-bold text-amber-300/80">
+                    {currentParticipant.name.charAt(0)}
+                  </span>
+                )}
+              </div>
 
-          {/* Main Content */}
-          {viewMode === 'cards' ? (
-            <div className="flex-1 flex flex-col">
-              {/* Card View */}
-              <div className="grid md:grid-cols-3 gap-8 flex-1">
-                {/* Participant Card */}
-                <div className="md:col-span-2">
-                  <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg flex flex-col h-full">
-                    {/* Image */}
-                    <div className="relative w-full bg-gradient-to-br from-gold to-gold-dark aspect-video flex items-center justify-center">
-                      {currentParticipant.profileImage ? (
-                        <img
-                          src={currentParticipant.profileImage}
-                          alt={currentParticipant.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-8xl font-bold text-secondary-foreground opacity-50">
-                          {currentParticipant.name.charAt(0)}
-                        </span>
-                      )}
-
-                      {/* Progress Indicator */}
-                      <div className="absolute top-4 right-4 bg-black/50 rounded-full px-4 py-2 text-white text-sm font-medium">
-                        {currentIndex + 1}/{participants.length}
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="mb-6">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h2 className="font-serif text-3xl font-bold text-foreground">
-                              {currentParticipant.name}
-                            </h2>
-                            <p className="text-lg text-muted-foreground">{currentParticipant.age} anos</p>
-                          </div>
-                        </div>
-                        <p className="text-secondary font-medium mb-3">{currentParticipant.profession}</p>
-                        {currentParticipant.bio && (
-                          <p className="text-foreground leading-relaxed mb-4">{currentParticipant.bio}</p>
-                        )}
-                        {currentParticipant.interests && currentParticipant.interests.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {currentParticipant.interests.map(interest => (
-                              <span
-                                key={interest}
-                                className="px-3 py-1 bg-secondary/20 text-secondary rounded-full text-sm font-medium"
-                              >
-                                {interest}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="space-y-3 mt-auto border-t border-border pt-6">
-                        <Button
-                          onClick={() => handleSelection('match')}
-                          variant={currentSelection?.type === 'match' ? 'gold' : 'outline'}
-                          className="w-full"
-                        >
-                          <Heart className="w-4 h-4 mr-2" />
-                          {currentSelection?.type === 'match' ? 'Match Selecionado' : 'Match'}
-                        </Button>
-                        <Button
-                          onClick={() => handleSelection('friendship')}
-                          variant={currentSelection?.type === 'friendship' ? 'secondary' : 'outline'}
-                          className="w-full"
-                        >
-                          <Users className="w-4 h-4 mr-2" />
-                          {currentSelection?.type === 'friendship' ? 'Amizade Selecionada' : 'Amizade'}
-                        </Button>
-                        <Button
-                          onClick={() => handleSelection('no-interest')}
-                          variant={currentSelection?.type === 'no-interest' ? 'destructive' : 'outline'}
-                          className="w-full"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          {currentSelection?.type === 'no-interest' ? 'Não Interessado' : 'Não Tenho Interesse'}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+              {/* Content Section */}
+              <div className="p-8 flex-1 flex flex-col">
+                {/* User Info */}
+                <div className="mb-8">
+                  <h2 className="font-serif text-3xl font-bold text-foreground">
+                    {currentParticipant.name}
+                  </h2>
+                  <p className="text-lg text-muted-foreground mt-1">
+                    {currentParticipant.age} anos • {currentParticipant.profession}
+                  </p>
                 </div>
 
-                {/* Sidebar with Navigation */}
-                <div className="flex flex-col gap-4">
-                  {/* Navigation Buttons */}
-                  <div className="space-y-2">
-                    <Button
-                      onClick={handlePrevious}
-                      disabled={currentIndex === 0}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      <ChevronLeft className="w-4 h-4 mr-2" />
-                      Anterior
-                    </Button>
-                    <Button
-                      onClick={handleNext}
-                      disabled={currentIndex === participants.length - 1}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Próximo
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </div>
-
-                  {/* Quick List */}
-                  <div className="bg-card border border-border rounded-xl p-4 flex-1">
-                    <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Users size={16} />
-                      Selecionados
-                    </h3>
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {selections.length === 0 ? (
-                        <p className="text-sm text-muted-foreground text-center py-4">
-                          Nenhum selecionado ainda
-                        </p>
-                      ) : (
-                        selections.map(selection => {
-                          const participant = participants.find(p => p.id === selection.userId);
-                          return (
-                            <div
-                              key={selection.userId}
-                              className={`flex items-center justify-between p-2 rounded-lg text-sm ${
-                                selection.type === 'match'
-                                  ? 'bg-gold/20 border border-gold'
-                                  : selection.type === 'friendship'
-                                  ? 'bg-secondary/20 border border-secondary'
-                                  : 'bg-destructive/20 border border-destructive'
-                              }`}
-                            >
-                              <span className="font-medium text-foreground">{participant?.name}</span>
-                              <button
-                                onClick={() => handleRemoveSelection(selection.userId)}
-                                className="text-muted-foreground hover:text-foreground transition-colors"
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Finish Button */}
+                {/* Action Buttons */}
+                <div className="space-y-3 mt-auto">
                   <Button
-                    onClick={handleFinish}
-                    variant="hero"
-                    className="w-full"
-                    disabled={selections.length === 0}
+                    onClick={() => handleSelection('match')}
+                    className={`w-full py-3 text-base font-medium transition-all ${
+                      currentSelection?.type === 'match'
+                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
+                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
+                    }`}
+                    variant="outline"
                   >
-                    Finalizar Seleção
+                    <Heart className="w-5 h-5 mr-2" />
+                    Match
+                  </Button>
+                  <Button
+                    onClick={() => handleSelection('friendship')}
+                    className={`w-full py-3 text-base font-medium transition-all ${
+                      currentSelection?.type === 'friendship'
+                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
+                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
+                    }`}
+                    variant="outline"
+                  >
+                    <Users className="w-5 h-5 mr-2" />
+                    Amizade
+                  </Button>
+                  <Button
+                    onClick={() => handleSelection('no-interest')}
+                    className={`w-full py-3 text-base font-medium transition-all ${
+                      currentSelection?.type === 'no-interest'
+                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
+                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
+                    }`}
+                    variant="outline"
+                  >
+                    <X className="w-5 h-5 mr-2" />
+                    Sem Interesse
                   </Button>
                 </div>
               </div>
             </div>
-          ) : (
-            // List View
-            <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {participants.map((participant, index) => {
-                  const selection = selections.find(s => s.userId === participant.id);
-                  return (
-                    <div
-                      key={participant.id}
-                      onClick={() => setCurrentIndex(index)}
-                      className={`bg-card border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                        currentIndex === index
-                          ? 'border-gold shadow-lg'
-                          : selection
-                          ? selection.type === 'match'
-                            ? 'border-gold/50'
-                            : selection.type === 'friendship'
-                            ? 'border-secondary/50'
-                            : 'border-destructive/50'
-                          : 'border-border hover:border-gold/30'
-                      }`}
-                    >
-                      {/* Avatar */}
-                      <div className="w-full aspect-square bg-gradient-to-br from-gold to-gold-dark rounded-lg flex items-center justify-center mb-4">
-                        {participant.profileImage ? (
-                          <img
-                            src={participant.profileImage}
-                            alt={participant.name}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <span className="text-5xl font-bold text-secondary-foreground opacity-50">
-                            {participant.name.charAt(0)}
-                          </span>
-                        )}
-                      </div>
 
-                      {/* Info */}
-                      <h3 className="font-semibold text-foreground">{participant.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {participant.age} anos • {participant.profession}
-                      </p>
-
-                      {/* Status Badge */}
-                      {selection && (
-                        <div className={`mt-3 px-3 py-1 rounded text-xs font-medium text-center ${
-                          selection.type === 'match'
-                            ? 'bg-gold/20 text-gold'
-                            : selection.type === 'friendship'
-                            ? 'bg-secondary/20 text-secondary'
-                            : 'bg-destructive/20 text-destructive'
-                        }`}>
-                          {selection.type === 'match' && '💕 Match'}
-                          {selection.type === 'friendship' && '👥 Amizade'}
-                          {selection.type === 'no-interest' && '❌ Sem Interesse'}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Finish Button */}
+            {/* Navigation Controls */}
+            <div className="flex items-center justify-between mt-8 gap-4">
               <Button
-                onClick={handleFinish}
-                variant="hero"
-                className="w-full"
-                disabled={selections.length === 0}
+                onClick={handlePrevious}
+                disabled={currentIndex === 0}
+                variant="outline"
                 size="lg"
               >
-                Finalizar Seleção ({selections.length})
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+
+              <div className="flex-1 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {currentIndex + 1} de {participants.length}
+                </p>
+              </div>
+
+              <Button
+                onClick={handleNext}
+                disabled={currentIndex === participants.length - 1}
+                variant="outline"
+                size="lg"
+              >
+                <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
-          )}
+
+            {/* Finish Button */}
+            <Button
+              onClick={handleFinish}
+              variant="hero"
+              className="w-full mt-6 py-3 text-base"
+              disabled={selections.length === 0}
+            >
+              Finalizar Seleção ({selections.length})
+            </Button>
+          </div>
         </div>
       </div>
     </div>
