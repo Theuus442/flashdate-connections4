@@ -111,7 +111,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
               );
             })}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button variant="gold" className="w-full" asChild>
+              <Button variant="emerald" className="w-full" asChild>
                 <a href="#proximo-evento" onClick={() => setIsMobileMenuOpen(false)}>
                   Inscreva-se
                 </a>
