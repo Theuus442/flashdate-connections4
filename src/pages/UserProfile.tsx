@@ -111,15 +111,54 @@ export default function UserProfile() {
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
         <div className="container mx-auto px-6 py-8 flex-1 flex flex-col">
-          {/* Page Header */}
-          <div className="mb-12">
-            <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Meu Perfil</h1>
-            <p className="text-muted-foreground">
-              Complete seu perfil e comece a fazer conexões
-            </p>
+          {/* Page Header with Tabs */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+                  {activeTab === 'profile' ? 'Meu Perfil' : 'Meus Matches'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {activeTab === 'profile'
+                    ? 'Complete seu perfil e comece a fazer conexões'
+                    : `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`}
+                </p>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-4 border-b border-border">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-4 py-3 font-medium transition-all relative ${
+                  activeTab === 'profile'
+                    ? 'text-gold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Meu Perfil
+                {activeTab === 'profile' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('matches')}
+                className={`px-4 py-3 font-medium transition-all relative ${
+                  activeTab === 'matches'
+                    ? 'text-gold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Matches ({matchCount})
+                {activeTab === 'matches' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Two Column Layout */}
+          {/* Two Column Layout - My Profile */}
+          {activeTab === 'profile' && (
           <div className="grid lg:grid-cols-3 gap-8 flex-1">
             {/* Left Column: User Profile */}
             <div className="lg:col-span-1">
@@ -397,6 +436,70 @@ export default function UserProfile() {
               </div>
             </div>
           </div>
+          )}
+
+          {/* Matches View */}
+          {activeTab === 'matches' && (
+            <div className="flex-1 flex flex-col">
+              {getSelectionsByType('match').length > 0 ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getSelectionsByType('match').map(sel => {
+                    const user = allUsers.find(u => u.id === sel.userId);
+                    if (!user) return null;
+                    return (
+                      <div
+                        key={user.id}
+                        className="bg-card border-2 border-gold rounded-2xl overflow-hidden shadow-lg shadow-gold/20"
+                      >
+                        {/* User Image */}
+                        <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
+                          {user.profileImage ? (
+                            <img
+                              src={user.profileImage}
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <UserCircle2 size={100} className="text-gold/30" />
+                          )}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="text-white text-center">
+                              <Heart size={40} className="mb-2 mx-auto" fill="white" />
+                              <p className="text-xs font-medium">Match</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* User Info */}
+                        <div className="p-4">
+                          <div className="mb-4">
+                            <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              @{user.username}
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-4">
+                            📧 {user.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            📱 {user.whatsapp}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 flex-1 flex items-center justify-center">
+                  <div>
+                    <Heart size={64} className="text-gold/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground text-lg">Nenhum match ainda</p>
+                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "Match" com outros participantes</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
