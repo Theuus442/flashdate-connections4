@@ -16,7 +16,7 @@ export default function UserProfile() {
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'participants' | 'matches'>('participants');
+  const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
 
   // Filter users excluding the current user
   const otherUsers = useMemo(() => 
