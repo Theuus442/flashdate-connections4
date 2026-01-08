@@ -61,11 +61,11 @@ export const HowItWorksSection = () => {
       <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-wine text-sm font-medium tracking-widest uppercase mb-4">
             Passo a Passo
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Como <span className="text-gradient-gold">Funciona</span>
+            Como <span className="text-gradient-wine">Funciona</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Um processo simples e elegante para encontrar sua conexão perfeita
@@ -75,7 +75,7 @@ export const HowItWorksSection = () => {
         {/* Introduction */}
         <div className="bg-card/50 border border-border/30 rounded-2xl p-8 md:p-12 mb-16 backdrop-blur-sm">
           <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-            <span className="text-gold font-semibold">Flashdate</span> é a plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar o seu match com maior potencial. Com o Flashdate, você otimiza suas chances de encontrar um(a) parceiro(a) compatível, aumentando significativamente as perspectivas de um relacionamento agradável e duradouro.
+            <span className="text-wine font-semibold">Flashdate</span> é a plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar o seu match com maior potencial. Com o Flashdate, você otimiza suas chances de encontrar um(a) parceiro(a) compatível, aumentando significativamente as perspectivas de um relacionamento agradável e duradouro.
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed">
             Acreditamos que há alguém procurando exatamente por você. Nosso processo usa tecnologia avançada para conectar pessoas com verdaeiro potencial de compatibilidade.
