@@ -46,7 +46,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
               className="h-10 w-auto"
             />
             <span className="hidden sm:inline font-bold text-lg text-foreground">
-              Flash<span className="text-gold">⚡</span>Date
+              Flash<span className="text-wine">⚡</span>Date
             </span>
           </a>
 
