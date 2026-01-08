@@ -22,9 +22,9 @@ export const HeroSection = () => {
       <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
+      <div className="relative z-10 flex-1 flex items-center justify-end pt-24 pb-32">
         <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-4">
+          <div className="max-w-3xl ml-auto text-center space-y-4">
             {/* Main Title - Red Background */}
             <div className="bg-red-600 py-4 animate-fade-up delay-100">
               <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl text-white">
