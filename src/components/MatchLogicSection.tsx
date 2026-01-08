@@ -102,8 +102,8 @@ export const MatchLogicSection = () => {
               >
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
-                    item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                    item.yourChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                    item.yourChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                     'bg-primary/20 text-primary'
                   }`}>
                     {item.yourChoice}
@@ -111,8 +111,8 @@ export const MatchLogicSection = () => {
                 </div>
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
-                    item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                    item.theirChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                    item.theirChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                     'bg-muted text-muted-foreground'
                   }`}>
                     {item.theirChoice}
