@@ -81,7 +81,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-foreground hover:text-gold transition-colors"
+            className="lg:hidden p-2 text-foreground hover:text-wine transition-colors"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
