@@ -36,7 +36,7 @@ export const Footer = () => {
             <div className="space-y-4">
               <a
                 href="mailto:contato@flashdate.com.br"
-                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors"
+                className="flex items-center gap-3 text-muted-foreground hover:text-wine transition-colors"
               >
                 <Mail className="w-5 h-5" />
                 <span>contato@flashdate.com.br</span>
