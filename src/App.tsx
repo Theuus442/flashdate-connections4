@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import ClientDashboard from "./pages/ClientDashboard";
 import EventUserSelection from "./pages/EventUserSelection";
 import UserProfile from "./pages/UserProfile";
+import LandingSimple from "./pages/LandingSimple";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<LandingSimple />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/dashboard" element={<ClientDashboard />} />

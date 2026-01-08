@@ -6,6 +6,7 @@ export interface User {
   username: string;
   email: string;
   whatsapp: string;
+  gender: 'M' | 'F' | 'Outro';
   profileImage?: string;
 }
 
@@ -26,6 +27,7 @@ const initialUsers: User[] = [
     username: 'maria.silva',
     email: 'maria@example.com',
     whatsapp: '(11) 98765-4321',
+    gender: 'F',
   },
   {
     id: '2',
@@ -33,6 +35,7 @@ const initialUsers: User[] = [
     username: 'joao.santos',
     email: 'joao@example.com',
     whatsapp: '(11) 99876-5432',
+    gender: 'M',
   },
   {
     id: '3',
@@ -40,6 +43,7 @@ const initialUsers: User[] = [
     username: 'ana.costa',
     email: 'ana@example.com',
     whatsapp: '(11) 98765-5321',
+    gender: 'F',
   },
   {
     id: '4',
@@ -47,6 +51,7 @@ const initialUsers: User[] = [
     username: 'carlos.mendes',
     email: 'carlos@example.com',
     whatsapp: '(11) 97654-3210',
+    gender: 'M',
   },
   {
     id: '5',
@@ -54,6 +59,7 @@ const initialUsers: User[] = [
     username: 'beatriz.lima',
     email: 'beatriz@example.com',
     whatsapp: '(11) 96543-2109',
+    gender: 'F',
   },
   {
     id: '6',
@@ -61,6 +67,7 @@ const initialUsers: User[] = [
     username: 'roberto.alves',
     email: 'roberto@example.com',
     whatsapp: '(11) 95432-1098',
+    gender: 'M',
   },
 ];
 

@@ -17,12 +17,26 @@ export default function UserProfile() {
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
+  const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Filter users excluding the current user
-  const otherUsers = useMemo(() => 
-    currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers,
-    [currentUser, allUsers]
-  );
+  // Filter and sort users excluding the current user
+  const otherUsers = useMemo(() => {
+    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers;
+
+    // Apply gender filter
+    if (genderFilter !== 'all') {
+      filtered = filtered.filter(user => user.gender === genderFilter);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name, 'pt-BR');
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }, [currentUser, allUsers, genderFilter, sortOrder]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -403,6 +417,9 @@ export default function UserProfile() {
                             <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
                             <p className="text-sm text-muted-foreground">
                               @{user.username}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground mb-4">
