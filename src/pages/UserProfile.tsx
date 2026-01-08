@@ -173,7 +173,7 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-6">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
                   return (
