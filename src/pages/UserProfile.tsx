@@ -230,6 +230,9 @@ export default function UserProfile() {
                           <p className="text-sm text-muted-foreground">
                             @{user.username}
                           </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}
+                          </p>
                         </div>
 
                         {/* Action Buttons */}
