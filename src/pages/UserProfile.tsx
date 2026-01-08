@@ -374,7 +374,7 @@ export default function UserProfile() {
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
               {getSelectionsByType('match').length > 0 ? (
-                <div className="grid grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {getSelectionsByType('match').map(sel => {
                     const user = allUsers.find(u => u.id === sel.userId);
                     if (!user) return null;
