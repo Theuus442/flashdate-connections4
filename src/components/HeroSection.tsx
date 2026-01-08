@@ -22,35 +22,28 @@ export const HeroSection = () => {
       <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-end pt-24 pb-32">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl ml-auto text-center space-y-4">
-            {/* Main Title - Red Background */}
-            <div className="bg-red-600 py-4 animate-fade-up delay-100">
-              <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl text-white">
-                FLASHDATE
-              </h1>
-            </div>
+      <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
+        <div className="container mx-auto px-6 text-center">
+          <div className="max-w-4xl mx-auto">
+            {/* Main Title */}
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
+              <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
+              <span className="text-white drop-shadow-md">
+                <span className="text-gradient-wine">Encontros Reais</span>, utilizando
+              </span>
+              <br />
+              <span className="text-gradient-wine block">Inteligência Artificial</span>
+              <span className="text-white drop-shadow-md">para conexões verdadeiras</span>
+            </h1>
 
-            {/* Main Content - Yellow Background */}
-            <div className="bg-yellow-300 py-8 animate-fade-up delay-200">
-              <p className="font-bold text-2xl md:text-3xl text-black leading-relaxed px-4">
-                Encontros Reais,<br />
-                utilizando IA<br />
-                <span className="text-red-600">para conexões<br />verdadeiras</span>
-              </p>
-            </div>
-
-            {/* Subtitle - Blue Background */}
-            <div className="bg-blue-400 py-6 animate-fade-up delay-300">
-              <p className="text-white font-medium text-base md:text-lg leading-relaxed px-6">
-                A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match com maior
-                potencial. Acreditamos que há alguém procurando exatamente por você.
-              </p>
-            </div>
+            {/* Subtitle */}
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 drop-shadow-md">
+              A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match
+              com maior potencial. Acreditamos que há alguém procurando exatamente por você.
+            </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up delay-300 mt-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up delay-300">
               <Button variant="hero" size="xl" asChild>
                 <a href="#proximo-evento">Garantir Meu Lugar</a>
               </Button>
