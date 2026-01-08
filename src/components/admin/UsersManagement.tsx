@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
+import { Trash2, Edit2, Plus } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
@@ -8,16 +8,11 @@ export const UsersManagement = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
+    username: '',
     email: '',
     whatsapp: '',
-    profession: '',
-    username: '',
-    password: '',
-    profileImage: undefined as string | undefined,
   });
 
-  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -29,34 +24,11 @@ export const UsersManagement = () => {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageUrl = reader.result as string;
-        setImagePreview(imageUrl);
-        setFormData(prev => ({
-          ...prev,
-          profileImage: imageUrl,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImagePreview(undefined);
-    setFormData(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.age || !formData.email || !formData.whatsapp || !formData.profession || !formData.username || !formData.password) {
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
       alert('Por favor, preencha todos os campos');
       return;
     }
@@ -65,13 +37,9 @@ export const UsersManagement = () => {
       const updatedUser: User = {
         id: editingId,
         name: formData.name,
-        age: parseInt(formData.age),
+        username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
-        profession: formData.profession,
-        username: formData.username,
-        password: formData.password,
-        profileImage: formData.profileImage,
       };
       updateUser(editingId, updatedUser);
       setEditingId(null);
@@ -79,43 +47,29 @@ export const UsersManagement = () => {
       const newUser: User = {
         id: Date.now().toString(),
         name: formData.name,
-        age: parseInt(formData.age),
+        username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
-        profession: formData.profession,
-        username: formData.username,
-        password: formData.password,
-        profileImage: formData.profileImage,
       };
       addUser(newUser);
     }
 
     setFormData({
       name: '',
-      age: '',
+      username: '',
       email: '',
       whatsapp: '',
-      profession: '',
-      username: '',
-      password: '',
-      profileImage: undefined,
     });
-    setImagePreview(undefined);
     setShowForm(false);
   };
 
   const handleEdit = (user: User) => {
     setFormData({
       name: user.name,
-      age: user.age.toString(),
+      username: user.username,
       email: user.email,
       whatsapp: user.whatsapp,
-      profession: user.profession,
-      username: user.username,
-      password: user.password,
-      profileImage: user.profileImage,
     });
-    setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
@@ -131,15 +85,10 @@ export const UsersManagement = () => {
     setEditingId(null);
     setFormData({
       name: '',
-      age: '',
+      username: '',
       email: '',
       whatsapp: '',
-      profession: '',
-      username: '',
-      password: '',
-      profileImage: undefined,
     });
-    setImagePreview(undefined);
   };
 
   return (
