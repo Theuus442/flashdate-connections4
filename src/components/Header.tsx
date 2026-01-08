@@ -61,8 +61,8 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   href={link.href}
                   className={`text-sm font-medium transition-colors duration-300 ${
                     isActive
-                      ? 'text-gold font-semibold'
-                      : 'text-foreground/80 hover:text-gold'
+                      ? 'text-wine font-semibold'
+                      : 'text-foreground/80 hover:text-wine'
                   }`}
                 >
                   {link.label}
