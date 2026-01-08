@@ -2,8 +2,8 @@ import { Check, X, UserPlus, Heart } from 'lucide-react';
 
 const matchLogic = [
   {
-    yourChoice: 'SIM',
-    theirChoice: 'SIM',
+    yourChoice: 'MATCH',
+    theirChoice: 'MATCH',
     result: 'MATCH',
     icon: Heart,
     color: 'text-secondary',
@@ -12,8 +12,8 @@ const matchLogic = [
     description: 'Conexão perfeita! Vocês receberão os contatos um do outro.',
   },
   {
-    yourChoice: 'SIM',
-    theirChoice: 'TALVEZ',
+    yourChoice: 'MATCH',
+    theirChoice: 'AMIZADE',
     result: 'AMIZADE',
     icon: UserPlus,
     color: 'text-gold',
@@ -22,8 +22,8 @@ const matchLogic = [
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'TALVEZ',
-    theirChoice: 'SIM',
+    yourChoice: 'AMIZADE',
+    theirChoice: 'MATCH',
     result: 'AMIZADE',
     icon: UserPlus,
     color: 'text-gold',
@@ -32,7 +32,17 @@ const matchLogic = [
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'NÃO',
+    yourChoice: 'AMIZADE',
+    theirChoice: 'AMIZADE',
+    result: 'AMIZADE',
+    icon: UserPlus,
+    color: 'text-gold',
+    bgColor: 'bg-gold/20',
+    borderColor: 'border-gold/30',
+    description: 'Ambos abertos para amizade. Contatos trocados para explorar.',
+  },
+  {
+    yourChoice: 'NÃO FAZ MEU TIPO',
     theirChoice: 'Qualquer',
     result: 'NENHUM CONTATO',
     icon: X,
