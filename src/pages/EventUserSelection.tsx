@@ -209,7 +209,7 @@ export default function EventUserSelection() {
                     {currentParticipant.name}
                   </h2>
                   <p className="text-lg text-muted-foreground mt-1">
-                    {currentParticipant.age} anos • {currentParticipant.profession}
+                    {currentParticipant.age} anos • {currentParticipant.gender === 'M' ? 'Masculino' : currentParticipant.gender === 'F' ? 'Feminino' : 'Outro'} • {currentParticipant.profession}
                   </p>
                 </div>
 
