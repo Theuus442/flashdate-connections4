@@ -68,7 +68,7 @@ export const MatchLogicSection = () => {
             Lógica de <span className="text-gradient-gold">Match</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            O contato só é liberado se houver SIM ou TALVEZ mútuo. Sua privacidade é sempre respeitada.
+            O contato só é liberado se houver Match ou Amizade mútua. Sua privacidade é sempre respeitada.
           </p>
         </div>
 
