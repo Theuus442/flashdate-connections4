@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
@@ -16,6 +16,7 @@ export default function UserProfile() {
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
+  const [activeTab, setActiveTab] = useState<'participants' | 'matches'>('participants');
 
   // Filter users excluding the current user
   const otherUsers = useMemo(() => 
@@ -110,15 +111,52 @@ export default function UserProfile() {
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
         <div className="container mx-auto px-6 py-8 flex-1 flex flex-col">
-          {/* Page Header */}
-          <div className="mb-12">
-            <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Meu Perfil</h1>
-            <p className="text-muted-foreground">
-              Complete seu perfil e comece a fazer conexões
-            </p>
+          {/* Page Header with Tabs */}
+          <div className="mb-8">
+            <div className="mb-8">
+              <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+                {activeTab === 'participants' ? 'Participantes' : 'Meus Matches'}
+              </h1>
+              <p className="text-muted-foreground">
+                {activeTab === 'participants'
+                  ? 'Veja quem mais está participando do evento'
+                  : `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`}
+              </p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-4 border-b border-border">
+              <button
+                onClick={() => setActiveTab('participants')}
+                className={`px-4 py-3 font-medium transition-all relative ${
+                  activeTab === 'participants'
+                    ? 'text-gold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Participantes ({otherUsers.length})
+                {activeTab === 'participants' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('matches')}
+                className={`px-4 py-3 font-medium transition-all relative ${
+                  activeTab === 'matches'
+                    ? 'text-gold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Matches ({matchCount})
+                {activeTab === 'matches' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Two Column Layout */}
+          {/* Two Column Layout - My Profile */}
+          {activeTab === 'profile' && (
           <div className="grid lg:grid-cols-3 gap-8 flex-1">
             {/* Left Column: User Profile */}
             <div className="lg:col-span-1">
@@ -145,7 +183,7 @@ export default function UserProfile() {
                   ) : (
                     <div className="w-full aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center mb-4">
                       <div className="text-center">
-                        <div className="text-6xl font-bold text-gold/30 mb-2">👤</div>
+                        <UserCircle2 size={80} className="text-gold/30 mb-2 mx-auto" />
                         <p className="text-sm text-muted-foreground">Sem foto ainda</p>
                       </div>
                     </div>
@@ -168,23 +206,19 @@ export default function UserProfile() {
                 {/* Profile Info */}
                 <div className="space-y-4 border-t border-border pt-6">
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Nome</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Nome Completo</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.name}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Idade</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.age} anos</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Profissão</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.profession}</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Apelido</p>
+                    <p className="text-sm font-semibold text-foreground">{currentUser.username}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-1">Email</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.email}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">WhatsApp</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Telefone</p>
                     <p className="text-sm font-semibold text-foreground">{currentUser.whatsapp}</p>
                   </div>
                 </div>
@@ -230,8 +264,8 @@ export default function UserProfile() {
                           {getSelectionsByType('match').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                💕 {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <Heart size={12} className="text-gold" /> {user?.name}
                               </p>
                             );
                           })}
@@ -246,8 +280,8 @@ export default function UserProfile() {
                           {getSelectionsByType('friendship').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                👥 {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <Users size={12} className="text-secondary" /> {user?.name}
                               </p>
                             );
                           })}
@@ -262,8 +296,8 @@ export default function UserProfile() {
                           {getSelectionsByType('no-interest').map(sel => {
                             const user = allUsers.find(u => u.id === sel.userId);
                             return (
-                              <p key={sel.userId} className="text-xs text-foreground">
-                                ❌ {user?.name}
+                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
+                                <XCircle size={12} className="text-destructive" /> {user?.name}
                               </p>
                             );
                           })}
@@ -315,22 +349,20 @@ export default function UserProfile() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-6xl font-bold text-gold/30">
-                              {user.name.charAt(0)}
-                            </span>
+                            <UserCircle2 size={100} className="text-gold/30" />
                           )}
 
                           {selection && (
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                               <div className="text-white text-center">
                                 {selection.type === 'match' && (
-                                  <div className="text-3xl mb-2">💕</div>
+                                  <Heart size={40} className="mb-2 mx-auto" fill="white" />
                                 )}
                                 {selection.type === 'friendship' && (
-                                  <div className="text-3xl mb-2">👥</div>
+                                  <Users size={40} className="mb-2 mx-auto" />
                                 )}
                                 {selection.type === 'no-interest' && (
-                                  <div className="text-3xl mb-2">❌</div>
+                                  <XCircle size={40} className="mb-2 mx-auto" />
                                 )}
                                 <p className="text-xs font-medium">
                                   {selection.type === 'match' && 'Match'}
@@ -347,7 +379,7 @@ export default function UserProfile() {
                           <div className="mb-4">
                             <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {user.age} anos • {user.profession}
+                              @{user.username}
                             </p>
                           </div>
 
@@ -402,6 +434,70 @@ export default function UserProfile() {
               </div>
             </div>
           </div>
+          )}
+
+          {/* Matches View */}
+          {activeTab === 'matches' && (
+            <div className="flex-1 flex flex-col">
+              {getSelectionsByType('match').length > 0 ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getSelectionsByType('match').map(sel => {
+                    const user = allUsers.find(u => u.id === sel.userId);
+                    if (!user) return null;
+                    return (
+                      <div
+                        key={user.id}
+                        className="bg-card border-2 border-gold rounded-2xl overflow-hidden shadow-lg shadow-gold/20"
+                      >
+                        {/* User Image */}
+                        <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
+                          {user.profileImage ? (
+                            <img
+                              src={user.profileImage}
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <UserCircle2 size={100} className="text-gold/30" />
+                          )}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="text-white text-center">
+                              <Heart size={40} className="mb-2 mx-auto" fill="white" />
+                              <p className="text-xs font-medium">Match</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* User Info */}
+                        <div className="p-4">
+                          <div className="mb-4">
+                            <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              @{user.username}
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-4">
+                            📧 {user.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            📱 {user.whatsapp}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 flex-1 flex items-center justify-center">
+                  <div>
+                    <Heart size={64} className="text-gold/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground text-lg">Nenhum match ainda</p>
+                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "Match" com outros participantes</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

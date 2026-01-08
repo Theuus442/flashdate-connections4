@@ -3,12 +3,9 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface User {
   id: string;
   name: string;
-  age: number;
+  username: string;
   email: string;
   whatsapp: string;
-  profession: string;
-  username: string;
-  password: string;
   profileImage?: string;
 }
 
@@ -26,68 +23,44 @@ const initialUsers: User[] = [
   {
     id: '1',
     name: 'Maria Silva',
-    age: 32,
+    username: 'maria.silva',
     email: 'maria@example.com',
     whatsapp: '(11) 98765-4321',
-    profession: 'Advogada',
-    username: 'maria.silva',
-    password: '123456',
-    profileImage: undefined,
   },
   {
     id: '2',
     name: 'João Santos',
-    age: 35,
+    username: 'joao.santos',
     email: 'joao@example.com',
     whatsapp: '(11) 99876-5432',
-    profession: 'Engenheiro de Software',
-    username: 'joao.santos',
-    password: '123456',
-    profileImage: undefined,
   },
   {
     id: '3',
     name: 'Ana Costa',
-    age: 28,
+    username: 'ana.costa',
     email: 'ana@example.com',
     whatsapp: '(11) 98765-5321',
-    profession: 'Designer Gráfico',
-    username: 'ana.costa',
-    password: '123456',
-    profileImage: undefined,
   },
   {
     id: '4',
     name: 'Carlos Mendes',
-    age: 38,
+    username: 'carlos.mendes',
     email: 'carlos@example.com',
     whatsapp: '(11) 97654-3210',
-    profession: 'Médico',
-    username: 'carlos.mendes',
-    password: '123456',
-    profileImage: undefined,
   },
   {
     id: '5',
     name: 'Beatriz Lima',
-    age: 30,
+    username: 'beatriz.lima',
     email: 'beatriz@example.com',
     whatsapp: '(11) 96543-2109',
-    profession: 'Psicóloga',
-    username: 'beatriz.lima',
-    password: '123456',
-    profileImage: undefined,
   },
   {
     id: '6',
     name: 'Roberto Alves',
-    age: 36,
+    username: 'roberto.alves',
     email: 'roberto@example.com',
     whatsapp: '(11) 95432-1098',
-    profession: 'Advogado',
-    username: 'roberto.alves',
-    password: '123456',
-    profileImage: undefined,
   },
 ];
 

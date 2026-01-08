@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
+import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
@@ -8,12 +8,9 @@ export const UsersManagement = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
+    username: '',
     email: '',
     whatsapp: '',
-    profession: '',
-    username: '',
-    password: '',
     profileImage: undefined as string | undefined,
   });
 
@@ -53,10 +50,11 @@ export const UsersManagement = () => {
     }));
   };
 
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.age || !formData.email || !formData.whatsapp || !formData.profession || !formData.username || !formData.password) {
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
       alert('Por favor, preencha todos os campos');
       return;
     }
@@ -65,12 +63,9 @@ export const UsersManagement = () => {
       const updatedUser: User = {
         id: editingId,
         name: formData.name,
-        age: parseInt(formData.age),
+        username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
-        profession: formData.profession,
-        username: formData.username,
-        password: formData.password,
         profileImage: formData.profileImage,
       };
       updateUser(editingId, updatedUser);
@@ -79,12 +74,9 @@ export const UsersManagement = () => {
       const newUser: User = {
         id: Date.now().toString(),
         name: formData.name,
-        age: parseInt(formData.age),
+        username: formData.username,
         email: formData.email,
         whatsapp: formData.whatsapp,
-        profession: formData.profession,
-        username: formData.username,
-        password: formData.password,
         profileImage: formData.profileImage,
       };
       addUser(newUser);
@@ -92,12 +84,9 @@ export const UsersManagement = () => {
 
     setFormData({
       name: '',
-      age: '',
+      username: '',
       email: '',
       whatsapp: '',
-      profession: '',
-      username: '',
-      password: '',
       profileImage: undefined,
     });
     setImagePreview(undefined);
@@ -107,12 +96,9 @@ export const UsersManagement = () => {
   const handleEdit = (user: User) => {
     setFormData({
       name: user.name,
-      age: user.age.toString(),
+      username: user.username,
       email: user.email,
       whatsapp: user.whatsapp,
-      profession: user.profession,
-      username: user.username,
-      password: user.password,
       profileImage: user.profileImage,
     });
     setImagePreview(user.profileImage);
@@ -131,12 +117,9 @@ export const UsersManagement = () => {
     setEditingId(null);
     setFormData({
       name: '',
-      age: '',
+      username: '',
       email: '',
       whatsapp: '',
-      profession: '',
-      username: '',
-      password: '',
       profileImage: undefined,
     });
     setImagePreview(undefined);
@@ -193,7 +176,7 @@ export const UsersManagement = () => {
                   ) : (
                     <div className="w-full h-48 rounded-lg border-2 border-dashed border-border bg-muted/30 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-5xl font-bold text-gold/30 mb-2">👤</div>
+                        <UserCircle2 size={64} className="text-gold/30 mb-2 mx-auto" />
                         <p className="text-sm text-muted-foreground">Nenhuma imagem selecionada</p>
                       </div>
                     </div>
@@ -216,11 +199,12 @@ export const UsersManagement = () => {
                 </div>
               </div>
             </div>
+
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Name */}
+              {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Nome
+                  Nome Completo
                 </label>
                 <input
                   type="text"
@@ -232,48 +216,17 @@ export const UsersManagement = () => {
                 />
               </div>
 
-              {/* Age */}
+              {/* Nickname/Username */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Idade
-                </label>
-                <input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                  placeholder="Idade"
-                  min="18"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
-              </div>
-
-              {/* Username */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Nome do Usuário
+                  Apelido
                 </label>
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
-                  placeholder="nome.usuario"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="••••••••"
+                  placeholder="seu.apelido"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -293,10 +246,10 @@ export const UsersManagement = () => {
                 />
               </div>
 
-              {/* WhatsApp */}
+              {/* Phone/WhatsApp */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  WhatsApp
+                  Telefone
                 </label>
                 <input
                   type="tel"
@@ -304,21 +257,6 @@ export const UsersManagement = () => {
                   value={formData.whatsapp}
                   onChange={handleInputChange}
                   placeholder="(11) 98765-4321"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
-              </div>
-
-              {/* Profession */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Profissão
-                </label>
-                <input
-                  type="text"
-                  name="profession"
-                  value={formData.profession}
-                  onChange={handleInputChange}
-                  placeholder="Sua profissão"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -345,11 +283,9 @@ export const UsersManagement = () => {
               <tr className="border-b border-border bg-muted/30">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Foto</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Nome</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Usuário</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Idade</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Apelido</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Email</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">WhatsApp</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Profissão</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Telefone</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Ações</th>
               </tr>
             </thead>
@@ -371,10 +307,8 @@ export const UsersManagement = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-foreground">{user.name}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.username}</td>
-                  <td className="px-6 py-4 text-sm text-foreground">{user.age}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.email}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.whatsapp}</td>
-                  <td className="px-6 py-4 text-sm text-foreground">{user.profession}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       <button
