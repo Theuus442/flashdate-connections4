@@ -24,15 +24,6 @@ export const HeroSection = () => {
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
-            {/* Logo */}
-            <div className="mb-8 animate-fade-up">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
-                alt="Flashdate Logo"
-                className="h-20 w-auto mx-auto mb-6"
-              />
-            </div>
-
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
               <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
