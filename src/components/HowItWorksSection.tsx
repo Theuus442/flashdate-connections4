@@ -44,7 +44,7 @@ const steps = [
     icon: Mail,
     title: 'Resultados',
     description: 'Você recebe o resultado via e-mail em até 24 horas com seus matches confirmados e contatos trocados.',
-    details: ['Contatos trocados quando ambos selecionam: Match ou Talvez', 'Contatos NÃO trocados quando um ou dois participantes selecionam: Não faz meu tipo'],
+    details: ['Contatos trocados quando ambos selecionam: Match ou Amizade', 'Contatos NÃO trocados quando um ou dois participantes selecionam: Não faz meu tipo', 'O contato só é liberado com Match ou Amizade mútua. Sua privacidade é sempre respeitada.'],
   },
 ];
 
