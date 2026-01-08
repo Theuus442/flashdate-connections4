@@ -224,7 +224,7 @@ export default function UserProfile() {
                             title="Match"
                           >
                             <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1 hidden sm:block">Match</span>
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Match</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'friendship')}
@@ -236,7 +236,7 @@ export default function UserProfile() {
                             title="Amizade"
                           >
                             <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1 hidden sm:block">Amigos</span>
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Amigos</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'no-interest')}
@@ -248,7 +248,7 @@ export default function UserProfile() {
                             title="Não faz meu tipo"
                           >
                             <X size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1 hidden sm:block">Não meu tipo</span>
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Não meu tipo</span>
                           </button>
                         </div>
                       </div>
