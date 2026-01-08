@@ -3,30 +3,27 @@ import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X } from 'luci
 const steps = [
   {
     number: '01',
-    icon: UserPlus,
-    title: 'Inscrição',
-    description: 'Adquira o ingresso. Após a compra, envie para o e-mail contato@flashdate.com.br:',
-    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
+    icon: CalendarCheck,
+    title: 'Pagamento',
+    description: 'Efetue o pagamento com o valor informado via Pix.',
+    details: [
+      'Chave Pix: 11 970329710',
+      'Sidnei'
+    ],
   },
   {
     number: '02',
-    icon: Brain,
-    title: 'Análise de IA',
-    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará seus dados para entender melhor seu perfil e encontrar o match mais compatível.',
-    details: [],
+    icon: UserPlus,
+    title: 'Inscrição',
+    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp 11 970327910:',
+    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
   },
   {
     number: '03',
-    icon: CalendarCheck,
-    title: 'Pagamento',
-    description: 'Efetue o pagamento com o valor informado do evento utilizando Pix e envie o comprovante com suas informações pessoais.',
-    details: [
-      'Chave Pix: 11 97032 9710',
-      'Envie comprovante via email ou WhatsApp',
-      'Email: contato@flashdate.com.br',
-      'WhatsApp: (11) 97032-9710',
-      'Informações necessárias: Nome, Data de Nascimento, Sexo, E-mail, Celular com DDD, Data do Evento'
-    ],
+    icon: Brain,
+    title: 'Análise de IA',
+    description: 'Nossa IA utilizará suas respostas para...',
+    details: [],
   },
   {
     number: '04',
@@ -39,15 +36,15 @@ const steps = [
     number: '05',
     icon: Smartphone,
     title: 'Seleção Digital',
-    description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante selecionar todos e enviar sua seleção.',
-    details: ['Opções: SIM, TALVEZ ou NÃO', 'A seleção determina os matches', 'Ambos devem selecionar SIM para match confirmado'],
+    description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante avaliar todos e enviar sua seleção.',
+    details: ['Opções: Match, Amizade, Não faz meu tipo', 'Ambos devem selecionar Match ou Amizade para a troca de contatos'],
   },
   {
     number: '06',
     icon: Mail,
     title: 'Resultados',
     description: 'Você recebe o resultado via e-mail em até 24 horas com seus matches confirmados e contatos trocados.',
-    details: ['Contatos apenas se ambos optarem por SIM ou TALVEZ', 'Possibilidade de amizade e outras conexões'],
+    details: ['Contatos trocados quando ambos selecionam: Match ou Talvez', 'Contatos NÃO trocados quando um ou dois participantes selecionam: Não faz meu tipo'],
   },
 ];
 
@@ -61,11 +58,11 @@ export const HowItWorksSection = () => {
       <div className="container mx-auto px-6 relative z-10 flex-1 overflow-hidden flex flex-col py-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-wine text-sm font-medium tracking-widest uppercase mb-4">
             Passo a Passo
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Como <span className="text-gradient-gold">Funciona</span>
+            Como <span className="text-gradient-wine">Funciona</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Um processo simples e elegante para encontrar sua conexão perfeita
@@ -75,7 +72,7 @@ export const HowItWorksSection = () => {
         {/* Introduction */}
         <div className="bg-card/50 border border-border/30 rounded-2xl p-8 md:p-12 mb-16 backdrop-blur-sm">
           <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-            <span className="text-gold font-semibold">Flashdate</span> é a plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar o seu match com maior potencial. Com o Flashdate, você otimiza suas chances de encontrar um(a) parceiro(a) compatível, aumentando significativamente as perspectivas de um relacionamento agradável e duradouro.
+            <span className="text-wine font-semibold">Flashdate</span> é a plataforma pioneira de encontros presenciais que utiliza Inteligência Artificial para identificar o seu match com maior potencial. Com o Flashdate, você otimiza suas chances de encontrar um(a) parceiro(a) compatível, aumentando significativamente as perspectivas de um relacionamento agradável e duradouro.
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed">
             Acreditamos que há alguém procurando exatamente por você. Nosso processo usa tecnologia avançada para conectar pessoas com verdaeiro potencial de compatibilidade.
@@ -91,8 +88,8 @@ export const HowItWorksSection = () => {
                 className="group relative bg-card rounded-2xl p-8 border border-border hover:border-secondary/40 transition-all duration-500 shadow-elegant"
               >
                 {/* Step Number Badge */}
-                <div className="absolute -top-4 left-8 w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center shadow-lg" style={{boxShadow: '0 10px 25px -5px hsl(var(--secondary) / 0.3)'}}>
-                  <span className="font-serif text-sm font-bold text-white">{step.number}</span>
+                <div className="absolute -top-5 left-8 w-14 h-14 rounded-full bg-gradient-to-br from-emerald to-emerald-dark flex items-center justify-center shadow-lg" style={{boxShadow: '0 10px 25px -5px hsl(var(--emerald) / 0.3)'}}>
+                  <span className="font-serif text-xl font-bold text-white">{step.number}</span>
                 </div>
 
                 {/* Icon */}
@@ -118,62 +115,6 @@ export const HowItWorksSection = () => {
                 )}
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Match Logic Table */}
-        <div className="mt-20 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Lógica de <span className="text-gradient-gold">Matches</span>
-            </h3>
-            <p className="text-muted-foreground">Como são determinados seus resultados após o evento</p>
-          </div>
-
-          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-elegant">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-wine/20 border-b border-border">
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Sua Escolha</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Escolha da Outra Pessoa</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Resultado</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Contatos</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-gold font-bold flex items-center gap-2">Match <Check className="w-4 h-4" /></span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">SIM ou TALVEZ</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">TALVEZ</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">NÃO</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM / TALVEZ / NÃO</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-destructive font-semibold flex items-center gap-2">Nenhum <X className="w-4 h-4" /></span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-muted-foreground">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 bg-foreground/5 border-t border-border">
-              <p className="text-sm text-muted-foreground">
-                <span className="text-secondary font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-secondary font-medium">SIM</span> ou <span className="text-secondary font-medium">TALVEZ</span>.
-              </p>
-            </div>
           </div>
         </div>
 

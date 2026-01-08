@@ -17,8 +17,9 @@ const buttonVariants = cva(
         link: "text-gold underline-offset-4 hover:underline",
         // Premium variants
         gold: "bg-gradient-to-r from-gold to-gold-dark text-secondary-foreground hover:from-gold-light hover:to-gold shadow-gold-glow font-semibold tracking-wide",
+        emerald: "bg-gradient-to-r from-emerald to-emerald-dark text-white hover:from-emerald-light hover:to-emerald shadow-emerald-glow font-semibold tracking-wide",
         wine: "bg-gradient-to-r from-wine to-wine-dark text-primary-foreground hover:from-wine-light hover:to-wine shadow-elegant font-semibold",
-        hero: "bg-gradient-to-r from-gold via-gold-light to-gold text-background hover:from-gold-light hover:via-gold hover:to-gold-dark shadow-gold-glow font-semibold tracking-wider uppercase",
+        hero: "bg-gradient-to-r from-emerald via-emerald-light to-emerald text-white hover:from-emerald-light hover:via-emerald hover:to-emerald-dark shadow-emerald-glow font-semibold tracking-wider uppercase",
         elegant: "border-2 border-gold/60 bg-transparent text-gold hover:bg-gold/10 hover:border-gold font-medium tracking-wide",
       },
       size: {

@@ -51,6 +51,9 @@
     --gold: 45 85% 52%;
     --gold-light: 45 85% 62%;
     --gold-dark: 45 85% 38%;
+    --emerald: 134 69% 43%;
+    --emerald-light: 134 69% 55%;
+    --emerald-dark: 134 69% 30%;
 
     /* Light Blue Token */
     --sky: 200 45% 88%;
@@ -71,6 +74,7 @@
     /* Soft Shadows */
     --shadow-elegant: 0 25px 50px -12px hsl(0 75% 52% / 0.12);
     --shadow-gold: 0 10px 40px -10px hsl(45 85% 52% / 0.15);
+    --shadow-emerald: 0 10px 40px -10px hsl(140 55% 48% / 0.15);
     --shadow-sky: 0 10px 40px -10px hsl(200 45% 75% / 0.15);
     --shadow-card: 0 4px 30px hsl(0 0% 0% / 0.08);
 
@@ -177,6 +181,10 @@
 
   .shadow-gold-glow {
     box-shadow: var(--shadow-gold);
+  }
+
+  .shadow-emerald-glow {
+    box-shadow: var(--shadow-emerald);
   }
 
   .shadow-sky-glow {

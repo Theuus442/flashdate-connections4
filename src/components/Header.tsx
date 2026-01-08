@@ -46,7 +46,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
               className="h-10 w-auto"
             />
             <span className="hidden sm:inline font-bold text-lg text-foreground">
-              Flash<span className="text-gold">⚡</span>Date
+              Flash<span className="text-wine">⚡</span>Date
             </span>
           </a>
 
@@ -61,8 +61,8 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   href={link.href}
                   className={`text-sm font-medium transition-colors duration-300 ${
                     isActive
-                      ? 'text-gold font-semibold'
-                      : 'text-foreground/80 hover:text-gold'
+                      ? 'text-wine font-semibold'
+                      : 'text-foreground/80 hover:text-wine'
                   }`}
                 >
                   {link.label}
@@ -73,7 +73,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="gold" size="sm" asChild>
+            <Button variant="emerald" size="sm" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
           </div>
@@ -81,7 +81,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-foreground hover:text-gold transition-colors"
+            className="lg:hidden p-2 text-foreground hover:text-wine transition-colors"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -102,8 +102,8 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`text-base font-medium transition-colors duration-300 py-2 ${
                     isActive
-                      ? 'text-gold font-semibold'
-                      : 'text-foreground hover:text-gold'
+                      ? 'text-wine font-semibold'
+                      : 'text-foreground hover:text-wine'
                   }`}
                 >
                   {link.label}
@@ -111,7 +111,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
               );
             })}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button variant="gold" className="w-full" asChild>
+              <Button variant="emerald" className="w-full" asChild>
                 <a href="#proximo-evento" onClick={() => setIsMobileMenuOpen(false)}>
                   Inscreva-se
                 </a>

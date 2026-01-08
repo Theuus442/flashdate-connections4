@@ -17,14 +17,14 @@ export const Footer = () => {
                 className="h-12 w-auto"
               />
               <span className="font-bold text-2xl text-foreground">
-                Flash<span className="text-gold">⚡</span>Date
+                Flash<span className="text-wine">⚡</span>Date
               </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar 
               seu match com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
-            <div className="flex items-center gap-2 text-gold">
+            <div className="flex items-center gap-2 text-wine">
               <Heart className="w-4 h-4" />
               <span className="text-sm">Encontre sua conexão verdadeira</span>
             </div>
@@ -36,14 +36,14 @@ export const Footer = () => {
             <div className="space-y-4">
               <a
                 href="mailto:contato@flashdate.com.br"
-                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors"
+                className="flex items-center gap-3 text-muted-foreground hover:text-wine transition-colors"
               >
                 <Mail className="w-5 h-5" />
                 <span>contato@flashdate.com.br</span>
               </a>
               <a
                 href="tel:+5511970329710"
-                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors"
+                className="flex items-center gap-3 text-muted-foreground hover:text-wine transition-colors"
               >
                 <Phone className="w-5 h-5" />
                 <span>(11) 9 7032-9710</span>

@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import heroBg from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
   return (
@@ -10,11 +9,11 @@ export const HeroSection = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroBg}
+          src="https://cdn.builder.io/api/v1/image/assets%2F45cbd39582f34d9083b683ebe80d9531%2Feb5bfdd83d90414790c6d2beeb9ef7ac?format=webp&width=1920"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/30" />
       </div>
 
       {/* Decorative Elements */}
@@ -25,20 +24,11 @@ export const HeroSection = () => {
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
-            {/* Logo */}
-            <div className="mb-8 animate-fade-up">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
-                alt="Flashdate Logo"
-                className="h-20 w-auto mx-auto mb-6"
-              />
-            </div>
-
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
               <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
               <span className="text-white drop-shadow-md">
-                <span className="text-gradient-gold">Encontros Reais</span>, utilizando
+                <span className="text-gradient-wine">Encontros Reais</span>, utilizando
               </span>
               <br />
               <span className="text-gradient-wine block">Inteligência Artificial</span>
@@ -56,7 +46,7 @@ export const HeroSection = () => {
               <Button variant="hero" size="xl" asChild>
                 <a href="#proximo-evento">Garantir Meu Lugar</a>
               </Button>
-              <Button variant="elegant" size="lg" asChild>
+              <Button variant="wine" size="lg" asChild>
                 <a href="#como-funciona">Saiba Mais</a>
               </Button>
             </div>
