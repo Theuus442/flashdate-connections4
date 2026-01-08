@@ -24,7 +24,7 @@ export const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
         <div className="container mx-auto px-6 text-center">
-          <div className="max-w-4xl mx-auto bg-black/30 backdrop-blur-sm rounded-lg px-8 py-12">
+          <div className="max-w-4xl mx-auto">
             {/* Main Title */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
               <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
