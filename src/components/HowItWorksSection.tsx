@@ -216,7 +216,7 @@ export const HowItWorksSection = () => {
               <div className="space-y-4">
                 <div>
                   <h5 className="text-secondary font-semibold mb-2">Faixa Etária Predominante</h5>
-                  <p className="text-foreground">Aproximadamente 30 a 50 anos</p>
+                  <p className="text-foreground">Aproximadamente 30 a 50 anos, com variações para menos ou para mais dependendo do evento.</p>
                 </div>
 
                 <div>
