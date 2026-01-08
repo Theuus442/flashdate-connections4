@@ -73,7 +73,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="gold" size="sm" asChild>
+            <Button variant="emerald" size="sm" asChild>
               <a href="#proximo-evento">Inscreva-se</a>
             </Button>
           </div>
