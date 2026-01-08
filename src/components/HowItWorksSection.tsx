@@ -118,15 +118,6 @@ export const HowItWorksSection = () => {
           </div>
         </div>
 
-        {/* Important Note */}
-        <div className="mt-20 max-w-4xl mx-auto">
-          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-elegant p-6">
-            <p className="text-sm text-muted-foreground">
-              <span className="text-secondary font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-secondary font-medium">Match</span> ou <span className="text-secondary font-medium">Talvez</span>.
-            </p>
-          </div>
-        </div>
-
         {/* Event Details Section */}
         <div className="mt-20 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Dress Code */}
