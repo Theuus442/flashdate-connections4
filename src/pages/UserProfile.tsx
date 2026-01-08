@@ -255,8 +255,14 @@ export default function UserProfile() {
 
                       {/* Contact Info Below Actions */}
                       <div className="border-t border-border bg-muted/30 px-3 sm:px-4 py-2 sm:py-3 text-xs text-muted-foreground space-y-1">
-                        <p>📧 {user.email}</p>
-                        <p>📱 {user.whatsapp}</p>
+                        <div className="flex items-center gap-2">
+                          <Mail size={14} />
+                          <span>{user.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} />
+                          <span>{user.whatsapp}</span>
+                        </div>
                       </div>
                     </div>
                   );
