@@ -17,6 +17,8 @@ export default function UserProfile() {
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
+  const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // Filter users excluding the current user
   const otherUsers = useMemo(() => 
