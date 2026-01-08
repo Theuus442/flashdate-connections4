@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit2, Plus, Upload, X } from 'lucide-react';
+import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 
 export const UsersManagement = () => {
@@ -176,7 +176,7 @@ export const UsersManagement = () => {
                   ) : (
                     <div className="w-full h-48 rounded-lg border-2 border-dashed border-border bg-muted/30 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-5xl font-bold text-gold/30 mb-2">👤</div>
+                        <UserCircle2 size={64} className="text-gold/30 mb-2 mx-auto" />
                         <p className="text-sm text-muted-foreground">Nenhuma imagem selecionada</p>
                       </div>
                     </div>
