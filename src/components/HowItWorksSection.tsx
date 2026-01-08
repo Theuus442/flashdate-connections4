@@ -125,7 +125,7 @@ export const HowItWorksSection = () => {
         <div className="mt-20 max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Lógica de <span className="text-gradient-gold">Matches</span>
+              Lógica de <span className="text-gradient-wine">Matches</span>
             </h3>
             <p className="text-muted-foreground">Como são determinados seus resultados após o evento</p>
           </div>
