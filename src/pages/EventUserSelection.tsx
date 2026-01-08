@@ -253,80 +253,46 @@ export default function EventUserSelection() {
                   </Button>
                 </div>
               </div>
-            </div>
-          ) : (
-            // List View
-            <div className="flex-1">
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {participants.map((participant, index) => {
-                  const selection = selections.find(s => s.userId === participant.id);
-                  return (
-                    <div
-                      key={participant.id}
-                      onClick={() => setCurrentIndex(index)}
-                      className={`bg-card border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                        currentIndex === index
-                          ? 'border-gold shadow-lg'
-                          : selection
-                          ? selection.type === 'match'
-                            ? 'border-gold/50'
-                            : selection.type === 'friendship'
-                            ? 'border-secondary/50'
-                            : 'border-destructive/50'
-                          : 'border-border hover:border-gold/30'
-                      }`}
-                    >
-                      {/* Avatar */}
-                      <div className="w-full aspect-square bg-gradient-to-br from-gold to-gold-dark rounded-lg flex items-center justify-center mb-4">
-                        {participant.profileImage ? (
-                          <img
-                            src={participant.profileImage}
-                            alt={participant.name}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <span className="text-5xl font-bold text-secondary-foreground opacity-50">
-                            {participant.name.charAt(0)}
-                          </span>
-                        )}
-                      </div>
 
-            {/* Navigation Controls */}
-            <div className="flex items-center justify-between mt-8 gap-4">
-              <Button
-                onClick={handlePrevious}
-                disabled={currentIndex === 0}
-                variant="outline"
-                size="lg"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
+              {/* Navigation Controls */}
+              <div className="flex items-center justify-between mt-8 gap-4 px-8 pb-8">
+                <Button
+                  onClick={handlePrevious}
+                  disabled={currentIndex === 0}
+                  variant="outline"
+                  size="lg"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
 
-              <div className="flex-1 text-center">
-                <p className="text-sm text-muted-foreground">
-                  {currentIndex + 1} de {participants.length}
-                </p>
+                <div className="flex-1 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {currentIndex + 1} de {participants.length}
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleNext}
+                  disabled={currentIndex === participants.length - 1}
+                  variant="outline"
+                  size="lg"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
               </div>
 
-              <Button
-                onClick={handleNext}
-                disabled={currentIndex === participants.length - 1}
-                variant="outline"
-                size="lg"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
+              {/* Finish Button */}
+              <div className="px-8 pb-8">
+                <Button
+                  onClick={handleFinish}
+                  variant="hero"
+                  className="w-full py-3 text-base"
+                  disabled={selections.length === 0}
+                >
+                  Finalizar Seleção ({selections.length})
+                </Button>
+              </div>
             </div>
-
-            {/* Finish Button */}
-            <Button
-              onClick={handleFinish}
-              variant="hero"
-              className="w-full mt-6 py-3 text-base"
-              disabled={selections.length === 0}
-            >
-              Finalizar Seleção ({selections.length})
-            </Button>
           </div>
         </div>
       </div>
