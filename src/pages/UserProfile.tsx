@@ -82,9 +82,9 @@ export default function UserProfile() {
           <div className="flex items-center justify-between h-20">
             <a href="/" className="flex items-center gap-2">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
                 alt="Flashdate Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <span className="hidden sm:inline font-bold text-lg text-foreground">
                 FlashDate<span className="text-gold">⚡</span>
@@ -173,7 +173,7 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
                   return (
@@ -374,7 +374,7 @@ export default function UserProfile() {
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
               {getSelectionsByType('match').length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {getSelectionsByType('match').map(sel => {
                     const user = allUsers.find(u => u.id === sel.userId);
                     if (!user) return null;
