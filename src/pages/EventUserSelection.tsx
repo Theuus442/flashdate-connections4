@@ -142,9 +142,9 @@ export default function EventUserSelection() {
           <div className="flex items-center justify-between h-20">
             <a href="/" className="flex items-center gap-2">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
                 alt="Flashdate Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <span className="hidden sm:inline font-bold text-lg text-foreground">
                 FlashDate<span className="text-gold">⚡</span>
@@ -254,6 +254,42 @@ export default function EventUserSelection() {
                 </div>
               </div>
             </div>
+          ) : (
+            // List View
+            <div className="flex-1">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                {participants.map((participant, index) => {
+                  const selection = selections.find(s => s.userId === participant.id);
+                  return (
+                    <div
+                      key={participant.id}
+                      onClick={() => setCurrentIndex(index)}
+                      className={`bg-card border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                        currentIndex === index
+                          ? 'border-gold shadow-lg'
+                          : selection
+                          ? selection.type === 'match'
+                            ? 'border-gold/50'
+                            : selection.type === 'friendship'
+                            ? 'border-secondary/50'
+                            : 'border-destructive/50'
+                          : 'border-border hover:border-gold/30'
+                      }`}
+                    >
+                      {/* Avatar */}
+                      <div className="w-full aspect-square bg-gradient-to-br from-gold to-gold-dark rounded-lg flex items-center justify-center mb-4">
+                        {participant.profileImage ? (
+                          <img
+                            src={participant.profileImage}
+                            alt={participant.name}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <span className="text-5xl font-bold text-secondary-foreground opacity-50">
+                            {participant.name.charAt(0)}
+                          </span>
+                        )}
+                      </div>
 
             {/* Navigation Controls */}
             <div className="flex items-center justify-between mt-8 gap-4">

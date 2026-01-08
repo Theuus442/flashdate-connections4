@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle } from 'lucide-react';
+import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
@@ -96,9 +96,9 @@ export default function UserProfile() {
           <div className="flex items-center justify-between h-20">
             <a href="/" className="flex items-center gap-2">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F73d680b1b3a649a9a5bc7e1247d963e4%2F685f0706602c47e4964899c8526c67cd?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
                 alt="Flashdate Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <span className="hidden sm:inline font-bold text-lg text-foreground">
                 FlashDate<span className="text-gold">⚡</span>
@@ -187,164 +187,95 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
-              {/* Filters */}
-              <div className="mb-8 flex flex-wrap gap-4 items-center">
-                {/* Gender Filter */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setGenderFilter('all')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      genderFilter === 'all'
-                        ? 'bg-gold text-secondary-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-gold'
-                    }`}
-                  >
-                    Todos
-                  </button>
-                  <button
-                    onClick={() => setGenderFilter('M')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      genderFilter === 'M'
-                        ? 'bg-gold text-secondary-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-gold'
-                    }`}
-                  >
-                    Masculino
-                  </button>
-                  <button
-                    onClick={() => setGenderFilter('F')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      genderFilter === 'F'
-                        ? 'bg-gold text-secondary-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-gold'
-                    }`}
-                  >
-                    Feminino
-                  </button>
-                </div>
-
-                {/* Sort Order */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setSortOrder('asc')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      sortOrder === 'asc'
-                        ? 'bg-gold text-secondary-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-gold'
-                    }`}
-                  >
-                    A-Z
-                  </button>
-                  <button
-                    onClick={() => setSortOrder('desc')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      sortOrder === 'desc'
-                        ? 'bg-gold text-secondary-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-gold'
-                    }`}
-                  >
-                    Z-A
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-3">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
                   return (
                     <div
                       key={user.id}
-                      className={`bg-card border-2 rounded-2xl overflow-hidden transition-all ${
+                      className={`bg-card border-2 rounded-xl overflow-hidden transition-all ${
                         selection
                           ? selection.type === 'match'
                             ? 'border-gold shadow-lg shadow-gold/20'
                             : selection.type === 'friendship'
                             ? 'border-secondary shadow-lg shadow-secondary/20'
-                            : 'border-destructive/50 opacity-75'
+                            : 'border-destructive/50'
                           : 'border-border hover:border-gold/50'
                       }`}
                     >
-                      {/* User Image */}
-                      <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
-                        {user.profileImage ? (
-                          <img
-                            src={user.profileImage}
-                            alt={user.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <UserCircle2 size={100} className="text-gold/30" />
-                        )}
-
-                        {selection && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <div className="text-white text-center">
-                              {selection.type === 'match' && (
-                                <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                              )}
-                              {selection.type === 'friendship' && (
-                                <Users size={40} className="mb-2 mx-auto" />
-                              )}
-                              {selection.type === 'no-interest' && (
-                                <XCircle size={40} className="mb-2 mx-auto" />
-                              )}
-                              <p className="text-xs font-medium">
-                                {selection.type === 'match' && 'Match'}
-                                {selection.type === 'friendship' && 'Amizade'}
-                                {selection.type === 'no-interest' && 'Sem Interesse'}
-                              </p>
-                            </div>
+                      {/* Main Card Content */}
+                      <div className="flex flex-col sm:flex-row items-stretch">
+                        {/* User Image and Name */}
+                        <div className="flex sm:flex-col items-center justify-start gap-3 sm:gap-0 px-3 sm:px-4 py-3 sm:py-4 bg-gradient-to-br from-gold/10 to-transparent sm:w-32 flex-shrink-0">
+                          <div className="relative w-16 sm:w-20 h-16 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 border border-border">
+                            {user.profileImage ? (
+                              <img
+                                src={user.profileImage}
+                                alt={user.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <UserCircle2 size={32} className="sm:w-12 sm:h-12 text-gold/30" />
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-
-                      {/* User Info */}
-                      <div className="p-4">
-                        <div className="mb-4">
-                          <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            @{user.username}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}
-                          </p>
+                          <div className="sm:text-center">
+                            <h3 className="font-semibold text-foreground text-sm">{user.name}</h3>
+                            <p className="text-xs text-muted-foreground">@{user.username}</p>
+                          </div>
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="space-y-2">
+                        <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
                             onClick={() => handleSelection(user.id, 'match')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
                               selection?.type === 'match'
-                                ? 'bg-gold text-secondary-foreground hover:bg-gold/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                                ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
+                                : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
+                            title="Match"
                           >
-                            <Heart size={16} />
-                            Match
+                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Match</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'friendship')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
                               selection?.type === 'friendship'
-                                ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                                ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
+                                : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
+                            title="Amizade"
                           >
-                            <Users size={16} />
-                            Amizade
+                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Amigos</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'no-interest')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
                               selection?.type === 'no-interest'
-                                ? 'bg-destructive text-white hover:bg-destructive/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                                ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
+                                : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
+                            title="Não faz meu tipo"
                           >
-                            <X size={16} />
-                            Sem Interesse
+                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Não meu tipo</span>
                           </button>
+                        </div>
+                      </div>
+
+                      {/* Contact Info Below Actions */}
+                      <div className="border-t border-border bg-muted/30 px-3 sm:px-4 py-2 sm:py-3 text-xs text-muted-foreground space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Mail size={14} />
+                          <span>{user.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} />
+                          <span>{user.whatsapp}</span>
                         </div>
                       </div>
                     </div>
@@ -452,7 +383,7 @@ export default function UserProfile() {
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
               {getSelectionsByType('match').length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {getSelectionsByType('match').map(sel => {
                     const user = allUsers.find(u => u.id === sel.userId);
                     if (!user) return null;
