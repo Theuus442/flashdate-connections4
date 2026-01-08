@@ -6,6 +6,7 @@ export interface User {
   username: string;
   email: string;
   whatsapp: string;
+  gender: 'M' | 'F' | 'Outro';
   profileImage?: string;
 }
 
