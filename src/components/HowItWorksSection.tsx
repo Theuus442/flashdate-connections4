@@ -5,13 +5,10 @@ const steps = [
     number: '01',
     icon: CalendarCheck,
     title: 'Pagamento',
-    description: 'Efetue o pagamento com o valor informado do evento utilizando Pix e envie o comprovante com suas informações pessoais.',
+    description: 'Efetue o pagamento com o valor informado via Pix.',
     details: [
-      'Chave Pix: 11 97032 9710',
-      'Envie comprovante via email ou WhatsApp',
-      'Email: contato@flashdate.com.br',
-      'WhatsApp: (11) 97032-9710',
-      'Informações necessárias: Nome, Data de Nascimento, Sexo, E-mail, Celular com DDD, Data do Evento'
+      'Chave Pix: 11 970329710',
+      'Sidnei'
     ],
   },
   {
