@@ -3,20 +3,6 @@ import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X } from 'luci
 const steps = [
   {
     number: '01',
-    icon: UserPlus,
-    title: 'Inscrição',
-    description: 'Adquira o ingresso. Após a compra, envie para o e-mail contato@flashdate.com.br:',
-    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
-  },
-  {
-    number: '02',
-    icon: Brain,
-    title: 'Análise de IA',
-    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará seus dados para entender melhor seu perfil e encontrar o match mais compatível.',
-    details: [],
-  },
-  {
-    number: '03',
     icon: CalendarCheck,
     title: 'Pagamento',
     description: 'Efetue o pagamento com o valor informado do evento utilizando Pix e envie o comprovante com suas informações pessoais.',
@@ -27,6 +13,20 @@ const steps = [
       'WhatsApp: (11) 97032-9710',
       'Informações necessárias: Nome, Data de Nascimento, Sexo, E-mail, Celular com DDD, Data do Evento'
     ],
+  },
+  {
+    number: '02',
+    icon: UserPlus,
+    title: 'Inscrição',
+    description: 'Adquira o ingresso. Após a compra, envie para o e-mail contato@flashdate.com.br:',
+    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
+  },
+  {
+    number: '03',
+    icon: Brain,
+    title: 'Análise de IA',
+    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará seus dados para entender melhor seu perfil e encontrar o match mais compatível.',
+    details: [],
   },
   {
     number: '04',
