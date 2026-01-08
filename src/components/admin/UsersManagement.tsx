@@ -152,7 +152,54 @@ export const UsersManagement = () => {
             {editingId ? 'Editar Usuário' : 'Novo Usuário'}
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Image Upload Section */}
+            <div className="space-y-4 pb-6 border-b border-border">
+              <label className="block text-sm font-medium text-foreground">Foto de Perfil</label>
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="flex-1">
+                  {imagePreview ? (
+                    <div className="relative w-full h-48 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center">
+                      <img
+                        src={imagePreview}
+                        alt="Prévia do perfil"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white p-2 rounded-lg transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 rounded-lg border-2 border-dashed border-border bg-muted/30 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-5xl font-bold text-gold/30 mb-2">👤</div>
+                        <p className="text-sm text-muted-foreground">Nenhuma imagem selecionada</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="md:w-64 flex flex-col justify-center">
+                  <label className="flex items-center justify-center w-full h-32 px-4 py-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <Upload className="w-6 h-6 text-muted-foreground mb-2" />
+                      <span className="text-sm font-medium text-foreground">Carregar foto</span>
+                      <span className="text-xs text-muted-foreground">PNG, JPG até 5MB</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-2 gap-6">
               {/* Full Name */}
               <div>
