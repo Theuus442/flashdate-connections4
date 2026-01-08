@@ -74,6 +74,7 @@
     /* Soft Shadows */
     --shadow-elegant: 0 25px 50px -12px hsl(0 75% 52% / 0.12);
     --shadow-gold: 0 10px 40px -10px hsl(45 85% 52% / 0.15);
+    --shadow-emerald: 0 10px 40px -10px hsl(140 55% 48% / 0.15);
     --shadow-sky: 0 10px 40px -10px hsl(200 45% 75% / 0.15);
     --shadow-card: 0 4px 30px hsl(0 0% 0% / 0.08);
 
