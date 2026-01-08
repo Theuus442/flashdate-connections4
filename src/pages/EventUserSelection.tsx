@@ -9,6 +9,7 @@ interface Participant {
   name: string;
   age: number;
   profession: string;
+  gender: 'M' | 'F' | 'Outro';
   profileImage?: string;
   bio?: string;
   interests?: string[];
