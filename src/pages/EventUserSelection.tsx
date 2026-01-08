@@ -380,7 +380,7 @@ export default function EventUserSelection() {
           ) : (
             // List View
             <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-3 gap-4 mb-8">
                 {participants.map((participant, index) => {
                   const selection = selections.find(s => s.userId === participant.id);
                   return (
