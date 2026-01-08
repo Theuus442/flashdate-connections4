@@ -115,12 +115,14 @@ export default function UserProfile() {
           <div className="mb-8">
             <div className="mb-8">
               <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
-                {activeTab === 'participants' ? 'Participantes' : 'Meus Matches'}
+                {activeTab === 'participants' ? 'Participantes' : activeTab === 'matches' ? 'Meus Matches' : 'Meu Perfil'}
               </h1>
               <p className="text-muted-foreground">
                 {activeTab === 'participants'
                   ? 'Veja quem mais está participando do evento'
-                  : `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`}
+                  : activeTab === 'matches'
+                  ? `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`
+                  : 'Visualize e atualize suas informações'}
               </p>
             </div>
 
