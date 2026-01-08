@@ -109,7 +109,7 @@ export default function LoginPage() {
                 className="h-10 w-auto"
               />
               <span className="hidden sm:inline font-bold text-lg text-foreground">
-                Flash<span className="text-gold">⚡</span>Date
+                FlashDate<span className="text-gold">⚡</span>
               </span>
             </a>
             <button
