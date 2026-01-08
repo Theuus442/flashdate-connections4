@@ -187,6 +187,67 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
+              {/* Filters */}
+              <div className="mb-8 flex flex-wrap gap-4 items-center">
+                {/* Gender Filter */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setGenderFilter('all')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      genderFilter === 'all'
+                        ? 'bg-gold text-secondary-foreground'
+                        : 'bg-card border border-border text-foreground hover:border-gold'
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  <button
+                    onClick={() => setGenderFilter('M')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      genderFilter === 'M'
+                        ? 'bg-gold text-secondary-foreground'
+                        : 'bg-card border border-border text-foreground hover:border-gold'
+                    }`}
+                  >
+                    Masculino
+                  </button>
+                  <button
+                    onClick={() => setGenderFilter('F')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      genderFilter === 'F'
+                        ? 'bg-gold text-secondary-foreground'
+                        : 'bg-card border border-border text-foreground hover:border-gold'
+                    }`}
+                  >
+                    Feminino
+                  </button>
+                </div>
+
+                {/* Sort Order */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSortOrder('asc')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      sortOrder === 'asc'
+                        ? 'bg-gold text-secondary-foreground'
+                        : 'bg-card border border-border text-foreground hover:border-gold'
+                    }`}
+                  >
+                    A-Z
+                  </button>
+                  <button
+                    onClick={() => setSortOrder('desc')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      sortOrder === 'desc'
+                        ? 'bg-gold text-secondary-foreground'
+                        : 'bg-card border border-border text-foreground hover:border-gold'
+                    }`}
+                  >
+                    Z-A
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
