@@ -17,7 +17,7 @@ export const Footer = () => {
                 className="h-12 w-auto"
               />
               <span className="font-bold text-2xl text-foreground">
-                Flash<span className="text-gold">⚡</span>Date
+                Flash<span className="text-wine">⚡</span>Date
               </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
