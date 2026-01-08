@@ -69,7 +69,7 @@ export default function ClientDashboard() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
                 alt="Flashdate Logo"
-                className="h-10 w-auto"
+                className="h-16 w-auto"
               />
               <span className="hidden sm:inline font-bold text-lg text-foreground">
                 FlashDate<span className="text-gold">⚡</span>
