@@ -118,59 +118,12 @@ export const HowItWorksSection = () => {
           </div>
         </div>
 
-        {/* Match Logic Table */}
+        {/* Important Note */}
         <div className="mt-20 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Lógica de <span className="text-gradient-wine">Matches</span>
-            </h3>
-            <p className="text-muted-foreground">Como são determinados seus resultados após o evento</p>
-          </div>
-
-          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-elegant">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-wine/20 border-b border-border">
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Sua Escolha</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Escolha da Outra Pessoa</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-wine">Resultado</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-sm font-semibold text-gold">Contatos</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-gold font-bold flex items-center gap-2">Match <Check className="w-4 h-4" /></span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">SIM ou TALVEZ</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">TALVEZ</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-secondary font-semibold">Amizade</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground">Contatos Trocados</td>
-                  </tr>
-                  <tr className="hover:bg-wine/5 transition-colors">
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-muted-foreground font-medium">NÃO</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-foreground"><span className="text-gold font-medium">SIM / TALVEZ / NÃO</span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm"><span className="text-destructive font-semibold flex items-center gap-2">Nenhum <X className="w-4 h-4" /></span></td>
-                    <td className="px-4 md:px-6 py-4 text-sm text-muted-foreground">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 bg-foreground/5 border-t border-border">
-              <p className="text-sm text-muted-foreground">
-                <span className="text-secondary font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-secondary font-medium">SIM</span> ou <span className="text-secondary font-medium">TALVEZ</span>.
-              </p>
-            </div>
+          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-elegant p-6">
+            <p className="text-sm text-muted-foreground">
+              <span className="text-secondary font-semibold">Importante:</span> A outra pessoa só receberá seu contato se você optar por <span className="text-secondary font-medium">Match</span> ou <span className="text-secondary font-medium">Talvez</span>.
+            </p>
           </div>
         </div>
 
