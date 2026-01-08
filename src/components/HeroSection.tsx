@@ -12,7 +12,7 @@ export const HeroSection = () => {
           src="https://cdn.builder.io/api/v1/image/assets%2F45cbd39582f34d9083b683ebe80d9531%2Feb5bfdd83d90414790c6d2beeb9ef7ac?format=webp&width=1920"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '-150px 50%' }}
+          style={{ objectPosition: '35% 50%' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/30" />
       </div>
