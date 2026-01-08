@@ -170,18 +170,128 @@ export default function UserProfile() {
             </div>
           </div>
 
-          {/* Two Column Layout - My Profile */}
-          {activeTab === 'profile' && (
-          <div className="grid lg:grid-cols-3 gap-8 flex-1">
-            {/* Left Column: User Profile */}
-            <div className="lg:col-span-1">
-              <div className="bg-card border border-border rounded-2xl p-8 sticky top-24">
-                <h2 className="font-serif text-2xl font-bold text-foreground mb-6">Seu Perfil</h2>
+          {/* Participants View */}
+          {activeTab === 'participants' && (
+            <div className="flex-1 flex flex-col">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {otherUsers.map(user => {
+                  const selection = getSelectionForUser(user.id);
+                  return (
+                    <div
+                      key={user.id}
+                      className={`bg-card border-2 rounded-2xl overflow-hidden transition-all ${
+                        selection
+                          ? selection.type === 'match'
+                            ? 'border-gold shadow-lg shadow-gold/20'
+                            : selection.type === 'friendship'
+                            ? 'border-secondary shadow-lg shadow-secondary/20'
+                            : 'border-destructive/50 opacity-75'
+                          : 'border-border hover:border-gold/50'
+                      }`}
+                    >
+                      {/* User Image */}
+                      <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
+                        {user.profileImage ? (
+                          <img
+                            src={user.profileImage}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <UserCircle2 size={100} className="text-gold/30" />
+                        )}
 
+                        {selection && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="text-white text-center">
+                              {selection.type === 'match' && (
+                                <Heart size={40} className="mb-2 mx-auto" fill="white" />
+                              )}
+                              {selection.type === 'friendship' && (
+                                <Users size={40} className="mb-2 mx-auto" />
+                              )}
+                              {selection.type === 'no-interest' && (
+                                <XCircle size={40} className="mb-2 mx-auto" />
+                              )}
+                              <p className="text-xs font-medium">
+                                {selection.type === 'match' && 'Match'}
+                                {selection.type === 'friendship' && 'Amizade'}
+                                {selection.type === 'no-interest' && 'Sem Interesse'}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* User Info */}
+                      <div className="p-4">
+                        <div className="mb-4">
+                          <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            @{user.username}
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="space-y-2">
+                          <button
+                            onClick={() => handleSelection(user.id, 'match')}
+                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                              selection?.type === 'match'
+                                ? 'bg-gold text-secondary-foreground hover:bg-gold/90'
+                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                            }`}
+                          >
+                            <Heart size={16} />
+                            Match
+                          </button>
+                          <button
+                            onClick={() => handleSelection(user.id, 'friendship')}
+                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                              selection?.type === 'friendship'
+                                ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
+                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                            }`}
+                          >
+                            <Users size={16} />
+                            Amizade
+                          </button>
+                          <button
+                            onClick={() => handleSelection(user.id, 'no-interest')}
+                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
+                              selection?.type === 'no-interest'
+                                ? 'bg-destructive text-white hover:bg-destructive/90'
+                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                            }`}
+                          >
+                            <X size={16} />
+                            Sem Interesse
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Empty State */}
+              {otherUsers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Nenhum participante disponível no momento</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Profile View */}
+          {activeTab === 'profile' && (
+            <div className="max-w-2xl mx-auto w-full">
+              <div className="bg-card border border-border rounded-2xl p-8">
                 {/* Profile Image Section */}
                 <div className="mb-8">
+                  <h3 className="font-serif text-xl font-bold text-foreground mb-4">Sua Foto</h3>
                   {imagePreview ? (
-                    <div className="relative w-full aspect-square rounded-xl border border-border overflow-hidden bg-muted/30 mb-4">
+                    <div className="relative w-full max-w-sm aspect-square rounded-xl border border-border overflow-hidden bg-muted/30 mb-4 mx-auto">
                       <img
                         src={imagePreview}
                         alt={currentUser.name}
@@ -196,7 +306,7 @@ export default function UserProfile() {
                       </button>
                     </div>
                   ) : (
-                    <div className="w-full aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center mb-4">
+                    <div className="w-full max-w-sm aspect-square rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center mb-4 mx-auto">
                       <div className="text-center">
                         <UserCircle2 size={80} className="text-gold/30 mb-2 mx-auto" />
                         <p className="text-sm text-muted-foreground">Sem foto ainda</p>
@@ -204,7 +314,7 @@ export default function UserProfile() {
                     </div>
                   )}
 
-                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
+                  <label className="flex items-center justify-center w-full max-w-sm mx-auto px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <Camera className="w-4 h-4 text-muted-foreground" />
                       <span className="font-medium text-foreground">Adicionar foto</span>
@@ -219,236 +329,45 @@ export default function UserProfile() {
                 </div>
 
                 {/* Profile Info */}
-                <div className="space-y-4 border-t border-border pt-6">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Nome Completo</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.name}</p>
+                <div className="border-t border-border pt-8">
+                  <h3 className="font-serif text-xl font-bold text-foreground mb-6">Suas Informações</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Nome Completo</p>
+                      <p className="text-lg font-semibold text-foreground">{currentUser.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Apelido/Username</p>
+                      <p className="text-lg font-semibold text-foreground">@{currentUser.username}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Email</p>
+                      <p className="text-lg font-semibold text-foreground">{currentUser.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Telefone (WhatsApp)</p>
+                      <p className="text-lg font-semibold text-foreground">{currentUser.whatsapp}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Apelido</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.username}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Email</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Telefone</p>
-                    <p className="text-sm font-semibold text-foreground">{currentUser.whatsapp}</p>
+
+                  {/* Stats */}
+                  <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Matches</p>
+                      <p className="text-3xl font-bold text-gold">{matchCount}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Amizades</p>
+                      <p className="text-3xl font-bold text-secondary">{friendshipCount}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Seleções</p>
+                      <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
+                    </div>
                   </div>
                 </div>
-
-                {/* Stats */}
-                <div className="mt-8 pt-6 border-t border-border space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Matches</span>
-                    <span className="text-lg font-bold text-gold">{matchCount}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Amizades</span>
-                    <span className="text-lg font-bold text-secondary">{friendshipCount}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Total Seleções</span>
-                    <span className="text-lg font-bold text-foreground">{allSelections.length}</span>
-                  </div>
-                </div>
-
-                {/* Selections Detail Toggle */}
-                {allSelections.length > 0 && (
-                  <button
-                    onClick={() => setShowSelectionsDetail(!showSelectionsDetail)}
-                    className="w-full mt-6 pt-6 border-t border-border flex items-center justify-between text-foreground hover:text-gold transition-colors"
-                  >
-                    <span className="text-sm font-medium">Ver Detalhes</span>
-                    {showSelectionsDetail ? (
-                      <ChevronUp size={18} />
-                    ) : (
-                      <ChevronDown size={18} />
-                    )}
-                  </button>
-                )}
-
-                {/* Selections Detail */}
-                {showSelectionsDetail && allSelections.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-border space-y-4">
-                    {getSelectionsByType('match').length > 0 && (
-                      <div>
-                        <p className="text-xs font-semibold text-gold mb-2 uppercase">Matches ({getSelectionsByType('match').length})</p>
-                        <div className="space-y-1">
-                          {getSelectionsByType('match').map(sel => {
-                            const user = allUsers.find(u => u.id === sel.userId);
-                            return (
-                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
-                                <Heart size={12} className="text-gold" /> {user?.name}
-                              </p>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {getSelectionsByType('friendship').length > 0 && (
-                      <div>
-                        <p className="text-xs font-semibold text-secondary mb-2 uppercase">Amizades ({getSelectionsByType('friendship').length})</p>
-                        <div className="space-y-1">
-                          {getSelectionsByType('friendship').map(sel => {
-                            const user = allUsers.find(u => u.id === sel.userId);
-                            return (
-                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
-                                <Users size={12} className="text-secondary" /> {user?.name}
-                              </p>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {getSelectionsByType('no-interest').length > 0 && (
-                      <div>
-                        <p className="text-xs font-semibold text-destructive mb-2 uppercase">Sem Interesse ({getSelectionsByType('no-interest').length})</p>
-                        <div className="space-y-1">
-                          {getSelectionsByType('no-interest').map(sel => {
-                            const user = allUsers.find(u => u.id === sel.userId);
-                            return (
-                              <p key={sel.userId} className="text-xs text-foreground flex items-center gap-2">
-                                <XCircle size={12} className="text-destructive" /> {user?.name}
-                              </p>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
-
-            {/* Right Column: Users List */}
-            <div className="lg:col-span-2">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="font-serif text-2xl font-bold text-foreground">Participantes</h2>
-                    <p className="text-muted-foreground mt-1">Veja quem mais está participando</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Total de participantes</p>
-                    <p className="text-2xl font-bold text-gold">{otherUsers.length}</p>
-                  </div>
-                </div>
-
-                {/* Users Grid */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  {otherUsers.map(user => {
-                    const selection = getSelectionForUser(user.id);
-                    return (
-                      <div
-                        key={user.id}
-                        className={`bg-card border-2 rounded-2xl overflow-hidden transition-all ${
-                          selection
-                            ? selection.type === 'match'
-                              ? 'border-gold shadow-lg shadow-gold/20'
-                              : selection.type === 'friendship'
-                              ? 'border-secondary shadow-lg shadow-secondary/20'
-                              : 'border-destructive/50 opacity-75'
-                            : 'border-border hover:border-gold/50'
-                        }`}
-                      >
-                        {/* User Image */}
-                        <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
-                          {user.profileImage ? (
-                            <img
-                              src={user.profileImage}
-                              alt={user.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <UserCircle2 size={100} className="text-gold/30" />
-                          )}
-
-                          {selection && (
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                              <div className="text-white text-center">
-                                {selection.type === 'match' && (
-                                  <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                                )}
-                                {selection.type === 'friendship' && (
-                                  <Users size={40} className="mb-2 mx-auto" />
-                                )}
-                                {selection.type === 'no-interest' && (
-                                  <XCircle size={40} className="mb-2 mx-auto" />
-                                )}
-                                <p className="text-xs font-medium">
-                                  {selection.type === 'match' && 'Match'}
-                                  {selection.type === 'friendship' && 'Amizade'}
-                                  {selection.type === 'no-interest' && 'Sem Interesse'}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* User Info */}
-                        <div className="p-4">
-                          <div className="mb-4">
-                            <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              @{user.username}
-                            </p>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="space-y-2">
-                            <button
-                              onClick={() => handleSelection(user.id, 'match')}
-                              className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                                selection?.type === 'match'
-                                  ? 'bg-gold text-secondary-foreground hover:bg-gold/90'
-                                  : 'bg-muted hover:bg-muted/80 text-foreground'
-                              }`}
-                            >
-                              <Heart size={16} />
-                              Match
-                            </button>
-                            <button
-                              onClick={() => handleSelection(user.id, 'friendship')}
-                              className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                                selection?.type === 'friendship'
-                                  ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
-                                  : 'bg-muted hover:bg-muted/80 text-foreground'
-                              }`}
-                            >
-                              <Users size={16} />
-                              Amizade
-                            </button>
-                            <button
-                              onClick={() => handleSelection(user.id, 'no-interest')}
-                              className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                                selection?.type === 'no-interest'
-                                  ? 'bg-destructive text-white hover:bg-destructive/90'
-                                  : 'bg-muted hover:bg-muted/80 text-foreground'
-                              }`}
-                            >
-                              <X size={16} />
-                              Sem Interesse
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Empty State */}
-                {otherUsers.length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">Nenhum participante disponível no momento</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
           )}
 
           {/* Matches View */}
