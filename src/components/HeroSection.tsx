@@ -46,7 +46,7 @@ export const HeroSection = () => {
               <Button variant="hero" size="xl" asChild>
                 <a href="#proximo-evento">Garantir Meu Lugar</a>
               </Button>
-              <Button variant="elegant" size="lg" asChild>
+              <Button variant="wine" size="lg" asChild>
                 <a href="#como-funciona">Saiba Mais</a>
               </Button>
             </div>
