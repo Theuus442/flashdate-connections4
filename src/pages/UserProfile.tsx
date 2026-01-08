@@ -125,10 +125,10 @@ export default function UserProfile() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-border">
+            <div className="flex gap-4 border-b border-border overflow-x-auto">
               <button
                 onClick={() => setActiveTab('participants')}
-                className={`px-4 py-3 font-medium transition-all relative ${
+                className={`px-4 py-3 font-medium transition-all relative whitespace-nowrap ${
                   activeTab === 'participants'
                     ? 'text-gold'
                     : 'text-muted-foreground hover:text-foreground'
@@ -141,7 +141,7 @@ export default function UserProfile() {
               </button>
               <button
                 onClick={() => setActiveTab('matches')}
-                className={`px-4 py-3 font-medium transition-all relative ${
+                className={`px-4 py-3 font-medium transition-all relative whitespace-nowrap ${
                   activeTab === 'matches'
                     ? 'text-gold'
                     : 'text-muted-foreground hover:text-foreground'
@@ -149,6 +149,19 @@ export default function UserProfile() {
               >
                 Matches ({matchCount})
                 {activeTab === 'matches' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-4 py-3 font-medium transition-all relative whitespace-nowrap ${
+                  activeTab === 'profile'
+                    ? 'text-gold'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Meu Perfil
+                {activeTab === 'profile' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
                 )}
               </button>
