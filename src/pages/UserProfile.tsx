@@ -173,101 +173,79 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-3">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
                   return (
                     <div
                       key={user.id}
-                      className={`bg-card border-2 rounded-2xl overflow-hidden transition-all ${
+                      className={`bg-card border-2 rounded-xl overflow-hidden transition-all flex items-stretch ${
                         selection
                           ? selection.type === 'match'
                             ? 'border-gold shadow-lg shadow-gold/20'
                             : selection.type === 'friendship'
                             ? 'border-secondary shadow-lg shadow-secondary/20'
-                            : 'border-destructive/50 opacity-75'
+                            : 'border-destructive/50'
                           : 'border-border hover:border-gold/50'
                       }`}
                     >
-                      {/* User Image */}
-                      <div className="relative w-full h-48 bg-gradient-to-br from-gold/20 to-gold/10 flex items-center justify-center overflow-hidden">
-                        {user.profileImage ? (
-                          <img
-                            src={user.profileImage}
-                            alt={user.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <UserCircle2 size={100} className="text-gold/30" />
-                        )}
-
-                        {selection && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <div className="text-white text-center">
-                              {selection.type === 'match' && (
-                                <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                              )}
-                              {selection.type === 'friendship' && (
-                                <Users size={40} className="mb-2 mx-auto" />
-                              )}
-                              {selection.type === 'no-interest' && (
-                                <XCircle size={40} className="mb-2 mx-auto" />
-                              )}
-                              <p className="text-xs font-medium">
-                                {selection.type === 'match' && 'Match'}
-                                {selection.type === 'friendship' && 'Amizade'}
-                                {selection.type === 'no-interest' && 'Sem Interesse'}
-                              </p>
+                      {/* User Image and Name */}
+                      <div className="flex flex-col items-center justify-center px-4 py-4 bg-gradient-to-br from-gold/10 to-transparent w-32 flex-shrink-0">
+                        <div className="relative w-20 h-20 rounded-lg overflow-hidden mb-2 border border-border">
+                          {user.profileImage ? (
+                            <img
+                              src={user.profileImage}
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              <UserCircle2 size={48} className="text-gold/30" />
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-foreground text-sm text-center">{user.name}</h3>
+                        <p className="text-xs text-muted-foreground text-center">@{user.username}</p>
                       </div>
 
-                      {/* User Info */}
-                      <div className="p-4">
-                        <div className="mb-4">
-                          <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            @{user.username}
-                          </p>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-2">
-                          <button
-                            onClick={() => handleSelection(user.id, 'match')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                              selection?.type === 'match'
-                                ? 'bg-gold text-secondary-foreground hover:bg-gold/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
-                            }`}
-                          >
-                            <Heart size={16} />
-                            Match
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'friendship')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                              selection?.type === 'friendship'
-                                ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
-                            }`}
-                          >
-                            <Users size={16} />
-                            Amizade
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'no-interest')}
-                            className={`w-full px-3 py-2 rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2 ${
-                              selection?.type === 'no-interest'
-                                ? 'bg-destructive text-white hover:bg-destructive/90'
-                                : 'bg-muted hover:bg-muted/80 text-foreground'
-                            }`}
-                          >
-                            <X size={16} />
-                            Sem Interesse
-                          </button>
-                        </div>
+                      {/* Action Buttons */}
+                      <div className="flex-1 flex items-center justify-around px-4 py-4 gap-3">
+                        <button
+                          onClick={() => handleSelection(user.id, 'match')}
+                          className={`flex flex-col items-center justify-center p-3 rounded-full transition-all ${
+                            selection?.type === 'match'
+                              ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
+                              : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
+                          }`}
+                          title="Match"
+                        >
+                          <Heart size={24} className={selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'} />
+                          <span className="text-xs font-medium mt-1">Match</span>
+                        </button>
+                        <button
+                          onClick={() => handleSelection(user.id, 'friendship')}
+                          className={`flex flex-col items-center justify-center p-3 rounded-full transition-all ${
+                            selection?.type === 'friendship'
+                              ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
+                              : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
+                          }`}
+                          title="Amizade"
+                        >
+                          <Users size={24} className={selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'} />
+                          <span className="text-xs font-medium mt-1">Amigos</span>
+                        </button>
+                        <button
+                          onClick={() => handleSelection(user.id, 'no-interest')}
+                          className={`flex flex-col items-center justify-center p-3 rounded-full transition-all ${
+                            selection?.type === 'no-interest'
+                              ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
+                              : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
+                          }`}
+                          title="Não faz meu tipo"
+                        >
+                          <X size={24} className={selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'} />
+                          <span className="text-xs font-medium mt-1">Não meu tipo</span>
+                        </button>
                       </div>
                     </div>
                   );
