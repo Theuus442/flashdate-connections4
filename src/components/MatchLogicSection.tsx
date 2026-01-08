@@ -2,8 +2,8 @@ import { Check, X, UserPlus, Heart } from 'lucide-react';
 
 const matchLogic = [
   {
-    yourChoice: 'SIM',
-    theirChoice: 'SIM',
+    yourChoice: 'MATCH',
+    theirChoice: 'MATCH',
     result: 'MATCH',
     icon: Heart,
     color: 'text-secondary',
@@ -12,8 +12,8 @@ const matchLogic = [
     description: 'Conexão perfeita! Vocês receberão os contatos um do outro.',
   },
   {
-    yourChoice: 'SIM',
-    theirChoice: 'TALVEZ',
+    yourChoice: 'MATCH',
+    theirChoice: 'AMIZADE',
     result: 'AMIZADE',
     icon: UserPlus,
     color: 'text-gold',
@@ -22,8 +22,8 @@ const matchLogic = [
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'TALVEZ',
-    theirChoice: 'SIM',
+    yourChoice: 'AMIZADE',
+    theirChoice: 'MATCH',
     result: 'AMIZADE',
     icon: UserPlus,
     color: 'text-gold',
@@ -32,7 +32,17 @@ const matchLogic = [
     description: 'Uma possível conexão. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'NÃO',
+    yourChoice: 'AMIZADE',
+    theirChoice: 'AMIZADE',
+    result: 'AMIZADE',
+    icon: UserPlus,
+    color: 'text-gold',
+    bgColor: 'bg-gold/20',
+    borderColor: 'border-gold/30',
+    description: 'Ambos abertos para amizade. Contatos trocados para explorar.',
+  },
+  {
+    yourChoice: 'NÃO FAZ MEU TIPO',
     theirChoice: 'Qualquer',
     result: 'NENHUM CONTATO',
     icon: X,
@@ -58,7 +68,7 @@ export const MatchLogicSection = () => {
             Lógica de <span className="text-gradient-gold">Match</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            O contato só é liberado se houver SIM ou TALVEZ mútuo. Sua privacidade é sempre respeitada.
+            O contato só é liberado se houver Match ou Amizade mútua. Sua privacidade é sempre respeitada.
           </p>
         </div>
 
@@ -92,8 +102,8 @@ export const MatchLogicSection = () => {
               >
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
-                    item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                    item.yourChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                    item.yourChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                     'bg-primary/20 text-primary'
                   }`}>
                     {item.yourChoice}
@@ -101,8 +111,8 @@ export const MatchLogicSection = () => {
                 </div>
                 <div className="text-center">
                   <span className={`inline-block px-4 py-2 rounded-full font-bold text-sm ${
-                    item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                    item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                    item.theirChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                    item.theirChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                     'bg-muted text-muted-foreground'
                   }`}>
                     {item.theirChoice}
@@ -133,16 +143,16 @@ export const MatchLogicSection = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
-                      item.yourChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.yourChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                      item.yourChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                      item.yourChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                       'bg-primary/20 text-primary'
                     }`}>
                       {item.yourChoice}
                     </span>
                     <span className="text-muted-foreground">+</span>
                     <span className={`px-3 py-1 rounded-full font-bold text-xs ${
-                      item.theirChoice === 'SIM' ? 'bg-green-500/20 text-green-400' :
-                      item.theirChoice === 'TALVEZ' ? 'bg-secondary/20 text-secondary' :
+                      item.theirChoice === 'MATCH' ? 'bg-green-500/20 text-green-400' :
+                      item.theirChoice === 'AMIZADE' ? 'bg-secondary/20 text-secondary' :
                       'bg-muted text-muted-foreground'
                     }`}>
                       {item.theirChoice}
@@ -161,8 +171,8 @@ export const MatchLogicSection = () => {
           {/* Note */}
           <div className="mt-8 p-6 rounded-xl bg-secondary/5 border border-secondary/20 text-center">
             <p className="text-foreground/80 text-sm">
-              <strong className="text-secondary">Nota Importante:</strong> O contato só é liberado se houver SIM ou TALVEZ mútuo.
-              Qualquer escolha com NÃO resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
+              <strong className="text-secondary">Nota Importante:</strong> O contato só é liberado se houver Match ou Amizade mútua.
+              Qualquer escolha com "Não faz meu tipo" resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
             </p>
           </div>
         </div>
