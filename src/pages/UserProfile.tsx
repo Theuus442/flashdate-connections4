@@ -113,31 +113,29 @@ export default function UserProfile() {
         <div className="container mx-auto px-6 py-8 flex-1 flex flex-col">
           {/* Page Header with Tabs */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
-                  {activeTab === 'profile' ? 'Meu Perfil' : 'Meus Matches'}
-                </h1>
-                <p className="text-muted-foreground">
-                  {activeTab === 'profile'
-                    ? 'Complete seu perfil e comece a fazer conexões'
-                    : `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`}
-                </p>
-              </div>
+            <div className="mb-8">
+              <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+                {activeTab === 'participants' ? 'Participantes' : 'Meus Matches'}
+              </h1>
+              <p className="text-muted-foreground">
+                {activeTab === 'participants'
+                  ? 'Veja quem mais está participando do evento'
+                  : `Você tem ${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`}
+              </p>
             </div>
 
             {/* Tabs */}
             <div className="flex gap-4 border-b border-border">
               <button
-                onClick={() => setActiveTab('profile')}
+                onClick={() => setActiveTab('participants')}
                 className={`px-4 py-3 font-medium transition-all relative ${
-                  activeTab === 'profile'
+                  activeTab === 'participants'
                     ? 'text-gold'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Meu Perfil
-                {activeTab === 'profile' && (
+                Participantes ({otherUsers.length})
+                {activeTab === 'participants' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
                 )}
               </button>
