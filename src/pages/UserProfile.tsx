@@ -311,22 +311,20 @@ export default function UserProfile() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-6xl font-bold text-gold/30">
-                              {user.name.charAt(0)}
-                            </span>
+                            <UserCircle2 size={100} className="text-gold/30" />
                           )}
 
                           {selection && (
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                               <div className="text-white text-center">
                                 {selection.type === 'match' && (
-                                  <div className="text-3xl mb-2">💕</div>
+                                  <Heart size={40} className="mb-2 mx-auto" fill="white" />
                                 )}
                                 {selection.type === 'friendship' && (
-                                  <div className="text-3xl mb-2">👥</div>
+                                  <Users size={40} className="mb-2 mx-auto" />
                                 )}
                                 {selection.type === 'no-interest' && (
-                                  <div className="text-3xl mb-2">❌</div>
+                                  <XCircle size={40} className="mb-2 mx-auto" />
                                 )}
                                 <p className="text-xs font-medium">
                                   {selection.type === 'match' && 'Match'}
@@ -343,7 +341,7 @@ export default function UserProfile() {
                           <div className="mb-4">
                             <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {user.age} anos • {user.profession}
+                              @{user.username}
                             </p>
                           </div>
 
