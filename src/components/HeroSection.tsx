@@ -28,7 +28,7 @@ export const HeroSection = () => {
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
               <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
               <span className="text-white drop-shadow-md">
-                <span className="text-gradient-gold">Encontros Reais</span>, utilizando
+                <span className="text-gradient-wine">Encontros Reais</span>, utilizando
               </span>
               <br />
               <span className="text-gradient-wine block">Inteligência Artificial</span>
