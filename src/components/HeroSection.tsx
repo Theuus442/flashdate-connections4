@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import heroBg from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
   return (
@@ -10,7 +9,7 @@ export const HeroSection = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroBg}
+          src="https://cdn.builder.io/api/v1/image/assets%2F45cbd39582f34d9083b683ebe80d9531%2Feb5bfdd83d90414790c6d2beeb9ef7ac?format=webp&width=800"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
         />
