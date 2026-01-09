@@ -7,13 +7,14 @@ export const HeroSection = () => {
       className="relative min-h-full flex flex-col"
     >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <img
           src="https://cdn.builder.io/api/v1/image/assets%2F45cbd39582f34d9083b683ebe80d9531%2Feb5bfdd83d90414790c6d2beeb9ef7ac?format=webp&width=1920"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
+          style={{ objectPosition: '35% 50%' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10" />
       </div>
 
       {/* Decorative Elements */}
@@ -25,18 +26,18 @@ export const HeroSection = () => {
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Main Title */}
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100 drop-shadow-lg">
-              <span className="text-white drop-shadow-md block mb-2">FlashDate</span>
-              <span className="text-white drop-shadow-md">
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-8 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+              <span className="text-white block mb-2">FlashDate</span>
+              <span className="text-white">
                 <span className="text-gradient-wine">Encontros Reais</span>, utilizando
               </span>
               <br />
               <span className="text-gradient-wine block">Inteligência Artificial</span>
-              <span className="text-white drop-shadow-md">para conexões verdadeiras</span>
+              <span className="text-white">para conexões verdadeiras</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 drop-shadow-md">
+            <p className="text-lg md:text-xl text-white max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match
               com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
