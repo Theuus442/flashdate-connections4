@@ -9,7 +9,7 @@ export const HeroSection = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 overflow-hidden">
         <img
-          src="https://cdn.builder.io/api/v1/image/assets%2F45cbd39582f34d9083b683ebe80d9531%2Feb5bfdd83d90414790c6d2beeb9ef7ac?format=webp&width=1920"
+          src="https://cdn.builder.io/api/v1/image/assets%2F4a212f387eb54876979913c5cf0408d5%2F6074e42db9fa4e5f936854eaea1be09c?format=webp&width=800"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
           style={{ objectPosition: '35% 50%' }}
