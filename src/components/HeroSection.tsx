@@ -26,16 +26,16 @@ export const HeroSection = () => {
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Main Title */}
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
-              <span className="text-white block mb-4">FlashDate.</span>
-              <div className="space-y-2">
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+              <span className="text-white block mb-2">FlashDate.</span>
+              <div className="space-y-0">
                 <div className="text-white">
-                  <span className="text-gradient-wine">Encontros Reais</span>,
+                  <span style={{ color: '#ff3366' }}>Encontros Reais</span>,
                 </div>
                 <div className="text-white">
                   utilizando
                 </div>
-                <div className="text-gradient-wine">
+                <div style={{ color: '#ff3366' }}>
                   Inteligência Artificial
                 </div>
                 <div className="text-white">
@@ -45,7 +45,7 @@ export const HeroSection = () => {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-base md:text-lg text-gray-200 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 mt-8" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
+            <p className="text-base md:text-lg text-gray-200 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up delay-200 mt-4" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
 
