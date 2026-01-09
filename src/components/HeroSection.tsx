@@ -12,7 +12,7 @@ export const HeroSection = () => {
           src="https://cdn.builder.io/api/v1/image/assets%2F4a212f387eb54876979913c5cf0408d5%2F6074e42db9fa4e5f936854eaea1be09c?format=webp&width=1920"
           alt="Flashdate - Encontros elegantes"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '35% 50%' }}
+          style={{ objectPosition: '50% 50%' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10" />
       </div>
@@ -26,7 +26,7 @@ export const HeroSection = () => {
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Main Title */}
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(20px)' }}>
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(39px)' }}>
               <span className="text-white block mb-2">FlashDate.</span>
               <div className="space-y-0">
                 <div className="text-white">
