@@ -94,8 +94,8 @@ export const NextEventSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Horário</h4>
-                      <p className="text-muted-foreground text-sm">Conforme agendado</p>
-                      <p className="text-gold font-semibold text-xs mt-1">Check-in: 15-30 min antes</p>
+                      <p className="text-muted-foreground text-sm">17:00hs às 19:00hs</p>
+                      <p className="text-wine font-semibold text-xs mt-1">Check-in: 15-30 min antes</p>
                     </div>
                   </div>
                 </div>
