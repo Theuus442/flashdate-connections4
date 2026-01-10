@@ -219,7 +219,7 @@ export const NextEventSection = () => {
         </div>
 
         {/* Newsletter Section */}
-        <div className="max-w-5xl mx-auto bg-gradient-to-r from-red-400/10 to-yellow-300/10 rounded-3xl border border-border/30 p-8 md:p-12">
+        <div className="max-w-5xl mx-auto bg-gradient-to-r from-primary/25 to-primary-dark/25 rounded-3xl border border-border/30 p-8 md:p-12">
           <h3 className="font-serif text-3xl font-bold text-foreground mb-4 text-center">
             Cadastre seu Email
           </h3>
