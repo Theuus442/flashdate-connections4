@@ -84,8 +84,8 @@ export const NextEventSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Data</h4>
-                      <p className="text-muted-foreground text-sm">Sábados com eventos regulares</p>
-                      <p className="text-secondary font-semibold text-xs mt-1">Próximo: 25/01/2026</p>
+                      <p className="text-muted-foreground text-sm">Sábado</p>
+                      <p className="text-wine font-semibold text-xs mt-1">25/01/2026</p>
                     </div>
                   </div>
 
