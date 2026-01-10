@@ -146,32 +146,32 @@ export const NextEventSection = () => {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Valor Promocional: R$40,00</p>
-                    <p className="text-muted-foreground">(não reembolsável por desistência)</p>
+                    <p className="font-semibold text-foreground mb-1">Valor: R$40,00</p>
+                    <p className="text-muted-foreground">Pagamento via Pix: (11) 97032-9710 - Nome: Sidnei</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
                   <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Garanta sua Vaga até 25/01/2026</p>
-                    <p className="text-muted-foreground">Vagas limitadas. Pix: (11) 97032-9710</p>
+                    <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: 25/01/2026</p>
+                    <p className="text-muted-foreground">Vagas limitadas</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Não há venda no local</p>
-                    <p className="text-muted-foreground">Pagamento antecipado é obrigatório</p>
+                    <p className="font-semibold text-foreground mb-1">Após o pagamento</p>
+                    <p className="text-muted-foreground">Acesse a aba <a href="#como-funciona" className="text-wine font-semibold hover:underline">Como Funciona</a> para saber os próximos passos</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Dica Extra: Música ao Vivo!</p>
-                    <p className="text-muted-foreground">Após o evento, aproveite a música ao vivo a partir das 19h com seus matches</p>
+                    <p className="font-semibold text-foreground mb-1">Horário do Evento</p>
+                    <p className="text-muted-foreground">17:00hs às 19:00hs (chegue com 15-30 min de antecedência para o check-in)</p>
                   </div>
                 </div>
               </div>
