@@ -253,15 +253,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -273,15 +273,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -293,15 +293,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -313,15 +313,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
