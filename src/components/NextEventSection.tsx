@@ -359,13 +359,13 @@ export const NextEventSection = () => {
             O Modelo Speed Dating
           </h3>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            O Speed Dating não é uma novidade: existe há mais de 25 anos porque <span className="text-gold font-semibold">funciona!</span>
+            O Speed Dating não é uma novidade: existe há mais de 25 anos porque <span className="text-wine font-semibold">funciona!</span>
             Nós pegamos esse método divertido e super popular em outros países e o trouxemos para o futuro, usando
-            <span className="text-gold font-semibold"> Inteligência Artificial</span> para dar aquele empurrãozinho extra na sua compatibilidade.
+            <span className="text-wine font-semibold"> Inteligência Artificial</span> para dar aquele empurrãozinho extra na sua compatibilidade.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            <span className="text-gold font-semibold">Chega de perder tempo!</span> Venha conhecer gente interessante, de forma segura e com a
-            certeza de que a tecnologia está trabalhando a seu favor para encontrar o seu <span className="text-gold font-semibold">match perfeito.</span>
+            <span className="text-wine font-semibold">Chega de perder tempo!</span> Venha conhecer gente interessante, de forma segura e com a
+            certeza de que a tecnologia está trabalhando a seu favor para encontrar o seu <span className="text-wine font-semibold">match perfeito.</span>
           </p>
         </div>
       </div>
