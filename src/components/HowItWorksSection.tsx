@@ -22,7 +22,7 @@ const steps = [
     number: '03',
     icon: Brain,
     title: 'Análise de IA',
-    description: 'Nossa IA utilizará suas respostas para...',
+    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará suas respostas para entender melhor seu perfil e encontrar o match mais compatível.',
     details: [],
   },
   {
