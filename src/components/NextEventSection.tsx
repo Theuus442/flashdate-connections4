@@ -181,7 +181,7 @@ export const NextEventSection = () => {
                   <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Email</p>
-                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
+                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
                       contato@flashdate.com.br
                     </a>
                   </div>
@@ -190,7 +190,7 @@ export const NextEventSection = () => {
                   <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
+                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
                       (11) 97032-9710
                     </a>
                   </div>
@@ -204,7 +204,7 @@ export const NextEventSection = () => {
                   <span className="text-sm text-muted-foreground">Valor Promocional</span>
                 </div>
                 <div className="mb-6">
-                  <span className="font-serif text-5xl font-bold text-gradient-gold">R$ 40</span>
+                  <span className="font-serif text-5xl font-bold text-gradient-wine">R$ 40</span>
                 </div>
                 <div className="flex justify-center">
                   <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
