@@ -228,6 +228,22 @@ export const NextEventSection = () => {
             Receba informações dos próximos eventos nas cidades abaixo
           </p>
 
+          {/* City Images */}
+          <div className="grid md:grid-cols-4 gap-4 mb-10">
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2Ffbe03bdc245d498c92b9e01bddadaa43?format=webp&width=800" alt="São Paulo" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F17e69ed45f994286a1d1220397d4c2f7?format=webp&width=800" alt="Santo André" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F10ba3cebab1d404eb68ef4fa2a495e75?format=webp&width=800" alt="São Bernardo" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F66ddd424e55144a09140cb7cc4994470?format=webp&width=800" alt="São Caetano" className="w-full h-48 object-cover" />
+            </div>
+          </div>
+
           {/* City Selection */}
           <div className="grid md:grid-cols-4 gap-4 mb-10">
             {cities.map(city => (
