@@ -30,11 +30,11 @@ export const NextEventSection = () => {
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-wine text-sm font-medium tracking-widest uppercase mb-4">
             Reserve Sua Vaga
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Próximo <span className="text-gradient-gold">Evento</span>
+            Próximo <span className="text-gradient-wine">Evento</span>
           </h2>
         </div>
 
