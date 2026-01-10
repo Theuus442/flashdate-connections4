@@ -72,7 +72,8 @@ export const NextEventSection = () => {
                       <h4 className="font-semibold text-foreground mb-1">Local</h4>
                       <p className="text-muted-foreground text-sm">
                         Armazém São Caetano<br />
-                        São Caetano do Sul, SP
+                        Rua Piauí, 248 - Santa Paula<br />
+                        São Caetano do Sul - SP, 09541-150
                       </p>
                     </div>
                   </div>
