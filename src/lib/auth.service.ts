@@ -51,28 +51,11 @@ export const authService = {
     console.log('[AUTH] Sign in attempt:', email);
 
     if (!isSupabaseConfigured()) {
-      console.warn('[AUTH] Supabase not configured, using test credentials');
-      // Fallback to test credentials
-      const testUser = TEST_CREDENTIALS.find(
-        (cred) => cred.email === email && cred.password === password
-      );
-
-      if (testUser) {
-        return {
-          user: {
-            id: testUser.id,
-            email: testUser.email,
-            user_metadata: { role: testUser.role, name: testUser.name },
-          },
-          session: { access_token: 'mock-token' },
-          error: null,
-        };
-      }
-
+      console.error('[AUTH] ❌ Supabase not configured');
       return {
         user: null,
         session: null,
-        error: new Error('Invalid credentials'),
+        error: new Error('Supabase is not configured'),
       };
     }
 
