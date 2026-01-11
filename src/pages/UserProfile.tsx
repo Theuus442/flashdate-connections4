@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -9,10 +9,17 @@ import { useSelections } from '@/context/SelectionsContext';
 export default function UserProfile() {
   const navigate = useNavigate();
   const { users: allUsers, updateUser } = useUsers();
-  const { updateSelection, getSelectionsByType } = useSelections();
+  const { updateSelection, setCurrentUserId, getSelectionsByType } = useSelections();
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
+
+  // Set current user in selections context
+  useEffect(() => {
+    if (currentUser) {
+      setCurrentUserId(currentUser.id);
+    }
+  }, [currentUser, setCurrentUserId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
