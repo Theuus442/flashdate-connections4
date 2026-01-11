@@ -251,7 +251,9 @@ export const usersService = {
       updateData.updated_at = new Date().toISOString();
 
       console.log('[usersService] Update data to send:', updateData);
+      console.log('[usersService] Fields being updated:', Object.keys(updateData));
       console.log('[usersService] Sending update request to Supabase for user:', id);
+      console.log('[usersService] Profile image URL included:', !!profileImageUrl);
 
       const { data, error } = await supabase
         .from('users')
