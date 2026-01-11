@@ -73,6 +73,12 @@ export const selectionsService = {
       return { data: [], error: null };
     }
 
+    // Skip if event_id is not a valid UUID (placeholder like 'default-event-id')
+    if (!isValidUUID(eventId)) {
+      console.log('Skipping selections load: invalid event_id format');
+      return { data: [], error: null };
+    }
+
     try {
       const { data, error } = await supabase
         .from('selections')
