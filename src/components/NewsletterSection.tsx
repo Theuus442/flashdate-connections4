@@ -1,27 +1,35 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MapPin, Send } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Send } from 'lucide-react';
 import { toast } from 'sonner';
 
-const cities = [
-  { id: 'sao-paulo', name: 'São Paulo' },
-  { id: 'santo-andre', name: 'Santo André' },
-  { id: 'sao-bernardo', name: 'São Bernardo' },
-  { id: 'sao-caetano', name: 'São Caetano' },
-];
-
 export const NewsletterSection = () => {
-  const [selectedCity, setSelectedCity] = useState('sao-paulo');
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [formData, setFormData] = useState({
+    assunto: '',
+    nome: '',
+    email: '',
+    mensagem: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const city = cities.find(c => c.id === selectedCity);
-    toast.success(`Obrigado! Você receberá novidades de eventos em ${city?.name}.`);
-    setEmail('');
-    setName('');
+    toast.success('Obrigado! Sua mensagem foi enviada com sucesso.');
+    setFormData({
+      assunto: '',
+      nome: '',
+      email: '',
+      mensagem: '',
+    });
   };
 
   return (
@@ -32,45 +40,39 @@ export const NewsletterSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
-            Fique Por Dentro
+            Entre em Contato
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Receba <span className="text-gradient-gold">Novidades</span>
+            Dúvidas, Parcerias e <span className="text-gradient-gold">Informações</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Cadastre-se para receber informações sobre eventos na sua cidade
+            Entre em contato conosco para qualquer dúvida, proposta de parceria ou informação adicional.
           </p>
         </div>
 
-        {/* City Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {cities.map((city) => (
-            <button
-              key={city.id}
-              onClick={() => setSelectedCity(city.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                selectedCity === city.id
-                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg shadow-yellow-500/30'
-                  : 'bg-card border border-border text-foreground hover:border-secondary/50'
-              }`}
-            >
-              <MapPin className="w-4 h-4" />
-              {city.name}
-            </button>
-          ))}
-        </div>
-
         {/* Form */}
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 border border-border shadow-elegant">
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Assunto</label>
+                <Input
+                  type="text"
+                  name="assunto"
+                  placeholder="Qual é o assunto da sua mensagem?"
+                  value={formData.assunto}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
                 <Input
                   type="text"
-                  placeholder="Seu nome"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name="nome"
+                  placeholder="Seu nome completo"
+                  value={formData.nome}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -78,15 +80,27 @@ export const NewsletterSection = () => {
                 <label className="block text-sm font-medium text-foreground mb-2">E-mail</label>
                 <Input
                   type="email"
+                  name="email"
                   placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleChange}
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Mensagem</label>
+                <Textarea
+                  name="mensagem"
+                  placeholder="Sua mensagem aqui..."
+                  value={formData.mensagem}
+                  onChange={handleChange}
+                  required
+                  className="min-h-32"
                 />
               </div>
               <Button type="submit" variant="hero" className="w-full text-xs sm:text-sm h-10 sm:h-12 px-3 sm:px-8 gap-1 sm:gap-2 flex-wrap">
                 <Send className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span>Quero Receber Novidades</span>
+                <span>Enviar Mensagem</span>
               </Button>
             </div>
           </form>
