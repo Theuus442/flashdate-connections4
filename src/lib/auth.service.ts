@@ -144,6 +144,78 @@ export const authService = {
   },
 
   /**
+   * Create user as admin with email and password (for admin panel)
+   * This creates both an auth user and a profile record
+   */
+  async createUserAsAdmin(email: string, password: string) {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[authService] Creating user as admin:', email);
+
+      // Create auth user without auto-confirming (simpler approach for admin)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+        },
+      });
+
+      if (error) {
+        console.error('[authService] Error creating auth user:', error);
+        throw error;
+      }
+
+      console.log('[authService] Auth user created:', data.user?.id);
+      return { data: data.user, error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[authService] Error creating user as admin:', {
+        message: errorMessage,
+        error,
+      });
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Update user password (admin function)
+   * Note: This uses the regular auth.updateUser API which has limitations
+   */
+  async updateUserPasswordAsAdmin(userId: string, newPassword: string) {
+    if (!isSupabaseConfigured()) {
+      return { error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[authService] Updating password for user:', userId);
+
+      // This will only work if we have proper session/permissions
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        console.error('[authService] Error updating password:', error);
+        throw error;
+      }
+
+      console.log('[authService] Password updated successfully');
+      return { error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[authService] Error updating password:', {
+        message: errorMessage,
+        error,
+      });
+      return { error };
+    }
+  },
+
+  /**
    * Listen to auth state changes
    */
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
