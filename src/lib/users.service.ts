@@ -144,16 +144,28 @@ export const usersService = {
         .select();
 
       if (error) {
-        const errorMsg = error instanceof Error
+        let errorMsg = error instanceof Error
           ? error.message
           : (error?.message || JSON.stringify(error));
+
+        // Provide better error messages for common issues
+        if (error?.code === '23505') {
+          if (errorMsg.includes('username')) {
+            errorMsg = 'Este apelido (username) já existe. Escolha outro apelido único.';
+          } else if (errorMsg.includes('email')) {
+            errorMsg = 'Este email já está cadastrado.';
+          } else {
+            errorMsg = 'Dados duplicados. Verifique se apelido ou email já existem.';
+          }
+        }
+
         console.error('[usersService] Database insert error:', {
           message: errorMsg,
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
         });
-        throw error;
+        throw new Error(errorMsg);
       }
 
       console.log('[usersService] Insert result:', { hasData: !!data, dataLength: data?.length });
