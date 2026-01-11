@@ -30,11 +30,57 @@ export const LGBTSection = () => {
     cidade: '',
   });
 
-  const [cidadesDisponiveis, setCidadesDisponiveis] = useState<string[]>([]);
+  const [estados, setEstados] = useState<Estado[]>([]);
+  const [municipios, setMunicipios] = useState<Municipio[]>([]);
+  const [loadingEstados, setLoadingEstados] = useState(true);
+  const [loadingMunicipios, setLoadingMunicipios] = useState(false);
 
-  const handleEstadoChange = (estado: string) => {
-    setFormData({ ...formData, estado, cidade: '' });
-    setCidadesDisponiveis(cidades[estado] || []);
+  // Fetch estados from IBGE API
+  useEffect(() => {
+    const fetchEstados = async () => {
+      try {
+        const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
+        const data = await response.json();
+        setEstados(data);
+      } catch (error) {
+        console.error('Erro ao carregar estados:', error);
+        toast.error('Erro ao carregar estados');
+      } finally {
+        setLoadingEstados(false);
+      }
+    };
+
+    fetchEstados();
+  }, []);
+
+  // Fetch municipios when estado changes
+  useEffect(() => {
+    if (formData.estado) {
+      const fetchMunicipios = async () => {
+        setLoadingMunicipios(true);
+        try {
+          const estadoSigla = estados.find(e => e.id.toString() === formData.estado)?.sigla;
+          if (estadoSigla) {
+            const response = await fetch(
+              `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoSigla}/municipios?orderBy=nome`
+            );
+            const data = await response.json();
+            setMunicipios(data);
+          }
+        } catch (error) {
+          console.error('Erro ao carregar municípios:', error);
+          toast.error('Erro ao carregar cidades');
+        } finally {
+          setLoadingMunicipios(false);
+        }
+      };
+
+      fetchMunicipios();
+    }
+  }, [formData.estado, estados]);
+
+  const handleEstadoChange = (estadoId: string) => {
+    setFormData({ ...formData, estado: estadoId, cidade: '' });
   };
 
   const toggleCheckbox = (field: 'generoBusca', value: string) => {
