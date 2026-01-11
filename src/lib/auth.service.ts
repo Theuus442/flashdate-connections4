@@ -214,14 +214,27 @@ export const authService = {
             console.log('[AUTH:STATE] Found role in database:', userData.role);
             role = userData.role as 'admin' | 'client';
           } else {
-            // Fallback to 'client' if not found
-            console.log('[AUTH:STATE] Role not found in database, using default: client', error?.message);
-            role = 'client';
+            // Fallback: check if email is in admin list or use default
+            console.log('[AUTH:STATE] Role not found in database, checking email for admin status...');
+            const adminEmails = ['matheus@teste.com', 'admin@flashdate.com'];
+            if (adminEmails.includes(session.user.email || '')) {
+              console.log('[AUTH:STATE] Email is in admin list, setting role to admin');
+              role = 'admin';
+            } else {
+              console.log('[AUTH:STATE] Using default: client');
+              role = 'client';
+            }
           }
         } catch (err) {
-          // If there's an error or timeout, use 'client' as default
+          // If there's an error or timeout, check email for admin status
           console.warn('[AUTH:STATE] Error fetching role (timeout or error):', err instanceof Error ? err.message : err);
-          role = 'client';
+          const adminEmails = ['matheus@teste.com', 'admin@flashdate.com'];
+          if (adminEmails.includes(session.user.email || '')) {
+            console.log('[AUTH:STATE] Query failed, but email is in admin list, setting role to admin');
+            role = 'admin';
+          } else {
+            role = 'client';
+          }
         }
 
         console.log('[AUTH:STATE] Callback with role:', role);
