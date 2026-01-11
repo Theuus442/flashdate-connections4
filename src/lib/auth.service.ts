@@ -69,44 +69,7 @@ export const authService = {
       }
 
       console.log('[signIn] Success, user ID:', data.user?.id);
-
-      // Always try to fetch and update user role from database
-      if (data.user) {
-        try {
-          console.log('[signIn] Fetching user role from database...');
-
-          // Wait a moment to ensure the user was created in the database
-          await new Promise(resolve => setTimeout(resolve, 500));
-
-          // Try to fetch user role with a simple query
-          const { data: userData } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', data.user.id)
-            .maybeSingle();
-
-          const userRole = (userData?.role || 'client') as 'admin' | 'client';
-
-          console.log('[signIn] Database role result:', { found: !!userData, role: userRole });
-
-          // Always update metadata with the found role (or default)
-          console.log('[signIn] Updating auth metadata with role:', userRole);
-          const { error: updateError } = await supabase.auth.updateUser({
-            data: {
-              ...data.user.user_metadata,
-              role: userRole,
-            }
-          });
-
-          if (updateError) {
-            console.error('[signIn] ERROR updating metadata:', updateError);
-          } else {
-            console.log('[signIn] ✓ Successfully updated metadata with role:', userRole);
-          }
-        } catch (err) {
-          console.error('[signIn] Error fetching/updating role:', err);
-        }
-      }
+      console.log('[signIn] User metadata:', data.user?.user_metadata);
 
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
