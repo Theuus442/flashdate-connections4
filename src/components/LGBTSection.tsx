@@ -1,57 +1,89 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Phone, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
-const estados = [
-  { value: 'sp', label: 'São Paulo' },
-  { value: 'mg', label: 'Minas Gerais' },
-  { value: 'rj', label: 'Rio de Janeiro' },
-  { value: 'ba', label: 'Bahia' },
-  { value: 'rs', label: 'Rio Grande do Sul' },
-  { value: 'sc', label: 'Santa Catarina' },
-  { value: 'pr', label: 'Paraná' },
-  { value: 'pe', label: 'Pernambuco' },
-  { value: 'ce', label: 'Ceará' },
-  { value: 'df', label: 'Distrito Federal' },
-];
+interface Estado {
+  id: number;
+  nome: string;
+  sigla: string;
+}
 
-const cidades: { [key: string]: string[] } = {
-  sp: ['São Paulo', 'Santo André', 'São Bernardo', 'São Caetano'],
-  mg: ['Belo Horizonte', 'Contagem', 'Betim'],
-  rj: ['Rio de Janeiro', 'Niterói', 'Duque de Caxias'],
-  ba: ['Salvador', 'Feira de Santana', 'Vitória da Conquista'],
-  rs: ['Porto Alegre', 'Caxias do Sul', 'Novo Hamburgo'],
-  sc: ['Florianópolis', 'Joinville', 'Blumenau'],
-  pr: ['Curitiba', 'Londrina', 'Maringá'],
-  pe: ['Recife', 'Jaboatão', 'Olinda'],
-  ce: ['Fortaleza', 'Juazeiro', 'Maracanaú'],
-  df: ['Brasília'],
-};
+interface Municipio {
+  id: number;
+  nome: string;
+}
 
 export const LGBTSection = () => {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     whatsapp: '',
-    identidadeGenero: [] as string[],
+    identidadeGenero: '',
     orientacao: '',
     generoBusca: [] as string[],
     estado: '',
     cidade: '',
   });
 
-  const [cidadesDisponiveis, setCidadesDisponiveis] = useState<string[]>([]);
+  const [estados, setEstados] = useState<Estado[]>([]);
+  const [municipios, setMunicipios] = useState<Municipio[]>([]);
+  const [loadingEstados, setLoadingEstados] = useState(true);
+  const [loadingMunicipios, setLoadingMunicipios] = useState(false);
 
-  const handleEstadoChange = (estado: string) => {
-    setFormData({ ...formData, estado, cidade: '' });
-    setCidadesDisponiveis(cidades[estado] || []);
+  // Fetch estados from IBGE API
+  useEffect(() => {
+    const fetchEstados = async () => {
+      try {
+        const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
+        const data = await response.json();
+        setEstados(data);
+      } catch (error) {
+        console.error('Erro ao carregar estados:', error);
+        toast.error('Erro ao carregar estados');
+      } finally {
+        setLoadingEstados(false);
+      }
+    };
+
+    fetchEstados();
+  }, []);
+
+  // Fetch municipios when estado changes
+  useEffect(() => {
+    if (formData.estado) {
+      const fetchMunicipios = async () => {
+        setLoadingMunicipios(true);
+        try {
+          const estadoSigla = estados.find(e => e.id.toString() === formData.estado)?.sigla;
+          if (estadoSigla) {
+            const response = await fetch(
+              `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoSigla}/municipios?orderBy=nome`
+            );
+            const data = await response.json();
+            setMunicipios(data);
+          }
+        } catch (error) {
+          console.error('Erro ao carregar municípios:', error);
+          toast.error('Erro ao carregar cidades');
+        } finally {
+          setLoadingMunicipios(false);
+        }
+      };
+
+      fetchMunicipios();
+    }
+  }, [formData.estado, estados]);
+
+  const handleEstadoChange = (estadoId: string) => {
+    setFormData({ ...formData, estado: estadoId, cidade: '' });
   };
 
-  const toggleCheckbox = (field: 'identidadeGenero' | 'generoBusca', value: string) => {
+  const toggleCheckbox = (field: 'generoBusca', value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -68,7 +100,7 @@ export const LGBTSection = () => {
       return;
     }
 
-    if (formData.identidadeGenero.length === 0) {
+    if (!formData.identidadeGenero) {
       toast.error('Por favor, selecione sua identidade de gênero');
       return;
     }
@@ -88,7 +120,7 @@ export const LGBTSection = () => {
       nome: '',
       email: '',
       whatsapp: '',
-      identidadeGenero: [],
+      identidadeGenero: '',
       orientacao: '',
       generoBusca: [],
       estado: '',
@@ -104,7 +136,7 @@ export const LGBTSection = () => {
 
       <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-muted/15 via-primary/10 to-secondary/10 rounded-full blur-3xl" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 pt-8">
         <div className="max-w-5xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
@@ -168,7 +200,7 @@ export const LGBTSection = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">WhatsApp <span className="text-xs text-muted-foreground">(opcional)</span></label>
+                    <label className="block text-sm font-medium text-foreground mb-2">WhatsApp <span className="text-xs text-muted-foreground">(opcional para contato via mensagem)</span></label>
                     <Input
                       type="tel"
                       placeholder="(11) 99999-9999"
@@ -182,24 +214,23 @@ export const LGBTSection = () => {
               {/* Gender Identity */}
               <div>
                 <h3 className="font-serif text-xl font-bold text-foreground mb-4">1. Identificação de Gênero <span className="text-sm font-normal text-gold">*</span></h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'masculino', label: 'Masculino' },
-                    { value: 'feminino', label: 'Feminino' },
-                    { value: 'homem-trans', label: 'Homem Trans' },
-                    { value: 'mulher-trans', label: 'Mulher Trans' },
-                    { value: 'nao-binario', label: 'Não-Binário' },
-                    { value: 'outro', label: 'Outro / Prefiro Não Dizer' },
-                  ].map((option) => (
-                    <label key={option.value} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-gold/40 cursor-pointer transition-colors">
-                      <Checkbox
-                        checked={formData.identidadeGenero.includes(option.value)}
-                        onCheckedChange={() => toggleCheckbox('identidadeGenero', option.value)}
-                      />
-                      <span className="text-sm text-foreground">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
+                <RadioGroup value={formData.identidadeGenero} onValueChange={(value) => setFormData({ ...formData, identidadeGenero: value })}>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {[
+                      { value: 'masculino', label: 'Masculino' },
+                      { value: 'feminino', label: 'Feminino' },
+                      { value: 'homem-trans', label: 'Homem Trans' },
+                      { value: 'mulher-trans', label: 'Mulher Trans' },
+                      { value: 'nao-binario', label: 'Não-Binário' },
+                      { value: 'outro', label: 'Outro / Prefiro Não Dizer' },
+                    ].map((option) => (
+                      <label key={option.value} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-gold/40 cursor-pointer transition-colors">
+                        <RadioGroupItem value={option.value} id={`identidade-${option.value}`} />
+                        <span className="text-sm text-foreground">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </RadioGroup>
               </div>
 
               {/* Sexual Orientation */}
@@ -255,14 +286,14 @@ export const LGBTSection = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Estado</label>
-                    <Select value={formData.estado} onValueChange={handleEstadoChange}>
+                    <Select value={formData.estado} onValueChange={handleEstadoChange} disabled={loadingEstados}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o estado" />
+                        <SelectValue placeholder={loadingEstados ? "Carregando..." : "Selecione o estado"} />
                       </SelectTrigger>
                       <SelectContent>
                         {estados.map((estado) => (
-                          <SelectItem key={estado.value} value={estado.value}>
-                            {estado.label}
+                          <SelectItem key={estado.id} value={estado.id.toString()}>
+                            {estado.nome}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -270,14 +301,14 @@ export const LGBTSection = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Cidade</label>
-                    <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })}>
-                      <SelectTrigger disabled={!formData.estado}>
-                        <SelectValue placeholder={formData.estado ? "Selecione a cidade" : "Selecione um estado primeiro"} />
+                    <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })} disabled={!formData.estado || loadingMunicipios}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={!formData.estado ? "Selecione um estado primeiro" : loadingMunicipios ? "Carregando..." : "Selecione a cidade"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {cidadesDisponiveis.map((cidade) => (
-                          <SelectItem key={cidade} value={cidade}>
-                            {cidade}
+                        {municipios.map((municipio) => (
+                          <SelectItem key={municipio.id} value={municipio.nome}>
+                            {municipio.nome}
                           </SelectItem>
                         ))}
                       </SelectContent>
