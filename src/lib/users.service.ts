@@ -160,11 +160,14 @@ export const usersService = {
         .single();
 
       if (error) {
+        const errorMsg = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
         console.error('[usersService] Database insert error:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
+          message: errorMsg,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
         });
       }
       console.log('[usersService] Insert result:', { hasData: !!data, hasError: !!error });
@@ -185,9 +188,10 @@ export const usersService = {
       console.log('[usersService] User created successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
       console.error('[usersService] Error creating user:', errorMessage);
-      console.error('[usersService] Full error:', error);
       return { data: null, error };
     }
   },
