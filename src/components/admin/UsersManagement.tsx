@@ -136,16 +136,40 @@ export const UsersManagement = () => {
       username: user.username,
       email: user.email,
       whatsapp: user.whatsapp,
-      profileImage: user.profileImage,
+      gender: user.gender,
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja deletar este usuário?')) {
-      deleteUser(id);
+      setIsLoading(true);
+      try {
+        const result = await deleteUser(id);
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário deletado com sucesso!',
+          });
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao deletar usuário',
+            variant: 'destructive',
+          });
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao deletar usuário',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
