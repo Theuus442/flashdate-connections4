@@ -474,14 +474,14 @@ export const UsersManagement = () => {
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Senha
+                  Senha {editingId ? '(Opcional)' : '(Obrigatória)'}
                 </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Insira uma senha segura"
+                  placeholder={editingId ? 'Deixe em branco para manter a senha atual' : 'Insira uma senha segura'}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
