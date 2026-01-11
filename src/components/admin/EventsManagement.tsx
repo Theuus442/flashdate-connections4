@@ -75,29 +75,75 @@ export const EventsManagement = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedImageFile(file);
+      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        setFormData(prev => ({
-          ...prev,
-          eventImage: imageUrl,
-        }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEventData(formData);
-    setIsEditing(false);
-    alert('Evento atualizado com sucesso!');
+    setIsLoading(true);
+
+    try {
+      if (supabaseConfigured) {
+        const { data, error } = await eventsService.updateEvent(
+          eventData.id,
+          formData,
+          selectedImageFile || undefined
+        );
+
+        if (error) {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao atualizar evento',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        if (data) {
+          setEventData(data);
+          setFormData(data);
+          setImagePreview(data.eventImage);
+          setSelectedImageFile(null);
+          toast({
+            title: 'Sucesso',
+            description: 'Evento atualizado com sucesso!',
+          });
+        }
+      } else {
+        // Fallback to local update
+        setEventData(formData);
+        setImagePreview(formData.eventImage);
+        toast({
+          title: 'Sucesso',
+          description: 'Evento atualizado (local apenas)',
+        });
+      }
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving event:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar evento',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setFormData(eventData);
     setImagePreview(eventData.eventImage);
+    setSelectedImageFile(null);
     setIsEditing(false);
   };
 
