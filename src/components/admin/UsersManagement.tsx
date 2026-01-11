@@ -270,17 +270,78 @@ export const UsersManagement = () => {
           <p className="text-muted-foreground mt-2">Cadastre e gerencie os participantes do evento</p>
         </div>
         {!showForm && (
-          <Button
-            variant="gold"
-            onClick={() => setShowForm(true)}
-            disabled={isLoading}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Novo Usuário
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Button
+                variant="destructive"
+                disabled={isLoading}
+                className="flex items-center gap-2"
+              >
+                <Trash2 size={20} />
+                Deletar em Massa
+              </Button>
+              <div className="absolute right-0 mt-1 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <button
+                  onClick={() => handleOpenBulkDeleteModal('client')}
+                  disabled={isLoading || users.filter(u => u.role === 'client').length === 0}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted/50 first:rounded-t-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Deletar Todos Clientes ({users.filter(u => u.role === 'client').length})
+                </button>
+                <div className="border-t border-border" />
+                <button
+                  onClick={() => handleOpenBulkDeleteModal('admin')}
+                  disabled={isLoading || users.filter(u => u.role === 'admin').length === 0}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted/50 last:rounded-b-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Deletar Todos Admins ({users.filter(u => u.role === 'admin').length})
+                </button>
+              </div>
+            </div>
+            <Button
+              variant="gold"
+              onClick={() => setShowForm(true)}
+              disabled={isLoading}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Novo Usuário
+            </Button>
+          </div>
         )}
       </div>
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-sm mx-4">
+            <h2 className="font-serif text-2xl font-bold text-foreground mb-4">
+              Confirmação de Exclusão em Massa
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              Você está prestes a deletar <strong>{bulkDeleteConfirmCount}</strong> {bulkDeleteRole === 'admin' ? 'administrador(es)' : 'cliente(s)'}.
+              <br /><br />
+              <span className="text-destructive font-semibold">Esta ação é irreversível!</span>
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkDeleteModal(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmBulkDelete}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Deletando...' : 'Confirmar Exclusão'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form */}
       {showForm && (
