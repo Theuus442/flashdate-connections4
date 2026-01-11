@@ -30,11 +30,11 @@ export const NextEventSection = () => {
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-wine text-sm font-medium tracking-widest uppercase mb-4">
             Reserve Sua Vaga
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Próximo <span className="text-gradient-gold">Evento</span>
+            Próximo <span className="text-gradient-wine">Evento</span>
           </h2>
         </div>
 
@@ -72,7 +72,8 @@ export const NextEventSection = () => {
                       <h4 className="font-semibold text-foreground mb-1">Local</h4>
                       <p className="text-muted-foreground text-sm">
                         Armazém São Caetano<br />
-                        São Caetano do Sul, SP
+                        Rua Piauí, 248 - Santa Paula<br />
+                        São Caetano do Sul - SP, 09541-150
                       </p>
                     </div>
                   </div>
@@ -83,8 +84,8 @@ export const NextEventSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Data</h4>
-                      <p className="text-muted-foreground text-sm">Sábados com eventos regulares</p>
-                      <p className="text-secondary font-semibold text-xs mt-1">Próximo: 25/01/2026</p>
+                      <p className="text-muted-foreground text-sm">Sábado</p>
+                      <p className="text-wine font-semibold text-xs mt-1">25/01/2026</p>
                     </div>
                   </div>
 
@@ -94,8 +95,8 @@ export const NextEventSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Horário</h4>
-                      <p className="text-muted-foreground text-sm">Conforme agendado</p>
-                      <p className="text-gold font-semibold text-xs mt-1">Check-in: 15-30 min antes</p>
+                      <p className="text-muted-foreground text-sm">17:00hs às 19:00hs</p>
+                      <p className="text-wine font-semibold text-xs mt-1">Check-in: 15-30 min antes</p>
                     </div>
                   </div>
                 </div>
@@ -145,32 +146,32 @@ export const NextEventSection = () => {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Valor Promocional: R$40,00</p>
-                    <p className="text-muted-foreground">(não reembolsável por desistência)</p>
+                    <p className="font-semibold text-foreground mb-1">Valor: R$40,00</p>
+                    <p className="text-muted-foreground">Pagamento via Pix: (11) 97032-9710 - Nome: Sidnei</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
                   <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Garanta sua Vaga até 25/01/2026</p>
-                    <p className="text-muted-foreground">Vagas limitadas. Pix: (11) 97032-9710</p>
+                    <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: 25/01/2026</p>
+                    <p className="text-muted-foreground">Vagas limitadas</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Não há venda no local</p>
-                    <p className="text-muted-foreground">Pagamento antecipado é obrigatório</p>
+                    <p className="font-semibold text-foreground mb-1">Após o pagamento</p>
+                    <p className="text-muted-foreground">Acesse a aba <a href="#como-funciona" className="text-wine font-semibold hover:underline">Como Funciona</a> para saber os próximos passos</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
                   <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Dica Extra: Música ao Vivo!</p>
-                    <p className="text-muted-foreground">Após o evento, aproveite a música ao vivo a partir das 19h com seus matches</p>
+                    <p className="font-semibold text-foreground mb-1">Horário do Evento</p>
+                    <p className="text-muted-foreground">17:00hs às 19:00hs (chegue com 15-30 min de antecedência para o check-in)</p>
                   </div>
                 </div>
               </div>
@@ -181,7 +182,7 @@ export const NextEventSection = () => {
                   <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Email</p>
-                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
+                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
                       contato@flashdate.com.br
                     </a>
                   </div>
@@ -190,7 +191,7 @@ export const NextEventSection = () => {
                   <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors break-all">
+                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
                       (11) 97032-9710
                     </a>
                   </div>
@@ -204,7 +205,7 @@ export const NextEventSection = () => {
                   <span className="text-sm text-muted-foreground">Valor Promocional</span>
                 </div>
                 <div className="mb-6">
-                  <span className="font-serif text-5xl font-bold text-gradient-gold">R$ 40</span>
+                  <span className="font-serif text-5xl font-bold text-gradient-wine">R$ 40</span>
                 </div>
                 <div className="flex justify-center">
                   <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
@@ -219,13 +220,29 @@ export const NextEventSection = () => {
         </div>
 
         {/* Newsletter Section */}
-        <div className="max-w-5xl mx-auto bg-gradient-to-r from-red-400/10 to-yellow-300/10 rounded-3xl border border-border/30 p-8 md:p-12">
+        <div className="max-w-5xl mx-auto bg-gradient-to-r from-primary/25 to-primary-dark/25 rounded-3xl border border-border/30 p-8 md:p-12">
           <h3 className="font-serif text-3xl font-bold text-foreground mb-4 text-center">
             Cadastre seu Email
           </h3>
           <p className="text-muted-foreground text-center mb-8">
             Receba informações dos próximos eventos nas cidades abaixo
           </p>
+
+          {/* City Images */}
+          <div className="grid md:grid-cols-4 gap-4 mb-10">
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2Ffbe03bdc245d498c92b9e01bddadaa43?format=webp&width=800" alt="São Paulo" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F17e69ed45f994286a1d1220397d4c2f7?format=webp&width=800" alt="Santo André" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F10ba3cebab1d404eb68ef4fa2a495e75?format=webp&width=800" alt="São Bernardo" className="w-full h-48 object-cover" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src="https://cdn.builder.io/api/v1/image/assets%2F58e8805b75844176990ce5b2f20e1469%2F66ddd424e55144a09140cb7cc4994470?format=webp&width=800" alt="São Caetano" className="w-full h-48 object-cover" />
+            </div>
+          </div>
 
           {/* City Selection */}
           <div className="grid md:grid-cols-4 gap-4 mb-10">
@@ -253,15 +270,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -273,15 +290,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -293,15 +310,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -313,15 +330,15 @@ export const NextEventSection = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Nome</label>
-                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="text" placeholder="Seu nome" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="email" placeholder="seu@email.com" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">WhatsApp (Opcional)</label>
-                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-gold" />
+                    <input type="tel" placeholder="(11) 99999-9999" className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-wine" />
                   </div>
                 </form>
               </div>
@@ -359,13 +376,13 @@ export const NextEventSection = () => {
             O Modelo Speed Dating
           </h3>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            O Speed Dating não é uma novidade: existe há mais de 25 anos porque <span className="text-gold font-semibold">funciona!</span>
+            O Speed Dating não é uma novidade: existe há mais de 25 anos porque <span className="text-wine font-semibold">funciona!</span>
             Nós pegamos esse método divertido e super popular em outros países e o trouxemos para o futuro, usando
-            <span className="text-gold font-semibold"> Inteligência Artificial</span> para dar aquele empurrãozinho extra na sua compatibilidade.
+            <span className="text-wine font-semibold"> Inteligência Artificial</span> para dar aquele empurrãozinho extra na sua compatibilidade.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            <span className="text-gold font-semibold">Chega de perder tempo!</span> Venha conhecer gente interessante, de forma segura e com a
-            certeza de que a tecnologia está trabalhando a seu favor para encontrar o seu <span className="text-gold font-semibold">match perfeito.</span>
+            <span className="text-wine font-semibold">Chega de perder tempo!</span> Venha conhecer gente interessante, de forma segura e com a
+            certeza de que a tecnologia está trabalhando a seu favor para encontrar o seu <span className="text-wine font-semibold">match perfeito.</span>
           </p>
         </div>
       </div>

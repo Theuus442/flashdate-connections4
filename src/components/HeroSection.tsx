@@ -4,7 +4,7 @@ export const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-full flex flex-col"
+      className="relative min-h-screen flex flex-col"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 overflow-hidden">
@@ -22,7 +22,7 @@ export const HeroSection = () => {
       <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center pt-24 pb-32">
+      <div className="relative z-10 flex-1 flex items-center justify-center pt-24 md:pt-32 lg:pt-40 pb-32">
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Main Title */}

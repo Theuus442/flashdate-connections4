@@ -6,9 +6,9 @@ const navLinks = [
   { href: '#home', label: 'Home' },
   { href: '#como-funciona', label: 'Como Funciona' },
   { href: '#proximo-evento', label: 'Próximo Evento' },
-  { href: '#lgbtq', label: 'LGBT+' },
+  { href: '#lgbtq', label: 'Área LGBT+' },
   { href: '#sobre', label: 'Sobre Nós' },
-  { href: '#faq', label: 'FAQ' },
+  { href: '#faq', label: 'Dúvidas' },
   { href: '#contato', label: 'Contato' },
 ];
 

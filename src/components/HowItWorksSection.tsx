@@ -22,7 +22,7 @@ const steps = [
     number: '03',
     icon: Brain,
     title: 'Análise de IA',
-    description: 'Nossa IA utilizará suas respostas para...',
+    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará suas respostas para entender melhor seu perfil e encontrar o match mais compatível.',
     details: [],
   },
   {
@@ -93,7 +93,7 @@ export const HowItWorksSection = () => {
                 </div>
 
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 mt-2 group-hover:scale-110 transition-transform duration-300">
                   <step.icon className="w-7 h-7 text-white" />
                 </div>
 
