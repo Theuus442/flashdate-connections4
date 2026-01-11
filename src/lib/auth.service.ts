@@ -153,75 +153,33 @@ export const authService = {
     }
 
     try {
-      console.log('[authService] Creating user as admin via serverless function:', email);
+      console.log('[authService] Creating user as admin via Supabase Edge Function:', email);
 
-      // Determine function URL - try Netlify first, fallback to Supabase Edge Function
-      let functionUrl = '';
-
-      // Get current origin to construct Netlify function URL
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const netlifyFunctionUrl = `${origin}/.netlify/functions/create-user-confirmed`;
-
-      // Try Netlify first (production), fallback to Supabase Edge Function (development)
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const supabaseFunctionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
+      const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
-      // Use Netlify if origin contains builderio.xyz or netlify, otherwise use Supabase
-      if (origin.includes('netlify') || origin.includes('builderio.xyz') || origin.includes('flashdate')) {
-        functionUrl = netlifyFunctionUrl;
-        console.log('[authService] Using Netlify function:', functionUrl);
-      } else {
-        functionUrl = supabaseFunctionUrl;
-        console.log('[authService] Using Supabase Edge Function:', functionUrl);
+      console.log('[authService] Calling Edge Function at:', functionUrl);
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      console.log('[authService] Response received - status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        console.error('[authService] Edge Function error:', errorMsg);
+        throw new Error(errorMsg);
       }
 
-      // Create abort controller with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-      try {
-        // Call the function to create confirmed user
-        const response = await fetch(functionUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        console.log('[authService] Response status:', response.status, response.statusText);
-
-        if (!response.ok) {
-          let errorMsg = `HTTP ${response.status}`;
-          try {
-            const errorData = await response.json();
-            errorMsg = errorData.error || errorMsg;
-          } catch (e) {
-            const text = await response.text();
-            errorMsg = text || errorMsg;
-          }
-          console.error('[authService] Function error:', errorMsg);
-          throw new Error(`Function failed: ${errorMsg}`);
-        }
-
-        const responseData = await response.json();
-        console.log('[authService] Function response:', responseData);
-
-        const user = responseData.data?.user;
-        console.log('[authService] Auth user created:', user?.id);
-        return { data: user, error: null };
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        if (fetchError instanceof TypeError && fetchError.name === 'AbortError') {
-          const timeoutError = new Error('Function request timed out after 30 seconds');
-          console.error('[authService] Timeout error:', timeoutError);
-          return { data: null, error: timeoutError };
-        }
-        throw fetchError;
-      }
+      const { data } = await response.json();
+      console.log('[authService] Auth user created:', data?.user?.id);
+      return { data: data.user, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
