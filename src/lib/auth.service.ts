@@ -103,11 +103,17 @@ export const authService = {
       // This handles cases where the user was created via admin panel
       if (data.user) {
         try {
+          // Simple, direct query with timeout protection
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
           const { data: userData, error: userError } = await supabase
             .from('users')
             .select('role')
-            .eq('email', email)
+            .eq('id', data.user.id) // Query by auth user ID (more reliable)
             .single();
+
+          clearTimeout(timeoutId);
 
           if (!userError && userData?.role) {
             // Update the user object with the role from database
@@ -116,67 +122,17 @@ export const authService = {
             } else {
               data.user.user_metadata = { role: userData.role };
             }
-          } else if (userError) {
-            // User doesn't exist in the users table
-            console.log('User not found in database, attempting to find by exact email match...');
-
-            // Try a case-insensitive search or look for similar email
-            try {
-              const { data: existingUser } = await supabase
-                .from('users')
-                .select('role')
-                .ilike('email', email) // Case-insensitive search
-                .single();
-
-              if (existingUser?.role) {
-                console.log('Found existing user with case-insensitive search');
-                if (data.user.user_metadata) {
-                  data.user.user_metadata.role = existingUser.role;
-                } else {
-                  data.user.user_metadata = { role: existingUser.role };
-                }
-              } else {
-                // Still not found, create new user
-                throw new Error('User not found');
-              }
-            } catch (searchErr) {
-              // User doesn't exist at all, create them automatically
-              console.log('Creating new user profile...');
-              try {
-                const { data: newUser, error: createError } = await supabase
-                  .from('users')
-                  .insert([{
-                    email: data.user.email,
-                    name: data.user.email?.split('@')[0] || 'User',
-                    username: data.user.email?.split('@')[0] || 'user',
-                    whatsapp: '',
-                    gender: 'Outro',
-                    role: 'admin', // Default to admin for new users created via login
-                  }])
-                  .select()
-                  .single();
-
-                if (!createError && newUser?.role) {
-                  console.log('User profile created successfully with role:', newUser.role);
-                  if (data.user.user_metadata) {
-                    data.user.user_metadata.role = newUser.role;
-                  } else {
-                    data.user.user_metadata = { role: newUser.role };
-                  }
-                }
-              } catch (createErr) {
-                console.warn('Could not create user profile:', createErr);
-                // Continue with login, set to admin role
-                if (data.user.user_metadata) {
-                  data.user.user_metadata.role = 'admin';
-                } else {
-                  data.user.user_metadata = { role: 'admin' };
-                }
-              }
+          } else {
+            // Default to 'client' if not found or error
+            console.log('Role not found in database, using default', userError?.message);
+            if (data.user.user_metadata) {
+              data.user.user_metadata.role = 'client';
+            } else {
+              data.user.user_metadata = { role: 'client' };
             }
           }
         } catch (err) {
-          console.warn('Error during user profile check/creation:', err);
+          console.warn('Error fetching user role:', err);
           // Continue with login, set default role
           if (data.user.user_metadata) {
             data.user.user_metadata.role = 'client';
