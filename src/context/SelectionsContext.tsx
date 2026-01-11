@@ -72,18 +72,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   }, [currentEventId, currentUserId, supabaseConfigured]);
 
   const addSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
-      return;
-    }
-
     try {
-      const { data, error } = await selectionsService.addSelection(eventId, userId, selectedUserId, vote);
-      if (error) {
-        console.error('Error adding selection:', error);
-        return;
-      }
+      const { data } = await selectionsService.addSelection(eventId, userId, selectedUserId, vote);
       if (data) {
         setSelections(prev => {
           // Remove existing selection for this selected user if it exists
