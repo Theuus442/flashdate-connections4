@@ -95,7 +95,16 @@ export const usersService = {
         console.log('[usersService] Image uploaded:', profileImageUrl);
       }
 
-      console.log('[usersService] Inserting user into database...');
+      console.log('[usersService] Inserting user into database with data:', {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        whatsapp: user.whatsapp,
+        gender: user.gender,
+        role: user.role || 'client',
+        hasImage: !!profileImageUrl,
+      });
+
       const { data, error } = await supabase
         .from('users')
         .insert([{
@@ -110,7 +119,15 @@ export const usersService = {
         .select()
         .single();
 
-      console.log('[usersService] Insert result:', { data, error: error?.message });
+      if (error) {
+        console.error('[usersService] Database insert error:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+        });
+      }
+      console.log('[usersService] Insert result:', { hasData: !!data, hasError: !!error });
 
       if (error) throw error;
 
