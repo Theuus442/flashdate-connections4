@@ -199,6 +199,7 @@ export const UsersManagement = () => {
           <Button
             variant="gold"
             onClick={() => setShowForm(true)}
+            disabled={isLoading}
             className="flex items-center gap-2"
           >
             <Plus size={20} />
