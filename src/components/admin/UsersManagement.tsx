@@ -62,10 +62,11 @@ export const UsersManagement = () => {
         email: !!formData.email,
         whatsapp: !!formData.whatsapp,
         password: !!formData.password,
+        role: !!formData.role,
       });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos (Nome, Apelido, Email, Telefone, Senha)',
+        description: 'Por favor, preencha todos os campos obrigatórios',
         variant: 'destructive',
       });
       setIsLoading(false);
