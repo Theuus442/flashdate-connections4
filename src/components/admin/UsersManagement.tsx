@@ -423,6 +423,7 @@ export const UsersManagement = () => {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Apelido</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Email</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Telefone</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Cargo</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Ações</th>
               </tr>
             </thead>
