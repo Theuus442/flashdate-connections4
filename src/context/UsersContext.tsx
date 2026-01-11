@@ -9,6 +9,7 @@ export interface User {
   email: string;
   whatsapp: string;
   gender: 'M' | 'F' | 'Outro';
+  role: 'admin' | 'client';
   profileImage?: string;
 }
 
