@@ -11,24 +11,6 @@ export interface AuthUser {
   role: 'admin' | 'client';
 }
 
-// Fallback for local development without Supabase
-const TEST_CREDENTIALS = [
-  { 
-    email: 'admin@flashdate.com', 
-    password: 'admin123', 
-    role: 'admin' as const,
-    id: '1',
-    name: 'Admin User'
-  },
-  { 
-    email: 'cliente@flashdate.com', 
-    password: 'cliente123', 
-    role: 'client' as const,
-    id: '2',
-    name: 'Cliente User'
-  },
-];
-
 export const authService = {
   /**
    * Sign up a new user
