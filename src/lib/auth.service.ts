@@ -146,29 +146,37 @@ export const authService = {
       console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
 
       if (session?.user) {
-        console.log('[onAuthStateChange] User detected, fetching role...');
+        console.log('[onAuthStateChange] User detected, checking role...');
         let role: 'admin' | 'client' = 'client';
 
-        // Try to fetch role from database, but DON'T block if it fails
-        try {
-          console.log('[onAuthStateChange] Querying users table...');
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+        // First check if role is in user metadata (set during signup)
+        const metadataRole = session.user.user_metadata?.role as 'admin' | 'client' | undefined;
+        if (metadataRole) {
+          console.log('[onAuthStateChange] Role found in metadata:', metadataRole);
+          role = metadataRole;
+        } else {
+          // If no role in metadata, try to fetch from database
+          try {
+            console.log('[onAuthStateChange] Querying users table for role...');
+            const { data: userData, error } = await supabase
+              .from('users')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
 
-          console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
+            console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
 
-          if (!error && userData?.role) {
-            console.log('[onAuthStateChange] Role found:', userData.role);
-            role = userData.role as 'admin' | 'client';
-          } else {
-            console.warn('[onAuthStateChange] No role found, using default');
+            if (!error && userData?.role) {
+              console.log('[onAuthStateChange] Role found in database:', userData.role);
+              role = userData.role as 'admin' | 'client';
+            } else {
+              console.warn('[onAuthStateChange] No role found in database, using default');
+              role = 'client';
+            }
+          } catch (err) {
+            console.error('[onAuthStateChange] Query error:', err);
+            role = 'client';
           }
-        } catch (err) {
-          console.error('[onAuthStateChange] Query error:', err);
-          role = 'client';
         }
 
         console.log('[onAuthStateChange] Calling callback with role:', role);
