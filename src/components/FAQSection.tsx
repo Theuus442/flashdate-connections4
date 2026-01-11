@@ -253,8 +253,8 @@ export const FAQSection = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           {faqData.map((category, categoryIndex) => (
             <div key={categoryIndex}>
-              <h3 className="font-serif text-xl font-bold text-secondary mb-4 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-sm">
+              <h3 className="font-serif text-xl font-bold text-blue-600 mb-4 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-sm text-blue-600">
                   {categoryIndex + 1}
                 </span>
                 {category.category}
