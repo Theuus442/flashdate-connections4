@@ -20,19 +20,22 @@ export const storageService = {
       const fileName = `${userId}-${Date.now()}-${file.name}`;
       const filePath = `profiles/${fileName}`;
 
+      console.log('[storageService] Uploading profile image to bucket: profiles');
       const { error: uploadError } = await supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data } = supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .getPublicUrl(filePath);
 
+      console.log('[storageService] Profile image uploaded successfully:', data.publicUrl);
       return { data: data.publicUrl, error: null };
     } catch (error) {
+      console.error('[storageService] Error uploading profile image:', error);
       return { data: null, error };
     }
   },
