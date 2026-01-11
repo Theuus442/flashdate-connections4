@@ -143,31 +143,42 @@ export const authService = {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
+
       if (session?.user) {
+        console.log('[onAuthStateChange] User detected, fetching role...');
         let role: 'admin' | 'client' = 'client';
 
         // Try to fetch role from database, but DON'T block if it fails
         try {
+          console.log('[onAuthStateChange] Querying users table...');
           const { data: userData, error } = await supabase
             .from('users')
             .select('role')
             .eq('id', session.user.id)
             .single();
 
+          console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
+
           if (!error && userData?.role) {
+            console.log('[onAuthStateChange] Role found:', userData.role);
             role = userData.role as 'admin' | 'client';
+          } else {
+            console.warn('[onAuthStateChange] No role found, using default');
           }
         } catch (err) {
-          // If query fails, just use default role
+          console.error('[onAuthStateChange] Query error:', err);
           role = 'client';
         }
 
+        console.log('[onAuthStateChange] Calling callback with role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
           role,
         });
       } else {
+        console.log('[onAuthStateChange] No session');
         callback(null);
       }
     });
