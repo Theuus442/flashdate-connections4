@@ -216,6 +216,51 @@ export const UsersManagement = () => {
     setImagePreview(undefined);
   };
 
+  const handleOpenBulkDeleteModal = (role: 'admin' | 'client') => {
+    const countToDelete = users.filter(u => u.role === role).length;
+    if (countToDelete === 0) {
+      toast({
+        title: 'Nenhum usuário',
+        description: `Não há ${role === 'admin' ? 'administradores' : 'clientes'} para deletar`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    setBulkDeleteRole(role);
+    setBulkDeleteConfirmCount(countToDelete);
+    setShowBulkDeleteModal(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    setIsLoading(true);
+    try {
+      const result = await deleteAllByRole(bulkDeleteRole);
+
+      if (result.error) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao deletar ${bulkDeleteRole === 'admin' ? 'administradores' : 'clientes'}`,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Sucesso',
+          description: `${result.count} ${bulkDeleteRole === 'admin' ? 'administrador(es)' : 'cliente(s)'} deletado(s) com sucesso!`,
+        });
+        setShowBulkDeleteModal(false);
+      }
+    } catch (error) {
+      console.error('Error during bulk delete:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao deletar usuários',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
