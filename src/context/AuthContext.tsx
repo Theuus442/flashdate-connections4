@@ -17,17 +17,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is already logged in on mount
   useEffect(() => {
+    console.log('[AuthContext] Setting up auth listener');
     const unsubscribe = authService.onAuthStateChange((authUser) => {
+      console.log('[AuthContext] Auth state changed:', { hasUser: !!authUser, role: authUser?.role });
       if (authUser) {
-        // Use role from auth metadata (set during signup/login)
         const role = (authUser.role || 'client') as 'admin' | 'client';
 
+        console.log('[AuthContext] Setting user:', { id: authUser.id, email: authUser.email, role });
         setUser({
           id: authUser.id,
           email: authUser.email,
           role,
         });
       } else {
+        console.log('[AuthContext] Clearing user');
         setUser(null);
       }
       setIsLoading(false);
