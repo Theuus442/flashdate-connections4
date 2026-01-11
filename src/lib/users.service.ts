@@ -92,7 +92,7 @@ export const usersService = {
   },
 
   /**
-   * Create new user - creates user directly in database without auth emails
+   * Create new user - creates user in both database and authentication
    */
   async createUser(user: Omit<User, 'id'>, profileImage?: File): Promise<{ data: User | null; error: any }> {
     if (!isSupabaseConfigured()) {
@@ -107,6 +107,22 @@ export const usersService = {
       // Generate a unique ID for the user
       const userId = crypto.randomUUID();
       console.log('[usersService] Generated user ID:', userId);
+
+      // Create auth user if password provided (Edge Function handles no email confirmation)
+      if (user.password && user.password.trim()) {
+        console.log('[usersService] Creating auth user with Edge Function...');
+        const authResult = await authService.createUserAsAdmin(user.email, user.password.trim());
+        if (authResult.error) {
+          const errorMsg = authResult.error instanceof Error
+            ? authResult.error.message
+            : JSON.stringify(authResult.error);
+          console.error('[usersService] Error creating auth user:', errorMsg);
+          // Don't throw - auth creation is secondary, we can still create user in DB
+          console.log('[usersService] Continuing with database creation despite auth error');
+        } else {
+          console.log('[usersService] Auth user created:', authResult.data?.id);
+        }
+      }
 
       // Upload profile image if provided
       if (profileImage) {
@@ -127,8 +143,7 @@ export const usersService = {
         hasImage: !!profileImageUrl,
       });
 
-      // Create user directly in database - no auth system needed!
-      // This avoids email confirmations completely
+      // Create user in database
       const { data, error } = await supabase
         .from('users')
         .insert([{
