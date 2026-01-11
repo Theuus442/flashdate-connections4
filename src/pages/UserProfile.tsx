@@ -188,7 +188,7 @@ export default function UserProfile() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Matches ({matchCount})
+                SIM ({matchCount})
                 {activeTab === 'matches' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
                 )}
