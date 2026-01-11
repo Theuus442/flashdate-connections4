@@ -57,7 +57,10 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, [supabaseConfigured]);
 
   const addUser = async (user: Omit<User, 'id'>, profileImage?: File) => {
+    console.log('[UsersContext] addUser called with:', user);
+
     if (!supabaseConfigured) {
+      console.log('[UsersContext] Supabase not configured, using local state');
       // Fallback to local state
       const newUser: User = {
         ...user,
@@ -68,17 +71,22 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
 
     try {
+      console.log('[UsersContext] Calling usersService.createUser...');
       const { data, error } = await usersService.createUser(user, profileImage);
+
+      console.log('[UsersContext] createUser response:', { hasData: !!data, hasError: !!error, error });
+
       if (error) {
-        console.error('Error adding user:', error);
+        console.error('[UsersContext] Error adding user:', error);
         return null;
       }
       if (data) {
+        console.log('[UsersContext] User created successfully:', data);
         setUsers(prev => [...prev, data]);
         return data;
       }
     } catch (error) {
-      console.error('Error adding user:', error);
+      console.error('[UsersContext] Error adding user:', error);
     }
     return null;
   };
