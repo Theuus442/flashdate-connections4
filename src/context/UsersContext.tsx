@@ -167,11 +167,40 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return users.find(user => user.id === id);
   };
 
+  const deleteAllByRole = async (role: 'admin' | 'client') => {
+    if (!supabaseConfigured) {
+      // Fallback to local state
+      const filteredUsers = users.filter(u => u.role !== role);
+      setUsers(filteredUsers);
+      return { count: users.length - filteredUsers.length, error: null };
+    }
+
+    try {
+      console.log('[UsersContext] Deleting all users with role:', role);
+      const result = await usersService.deleteAllByRole(role);
+
+      if (result.error) {
+        console.error('[UsersContext] Error deleting users by role:', result.error);
+        return result;
+      }
+
+      // Update local state to remove deleted users
+      setUsers(prev => prev.filter(u => u.role !== role));
+      console.log('[UsersContext] Successfully deleted', result.count, 'users with role:', role);
+
+      return result;
+    } catch (error) {
+      console.error('[UsersContext] Error deleting users by role:', error);
+      return { count: 0, error };
+    }
+  };
+
   const value: UsersContextType = {
     users,
     addUser,
     updateUser,
     deleteUser,
+    deleteAllByRole,
     getUserById,
     isLoading,
   };
