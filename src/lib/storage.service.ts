@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { sanitizeFilename } from './utils';
 
 export const storageService = {
   /**
