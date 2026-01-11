@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -9,10 +9,17 @@ import { useSelections } from '@/context/SelectionsContext';
 export default function UserProfile() {
   const navigate = useNavigate();
   const { users: allUsers, updateUser } = useUsers();
-  const { updateSelection, getSelectionsByType } = useSelections();
+  const { updateSelection, setCurrentUserId, getSelectionsByType } = useSelections();
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
+
+  // Set current user in selections context
+  useEffect(() => {
+    if (currentUser) {
+      setCurrentUserId(currentUser.id);
+    }
+  }, [currentUser, setCurrentUserId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
@@ -38,32 +45,44 @@ export default function UserProfile() {
     return filtered;
   }, [currentUser, allUsers, genderFilter, sortOrder]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && currentUser) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        const updatedUser = { ...currentUser, profileImage: imageUrl };
-        updateUser(currentUser.id, updatedUser);
-        toast.success('Foto atualizada com sucesso!');
+        const result = await updateUser(currentUser.id, { profileImage: imageUrl }, file);
+        if (result) {
+          toast.success('Foto atualizada com sucesso!');
+        } else {
+          toast.error('Falha ao atualizar foto');
+        }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
+  const handleRemoveImage = async () => {
     if (currentUser) {
       setImagePreview(undefined);
-      const updatedUser = { ...currentUser, profileImage: undefined };
-      updateUser(currentUser.id, updatedUser);
-      toast.success('Foto removida');
+      const result = await updateUser(currentUser.id, { profileImage: undefined });
+      if (result) {
+        toast.success('Foto removida');
+      } else {
+        toast.error('Falha ao remover foto');
+      }
     }
   };
 
-  const handleSelection = (userId: string, type: 'match' | 'friendship' | 'no-interest') => {
-    updateSelection(userId, type);
+  const handleSelection = async (selectedUserId: string, type: 'match' | 'friendship' | 'no-interest') => {
+    if (!currentUser) return;
+    try {
+      await updateSelection(currentUser.id, selectedUserId, type);
+    } catch (error) {
+      console.error('Error updating selection:', error);
+      toast.error('Erro ao processar seleção');
+    }
   };
 
   const matchCount = getSelectionsByType('match').length;

@@ -2,21 +2,25 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
+import { useToast } from '@/hooks/use-toast';
 
 export const UsersManagement = () => {
   const { users, addUser, updateUser, deleteUser } = useUsers();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
     username: '',
     email: '',
     whatsapp: '',
-    profileImage: undefined as string | undefined,
+    gender: 'Outro' as 'M' | 'F' | 'Outro',
   });
 
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,68 +33,101 @@ export const UsersManagement = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        setFormData(prev => ({
-          ...prev,
-          profileImage: imageUrl,
-        }));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleRemoveImage = () => {
+    setSelectedImageFile(undefined);
     setImagePreview(undefined);
-    setFormData(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
   };
 
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
-      alert('Por favor, preencha todos os campos');
+      toast({
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
       return;
     }
 
-    if (editingId) {
-      const updatedUser: User = {
-        id: editingId,
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        profileImage: formData.profileImage,
-      };
-      updateUser(editingId, updatedUser);
-      setEditingId(null);
-    } else {
-      const newUser: User = {
-        id: Date.now().toString(),
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        profileImage: formData.profileImage,
-      };
-      addUser(newUser);
-    }
+    try {
+      if (editingId) {
+        const result = await updateUser(editingId, {
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          gender: formData.gender,
+        }, selectedImageFile);
 
-    setFormData({
-      name: '',
-      username: '',
-      email: '',
-      whatsapp: '',
-      profileImage: undefined,
-    });
-    setImagePreview(undefined);
-    setShowForm(false);
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário atualizado com sucesso!',
+          });
+          setEditingId(null);
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao atualizar usuário',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        const result = await addUser({
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          gender: formData.gender,
+        }, selectedImageFile);
+
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário cadastrado com sucesso!',
+          });
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao cadastrar usuário',
+            variant: 'destructive',
+          });
+        }
+      }
+
+      setFormData({
+        name: '',
+        username: '',
+        email: '',
+        whatsapp: '',
+        gender: 'Outro',
+      });
+      setSelectedImageFile(undefined);
+      setImagePreview(undefined);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao processar formulário',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleEdit = (user: User) => {
@@ -99,16 +136,40 @@ export const UsersManagement = () => {
       username: user.username,
       email: user.email,
       whatsapp: user.whatsapp,
-      profileImage: user.profileImage,
+      gender: user.gender,
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja deletar este usuário?')) {
-      deleteUser(id);
+      setIsLoading(true);
+      try {
+        const result = await deleteUser(id);
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário deletado com sucesso!',
+          });
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao deletar usuário',
+            variant: 'destructive',
+          });
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao deletar usuário',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -120,8 +181,9 @@ export const UsersManagement = () => {
       username: '',
       email: '',
       whatsapp: '',
-      profileImage: undefined,
+      gender: 'Outro',
     });
+    setSelectedImageFile(undefined);
     setImagePreview(undefined);
   };
 
@@ -137,6 +199,7 @@ export const UsersManagement = () => {
           <Button
             variant="gold"
             onClick={() => setShowForm(true)}
+            disabled={isLoading}
             className="flex items-center gap-2"
           >
             <Plus size={20} />
@@ -260,15 +323,32 @@ export const UsersManagement = () => {
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Gênero
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as 'M' | 'F' | 'Outro' }))}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                >
+                  <option value="Outro">Outro</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                </select>
+              </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-4 justify-end">
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
                 Cancelar
               </Button>
-              <Button variant="gold" type="submit">
-                {editingId ? 'Atualizar' : 'Cadastrar'}
+              <Button variant="gold" type="submit" disabled={isLoading}>
+                {isLoading ? (editingId ? 'Atualizando...' : 'Cadastrando...') : (editingId ? 'Atualizar' : 'Cadastrar')}
               </Button>
             </div>
           </form>

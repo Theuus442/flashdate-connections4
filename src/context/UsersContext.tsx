@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { usersService } from '@/lib/users.service';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 export interface User {
   id: string;
@@ -12,14 +14,16 @@ export interface User {
 
 interface UsersContextType {
   users: User[];
-  addUser: (user: User) => void;
-  updateUser: (id: string, user: User) => void;
-  deleteUser: (id: string) => void;
+  addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<User | null>;
+  updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
+  deleteUser: (id: string) => Promise<boolean>;
   getUserById: (id: string) => User | undefined;
+  isLoading: boolean;
 }
 
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
+// Mock initial users for fallback
 const initialUsers: User[] = [
   {
     id: '1',
@@ -73,19 +77,108 @@ const initialUsers: User[] = [
 
 export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>(initialUsers);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabaseConfigured = isSupabaseConfigured();
 
-  const addUser = (user: User) => {
-    setUsers(prev => [...prev, user]);
+  // Load users from Supabase on mount
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (!supabaseConfigured) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await usersService.getUsers();
+        if (error) {
+          console.error('Error loading users:', error);
+        } else if (data) {
+          setUsers(data);
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, [supabaseConfigured]);
+
+  const addUser = async (user: Omit<User, 'id'>, profileImage?: File) => {
+    if (!supabaseConfigured) {
+      // Fallback to local state
+      const newUser: User = {
+        ...user,
+        id: Date.now().toString(),
+      };
+      setUsers(prev => [...prev, newUser]);
+      return newUser;
+    }
+
+    try {
+      const { data, error } = await usersService.createUser(user, profileImage);
+      if (error) {
+        console.error('Error adding user:', error);
+        return null;
+      }
+      if (data) {
+        setUsers(prev => [...prev, data]);
+        return data;
+      }
+    } catch (error) {
+      console.error('Error adding user:', error);
+    }
+    return null;
   };
 
-  const updateUser = (id: string, updatedUser: User) => {
-    setUsers(prev =>
-      prev.map(user => (user.id === id ? updatedUser : user))
-    );
+  const updateUser = async (id: string, updates: Partial<User>, profileImage?: File) => {
+    if (!supabaseConfigured) {
+      // Fallback to local state
+      const updatedUser = users.find(u => u.id === id);
+      if (updatedUser) {
+        const newUser = { ...updatedUser, ...updates };
+        setUsers(prev => prev.map(u => (u.id === id ? newUser : u)));
+        return newUser;
+      }
+      return null;
+    }
+
+    try {
+      const { data, error } = await usersService.updateUser(id, updates, profileImage);
+      if (error) {
+        console.error('Error updating user:', error);
+        return null;
+      }
+      if (data) {
+        setUsers(prev => prev.map(u => (u.id === id ? data : u)));
+        return data;
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+    return null;
   };
 
-  const deleteUser = (id: string) => {
-    setUsers(prev => prev.filter(user => user.id !== id));
+  const deleteUser = async (id: string) => {
+    if (!supabaseConfigured) {
+      // Fallback to local state
+      setUsers(prev => prev.filter(u => u.id !== id));
+      return true;
+    }
+
+    try {
+      const { error } = await usersService.deleteUser(id);
+      if (error) {
+        console.error('Error deleting user:', error);
+        return false;
+      }
+      setUsers(prev => prev.filter(u => u.id !== id));
+      return true;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
   };
 
   const getUserById = (id: string) => {
@@ -98,6 +191,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     updateUser,
     deleteUser,
     getUserById,
+    isLoading,
   };
 
   return (
