@@ -254,40 +254,40 @@ export default function UserProfile() {
                         {/* Action Buttons */}
                         <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
-                            onClick={() => handleSelection(user.id, 'match')}
+                            onClick={() => handleSelection(user.id, 'SIM')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'match'
+                              selection?.vote === 'SIM'
                                 ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Match"
+                            title="SIM"
                           >
-                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Match</span>
+                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'friendship')}
+                            onClick={() => handleSelection(user.id, 'TALVEZ')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'friendship'
+                              selection?.vote === 'TALVEZ'
                                 ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Amizade"
+                            title="TALVEZ"
                           >
-                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Amigos</span>
+                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'no-interest')}
+                            onClick={() => handleSelection(user.id, 'NÃO')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'no-interest'
+                              selection?.vote === 'NÃO'
                                 ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Não faz meu tipo"
+                            title="NÃO"
                           >
-                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Não meu tipo</span>
+                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
                           </button>
                         </div>
                       </div>
