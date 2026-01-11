@@ -156,6 +156,7 @@ export const UsersManagement = () => {
       email: user.email,
       whatsapp: user.whatsapp,
       gender: user.gender,
+      password: user.password || '',
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
