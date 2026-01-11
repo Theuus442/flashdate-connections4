@@ -106,15 +106,20 @@ export const usersService = {
 
       // First, create auth user with password if provided
       let authUserId: string | undefined;
-      if (user.password) {
+      if (user.password && user.password.trim()) {
         console.log('[usersService] Creating auth user with password...');
-        const authResult = await authService.createUserAsAdmin(user.email, user.password);
+        const authResult = await authService.createUserAsAdmin(user.email, user.password.trim());
         if (authResult.error) {
-          console.error('[usersService] Error creating auth user:', authResult.error);
+          const errorMsg = authResult.error instanceof Error
+            ? authResult.error.message
+            : JSON.stringify(authResult.error);
+          console.error('[usersService] Error creating auth user:', errorMsg);
           throw authResult.error;
         }
         authUserId = authResult.data?.id;
         console.log('[usersService] Auth user created:', authUserId);
+      } else {
+        console.log('[usersService] No password provided, user will need to set one later');
       }
 
       // Upload profile image if provided
