@@ -23,6 +23,9 @@ export const UsersManagement = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [bulkDeleteRole, setBulkDeleteRole] = useState<'admin' | 'client'>('client');
+  const [bulkDeleteConfirmCount, setBulkDeleteConfirmCount] = useState(0);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
