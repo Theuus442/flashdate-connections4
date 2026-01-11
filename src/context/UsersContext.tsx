@@ -19,6 +19,7 @@ interface UsersContextType {
   addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<User | null>;
   updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
   deleteUser: (id: string) => Promise<boolean>;
+  deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
   getUserById: (id: string) => User | undefined;
   isLoading: boolean;
 }
