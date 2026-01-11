@@ -83,7 +83,7 @@ export const UsersManagement = () => {
           whatsapp: formData.whatsapp,
           gender: formData.gender,
           password: formData.password,
-          role: 'client',
+          role: formData.role,
         }, selectedImageFile);
 
         console.log('[UsersManagement] Update result:', result);
