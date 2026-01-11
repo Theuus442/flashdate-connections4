@@ -52,7 +52,7 @@ export const LGBTSection = () => {
     setCidadesDisponiveis(cidades[estado] || []);
   };
 
-  const toggleCheckbox = (field: 'identidadeGenero' | 'generoBusca', value: string) => {
+  const toggleCheckbox = (field: 'generoBusca', value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: prev[field].includes(value)
