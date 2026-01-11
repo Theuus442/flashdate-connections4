@@ -5,7 +5,7 @@ import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
 
 export const UsersManagement = () => {
-  const { users, addUser, updateUser, deleteUser } = useUsers();
+  const { users, addUser, updateUser, deleteUser, deleteAllByRole } = useUsers();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
