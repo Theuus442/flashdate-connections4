@@ -248,7 +248,8 @@ export const selectionsService = {
    * Remove selection
    */
   async removeSelection(eventId: string, userId: string, selectedUserId: string): Promise<{ error: any }> {
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !isValidUUID(eventId)) {
+      // Return success for local state update
       return { error: null };
     }
 
@@ -264,7 +265,7 @@ export const selectionsService = {
 
       return { error: null };
     } catch (error: any) {
-      console.error('Error removing selection:', error?.message || error);
+      console.error('Error removing selection from database:', error?.message || error);
       // Return success even on error to allow local state update
       return { error: null };
     }
