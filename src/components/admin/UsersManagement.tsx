@@ -145,16 +145,28 @@ export const UsersManagement = () => {
         }, selectedImageFile);
 
         console.log('[UsersManagement] Add user result:', result);
-        if (result) {
+        if (result.data) {
           toast({
             title: 'Sucesso',
             description: 'Usuário cadastrado com sucesso!',
           });
+          setFormData({
+            name: '',
+            username: '',
+            email: '',
+            whatsapp: '',
+            gender: 'Outro',
+            password: '',
+            role: 'client',
+          });
+          setSelectedImageFile(undefined);
+          setImagePreview(undefined);
+          setShowForm(false);
         } else {
-          console.error('[UsersManagement] Failed to add user - no result returned');
+          console.error('[UsersManagement] Failed to add user:', result.error);
           toast({
             title: 'Erro',
-            description: 'Falha ao cadastrar usuário - verifique o console para detalhes',
+            description: result.error || 'Falha ao cadastrar usuário',
             variant: 'destructive',
           });
         }

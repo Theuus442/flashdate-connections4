@@ -16,7 +16,7 @@ export interface User {
 
 interface UsersContextType {
   users: User[];
-  addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<User | null>;
+  addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
   updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
   deleteUser: (id: string) => Promise<boolean>;
   deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
@@ -88,7 +88,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         id: Date.now().toString(),
       };
       setUsers(prev => [...prev, newUser]);
-      return newUser;
+      return { data: newUser, error: null };
     }
 
     try {
@@ -101,17 +101,19 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (error) {
         console.error('[UsersContext] Error adding user:', errorMessage);
         console.error('[UsersContext] Full error:', error);
-        return null;
+        return { data: null, error: errorMessage };
       }
       if (data) {
         console.log('[UsersContext] User created successfully:', data);
         setUsers(prev => [...prev, data]);
-        return data;
+        return { data, error: null };
       }
     } catch (error) {
-      console.error('[UsersContext] Error adding user:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[UsersContext] Error adding user:', errorMessage);
+      return { data: null, error: errorMessage };
     }
-    return null;
+    return { data: null, error: 'Unknown error' };
   };
 
   const updateUser = async (id: string, updates: Partial<User>, profileImage?: File) => {
