@@ -135,6 +135,7 @@ export const usersService = {
           gender: user.gender,
           role: user.role || 'client',
           profile_image_url: profileImageUrl,
+          password: user.password,
         }])
         .select()
         .single();
@@ -160,6 +161,7 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
+        password: data.password,
       };
 
       console.log('[usersService] User created successfully:', transformedData);
