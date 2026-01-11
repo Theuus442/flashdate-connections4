@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { User } from '@/context/UsersContext';
 import { storageService } from './storage.service';
+import { authService } from './auth.service';
 
 export const usersService = {
   /**
