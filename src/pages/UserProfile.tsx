@@ -387,15 +387,15 @@ export default function UserProfile() {
                   {/* Stats */}
                   <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Matches</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">SIM</p>
                       <p className="text-3xl font-bold text-gold">{matchCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Amizades</p>
-                      <p className="text-3xl font-bold text-secondary">{friendshipCount}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">TALVEZ</p>
+                      <p className="text-3xl font-bold text-secondary">{talvezCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Seleções</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Total</p>
                       <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
                     </div>
                   </div>
