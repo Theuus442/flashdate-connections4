@@ -247,7 +247,10 @@ export const usersService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
-      if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
+      if (profileImageUrl) {
+        updateData.profile_image_url = profileImageUrl;
+        console.log('[usersService] 🖼️ Profile image URL to save:', profileImageUrl);
+      }
       updateData.updated_at = new Date().toISOString();
 
       console.log('[usersService] Update data to send:', updateData);
