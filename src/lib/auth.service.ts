@@ -142,12 +142,8 @@ export const authService = {
       if (session?.user) {
         let role: 'admin' | 'client' = 'client';
 
-        console.log('[AUTH:STATE] ✅ Auth state change detected for user:', session.user.id, session.user.email);
-
         // Try to fetch role from database, but DON'T block if it fails
         try {
-          console.log('[AUTH:STATE] Attempting to fetch user role from database...');
-
           const { data: userData, error } = await supabase
             .from('users')
             .select('role')
@@ -155,28 +151,19 @@ export const authService = {
             .single();
 
           if (!error && userData?.role) {
-            console.log('[AUTH:STATE] ✅ Found role in database:', userData.role);
             role = userData.role as 'admin' | 'client';
-          } else if (error) {
-            console.warn('[AUTH:STATE] ⚠️  Could not find user in database:', error.message);
-            // If user not found in DB, try to see if they're already known
-            console.log('[AUTH:STATE] Falling back to default role (client)');
-            role = 'client';
           }
         } catch (err) {
-          console.warn('[AUTH:STATE] ⚠️  Error querying database:', err instanceof Error ? err.message : err);
-          console.log('[AUTH:STATE] Continuing with default role (client)');
+          // If query fails, just use default role
           role = 'client';
         }
 
-        console.log('[AUTH:STATE] ✅ Calling callback with user:', { id: session.user.id, email: session.user.email, role });
         callback({
           id: session.user.id,
           email: session.user.email || '',
           role,
         });
       } else {
-        console.log('[AUTH:STATE] No session, clearing user');
         callback(null);
       }
     });
