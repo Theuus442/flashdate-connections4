@@ -592,17 +592,30 @@ export const UsersManagement = () => {
                     <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center overflow-hidden">
                       {user.profileImage ? (
                         <img
+                          key={`img-${user.id}-${user.profileImage}`}
                           src={user.profileImage}
                           alt={user.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.error('[UsersManagement] Image load failed for user:', user.name);
+                            console.error('[UsersManagement] ❌ Image load failed for user:', user.name);
                             console.error('[UsersManagement] Image URL:', user.profileImage);
-                            console.error('[UsersManagement] Error:', e);
-                            (e.target as HTMLImageElement).style.display = 'none';
+                            const event = e as any;
+                            console.error('[UsersManagement] Error event:', {
+                              status: event.target?.status,
+                              statusText: event.target?.statusText,
+                              response: event.target?.response
+                            });
+                            // Don't hide - show initial instead
+                            (e.target as HTMLImageElement).replaceWith(
+                              Object.assign(document.createElement('span'), {
+                                className: 'text-lg font-bold text-gold',
+                                textContent: user.name.charAt(0)
+                              })
+                            );
                           }}
                           onLoad={() => {
-                            console.log('[UsersManagement] Image loaded successfully:', user.profileImage);
+                            console.log('[UsersManagement] ✅ Image loaded successfully for:', user.name);
+                            console.log('[UsersManagement] URL:', user.profileImage);
                           }}
                         />
                       ) : (
