@@ -301,8 +301,12 @@ export const usersService = {
 
         userData = fetchedUser;
         console.log('[usersService] Successfully fetched user after update');
+        console.log('[usersService] Fetched user data from DB:', userData);
+        console.log('[usersService] 🖼️ profile_image_url from DB:', userData.profile_image_url);
       } else {
         userData = data[0];
+        console.log('[usersService] Using user data from update .select()');
+        console.log('[usersService] 🖼️ profile_image_url from update:', userData.profile_image_url);
       }
       const transformedData: User = {
         id: userData.id,
