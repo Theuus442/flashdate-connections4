@@ -127,14 +127,19 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
 
     try {
-      console.log('[UsersContext] Updating user:', id, 'with updates:', updates);
-      const { data, error } = await usersService.updateUser(id, updates, profileImage);
+      console.log('[UsersContext] Updating user:', id);
+      // Don't pass empty password
+      const updatesToSend = { ...updates };
+      if (updatesToSend.password === '') {
+        delete updatesToSend.password;
+      }
+
+      const { data, error } = await usersService.updateUser(id, updatesToSend, profileImage);
       if (error) {
-        const errorMessage = error instanceof Error ? error.message : (error?.message || JSON.stringify(error));
-        console.error('[UsersContext] Error updating user:', {
-          message: errorMessage,
-          error,
-        });
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error)));
+        console.error('[UsersContext] Error updating user:', errorMessage);
         return null;
       }
       if (data) {
@@ -143,11 +148,10 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return data;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-      console.error('[UsersContext] Error updating user:', {
-        message: errorMessage,
-        error,
-      });
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      console.error('[UsersContext] Error updating user:', errorMessage);
     }
     return null;
   };
