@@ -25,7 +25,8 @@ export default async (req: Request) => {
       const body = await req.json() as CreateUserRequest;
       email = body.email;
       password = body.password;
-    } catch {
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
       return new Response(
         JSON.stringify({ error: "Invalid JSON in request body" }),
         {
@@ -36,6 +37,7 @@ export default async (req: Request) => {
     }
 
     if (!email || !password) {
+      console.error("Missing required fields:", { email, password });
       return new Response(
         JSON.stringify({ error: "Email and password are required" }),
         {
@@ -45,9 +47,14 @@ export default async (req: Request) => {
       );
     }
 
+    console.log("Creating user:", email);
+
     // Get the service role key from environment
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    console.log("Service role key available:", !!serviceRoleKey);
+
     if (!serviceRoleKey) {
+      console.error("Service role key not configured");
       return new Response(
         JSON.stringify({ error: "Service role key not configured" }),
         {
@@ -59,7 +66,10 @@ export default async (req: Request) => {
 
     // Get Supabase URL from environment
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    console.log("Supabase URL:", supabaseUrl);
+
     if (!supabaseUrl) {
+      console.error("Supabase URL not configured");
       return new Response(
         JSON.stringify({ error: "Supabase URL not configured" }),
         {
@@ -70,8 +80,15 @@ export default async (req: Request) => {
     }
 
     // Create admin client with service role key
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    console.log("Creating Supabase admin client...");
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
 
+    console.log("Creating auth user as admin...");
     // Create user as admin - this creates user already confirmed without email
     const { data, error } = await supabase.auth.admin.createUser({
       email,
@@ -80,22 +97,24 @@ export default async (req: Request) => {
     });
 
     if (error) {
-      console.error("Error creating user:", error);
+      console.error("Auth admin createUser error:", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    console.log("User created successfully:", data?.user?.id);
     return new Response(JSON.stringify({ data }), {
       status: 201,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Unexpected error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
       }),
       {
         status: 500,
