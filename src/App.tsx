@@ -31,10 +31,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/landing" element={<LandingSimple />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/dashboard" element={<ClientDashboard />} />
-              <Route path="/event-selection" element={<EventUserSelection />} />
-              <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPanel /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
+              <Route path="/event-selection" element={<ProtectedRoute><EventUserSelection /></ProtectedRoute>} />
+              <Route path="/user-profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
