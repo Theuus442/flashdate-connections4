@@ -153,20 +153,34 @@ export const authService = {
     }
 
     try {
-      console.log('[authService] Creating user as admin via Edge Function:', email);
+      console.log('[authService] Creating user as admin via serverless function:', email);
 
-      // Get the Supabase URL to construct the function URL
+      // Determine function URL - try Netlify first, fallback to Supabase Edge Function
+      let functionUrl = '';
+
+      // Get current origin to construct Netlify function URL
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const netlifyFunctionUrl = `${origin}/.netlify/functions/create-user-confirmed`;
+
+      // Try Netlify first (production), fallback to Supabase Edge Function (development)
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
+      const supabaseFunctionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
-      console.log('[authService] Calling Edge Function at:', functionUrl);
+      // Use Netlify if origin contains builderio.xyz or netlify, otherwise use Supabase
+      if (origin.includes('netlify') || origin.includes('builderio.xyz') || origin.includes('flashdate')) {
+        functionUrl = netlifyFunctionUrl;
+        console.log('[authService] Using Netlify function:', functionUrl);
+      } else {
+        functionUrl = supabaseFunctionUrl;
+        console.log('[authService] Using Supabase Edge Function:', functionUrl);
+      }
 
       // Create abort controller with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       try {
-        // Call the Edge Function to create confirmed user (no auth needed - public function)
+        // Call the function to create confirmed user
         const response = await fetch(functionUrl, {
           method: 'POST',
           headers: {
@@ -189,20 +203,20 @@ export const authService = {
             const text = await response.text();
             errorMsg = text || errorMsg;
           }
-          console.error('[authService] Edge Function error:', errorMsg);
-          throw new Error(`Edge Function failed: ${errorMsg}`);
+          console.error('[authService] Function error:', errorMsg);
+          throw new Error(`Function failed: ${errorMsg}`);
         }
 
         const responseData = await response.json();
-        console.log('[authService] Edge Function response:', responseData);
+        console.log('[authService] Function response:', responseData);
 
         const user = responseData.data?.user;
-        console.log('[authService] Auth user created via Edge Function:', user?.id);
+        console.log('[authService] Auth user created:', user?.id);
         return { data: user, error: null };
       } catch (fetchError) {
         clearTimeout(timeoutId);
         if (fetchError instanceof TypeError && fetchError.name === 'AbortError') {
-          const timeoutError = new Error('Edge Function request timed out after 30 seconds');
+          const timeoutError = new Error('Function request timed out after 30 seconds');
           console.error('[authService] Timeout error:', timeoutError);
           return { data: null, error: timeoutError };
         }
