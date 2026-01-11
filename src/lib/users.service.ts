@@ -75,21 +75,35 @@ export const usersService = {
    */
   async createUser(user: Omit<User, 'id'>, profileImage?: File): Promise<{ data: User | null; error: any }> {
     if (!isSupabaseConfigured()) {
+      console.error('[usersService] Supabase not configured');
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
+      console.log('[usersService] Creating user:', user);
       let profileImageUrl: string | undefined;
 
       // Upload profile image if provided
       if (profileImage) {
+        console.log('[usersService] Uploading profile image...');
         const result = await storageService.uploadUserProfileImage(
           Date.now().toString(),
           profileImage
         );
         if (result.error) throw result.error;
         profileImageUrl = result.data;
+        console.log('[usersService] Image uploaded:', profileImageUrl);
       }
+
+      console.log('[usersService] Inserting user into database with data:', {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        whatsapp: user.whatsapp,
+        gender: user.gender,
+        role: user.role || 'client',
+        hasImage: !!profileImageUrl,
+      });
 
       const { data, error } = await supabase
         .from('users')
@@ -105,6 +119,16 @@ export const usersService = {
         .select()
         .single();
 
+      if (error) {
+        console.error('[usersService] Database insert error:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+        });
+      }
+      console.log('[usersService] Insert result:', { hasData: !!data, hasError: !!error });
+
       if (error) throw error;
 
       const transformedData: User = {
@@ -118,8 +142,12 @@ export const usersService = {
         profileImage: data.profile_image_url,
       };
 
+      console.log('[usersService] User created successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[usersService] Error creating user:', errorMessage);
+      console.error('[usersService] Full error:', error);
       return { data: null, error };
     }
   },

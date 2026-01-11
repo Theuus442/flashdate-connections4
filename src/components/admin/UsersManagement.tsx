@@ -50,12 +50,19 @@ export const UsersManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[UsersManagement] Form submitted with data:', formData);
     setIsLoading(true);
 
     if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
+      console.warn('[UsersManagement] Validation failed - missing fields:', {
+        name: !!formData.name,
+        username: !!formData.username,
+        email: !!formData.email,
+        whatsapp: !!formData.whatsapp,
+      });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos',
+        description: 'Por favor, preencha todos os campos (Nome, Apelido, Email, Telefone)',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -64,14 +71,17 @@ export const UsersManagement = () => {
 
     try {
       if (editingId) {
+        console.log('[UsersManagement] Updating user:', editingId);
         const result = await updateUser(editingId, {
           name: formData.name,
           username: formData.username,
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
+          role: 'client',
         }, selectedImageFile);
 
+        console.log('[UsersManagement] Update result:', result);
         if (result) {
           toast({
             title: 'Sucesso',
@@ -86,23 +96,27 @@ export const UsersManagement = () => {
           });
         }
       } else {
+        console.log('[UsersManagement] Creating new user with data:', formData);
         const result = await addUser({
           name: formData.name,
           username: formData.username,
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
+          role: 'client',
         }, selectedImageFile);
 
+        console.log('[UsersManagement] Add user result:', result);
         if (result) {
           toast({
             title: 'Sucesso',
             description: 'Usuário cadastrado com sucesso!',
           });
         } else {
+          console.error('[UsersManagement] Failed to add user - no result returned');
           toast({
             title: 'Erro',
-            description: 'Falha ao cadastrar usuário',
+            description: 'Falha ao cadastrar usuário - verifique o console para detalhes',
             variant: 'destructive',
           });
         }
@@ -119,10 +133,10 @@ export const UsersManagement = () => {
       setImagePreview(undefined);
       setShowForm(false);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('[UsersManagement] Error submitting form:', error);
       toast({
         title: 'Erro',
-        description: 'Erro ao processar formulário',
+        description: `Erro ao processar formulário: ${error instanceof Error ? error.message : 'Desconhecido'}`,
         variant: 'destructive',
       });
     } finally {

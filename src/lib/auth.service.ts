@@ -63,14 +63,14 @@ export const authService = {
         password,
       });
 
-      console.log('[signIn] Auth response received');
-
       if (error) {
         console.error('[signIn] Auth error:', error.message);
         throw error;
       }
 
       console.log('[signIn] Success, user ID:', data.user?.id);
+      console.log('[signIn] User metadata:', data.user?.user_metadata);
+
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       console.error('[signIn] Caught error:', error);
@@ -146,32 +146,44 @@ export const authService = {
       console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
 
       if (session?.user) {
-        console.log('[onAuthStateChange] User detected, fetching role...');
-        let role: 'admin' | 'client' = 'client';
+        console.log('[onAuthStateChange] User detected:', session.user.id, session.user.email);
+        console.log('[onAuthStateChange] User metadata:', session.user.user_metadata);
 
-        // Try to fetch role from database, but DON'T block if it fails
-        try {
-          console.log('[onAuthStateChange] Querying users table...');
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+        let role: 'admin' | 'client' = (session.user.user_metadata?.role as 'admin' | 'client') || 'client';
 
-          console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
+        // If no role in metadata, try to fetch from database and update metadata
+        if (!session.user.user_metadata?.role) {
+          console.log('[onAuthStateChange] No role in metadata, fetching from database...');
+          try {
+            const { data: userData } = await supabase
+              .from('users')
+              .select('role')
+              .eq('id', session.user.id)
+              .maybeSingle();
 
-          if (!error && userData?.role) {
-            console.log('[onAuthStateChange] Role found:', userData.role);
-            role = userData.role as 'admin' | 'client';
-          } else {
-            console.warn('[onAuthStateChange] No role found, using default');
+            if (userData?.role) {
+              console.log('[onAuthStateChange] Found role in database:', userData.role);
+              role = userData.role as 'admin' | 'client';
+
+              // Update metadata for next time
+              try {
+                console.log('[onAuthStateChange] Updating metadata with role:', userData.role);
+                await supabase.auth.updateUser({
+                  data: {
+                    ...session.user.user_metadata,
+                    role: userData.role,
+                  }
+                });
+              } catch (err) {
+                console.warn('[onAuthStateChange] Could not update metadata:', err);
+              }
+            }
+          } catch (err) {
+            console.warn('[onAuthStateChange] Could not fetch from database:', err);
           }
-        } catch (err) {
-          console.error('[onAuthStateChange] Query error:', err);
-          role = 'client';
         }
 
-        console.log('[onAuthStateChange] Calling callback with role:', role);
+        console.log('[onAuthStateChange] Final role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
