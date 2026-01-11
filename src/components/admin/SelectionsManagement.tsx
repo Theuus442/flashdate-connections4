@@ -3,12 +3,12 @@ import { useUsers } from '@/context/UsersContext';
 import { Heart, Users, X } from 'lucide-react';
 
 export const SelectionsManagement = () => {
-  const { getSelectionsByType } = useSelections();
+  const { getSelectionsByVote } = useSelections();
   const { users } = useUsers();
 
-  const matches = getSelectionsByType('match');
-  const friendships = getSelectionsByType('friendship');
-  const noInterests = getSelectionsByType('no-interest');
+  const matches = getSelectionsByVote('SIM');
+  const maybe = getSelectionsByVote('TALVEZ');
+  const noInterests = getSelectionsByVote('NÃO');
 
   const getUserName = (userId: string) => {
     return users.find(u => u.id === userId)?.name || 'Usuário desconhecido';
