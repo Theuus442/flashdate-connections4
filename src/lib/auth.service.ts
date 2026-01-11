@@ -148,6 +148,7 @@ export const authService = {
    */
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
     if (!isSupabaseConfigured()) {
+      console.warn('[onAuthStateChange] Supabase not configured');
       return () => {};
     }
 
@@ -190,7 +191,12 @@ export const authService = {
               }
             }
           } catch (err) {
-            console.warn('[onAuthStateChange] Could not fetch from database:', err);
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            if (err instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+              console.error('[onAuthStateChange] Network error while fetching user role from database');
+            } else {
+              console.warn('[onAuthStateChange] Could not fetch from database:', err);
+            }
           }
         }
 
