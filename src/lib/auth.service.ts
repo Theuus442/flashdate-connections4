@@ -122,11 +122,22 @@ export const authService = {
         console.log('[AUTH] Fetching user role for ID:', data.user.id);
         try {
           console.log('[AUTH] Querying users table for role...');
-          const { data: userData, error: userError } = await supabase
+
+          // Wrap with timeout to prevent hanging
+          const roleQueryPromise = supabase
             .from('users')
             .select('role')
-            .eq('id', data.user.id) // Query by auth user ID (more reliable)
+            .eq('id', data.user.id)
             .single();
+
+          const roleTimeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Role query timeout (3s)')), 3000)
+          );
+
+          const { data: userData, error: userError } = await Promise.race([
+            roleQueryPromise,
+            roleTimeoutPromise
+          ]) as any;
 
           console.log('[AUTH] Users table query result:', { hasRole: !!userData?.role, error: userError?.message });
 
