@@ -153,18 +153,35 @@ export const authService = {
           console.log('[onAuthStateChange] Role found in metadata:', metadataRole);
           role = metadataRole as 'admin' | 'client';
         } else {
-          // Try to fetch user role from database
+          // Try to fetch user role from database with timeout
           console.log('[onAuthStateChange] No role in metadata, querying users table...');
           try {
-            const { data: userData, error } = await supabase
+            console.log('[onAuthStateChange] Starting database query...');
+
+            const queryPromise = supabase
               .from('users')
               .select('role')
               .eq('id', session.user.id)
               .maybeSingle();
 
-            if (!error && userData?.role) {
-              console.log('[onAuthStateChange] Role found in database:', userData.role);
-              role = userData.role as 'admin' | 'client';
+            // Create a timeout that resolves after 3 seconds
+            const timeoutPromise = new Promise((resolve) => {
+              setTimeout(() => {
+                console.warn('[onAuthStateChange] Query timeout after 3s, using default role');
+                resolve({ data: null, error: new Error('timeout') });
+              }, 3000);
+            });
+
+            const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+
+            console.log('[onAuthStateChange] Query result:', { userData: result.data, error: result.error?.message });
+
+            if (result.data?.role) {
+              console.log('[onAuthStateChange] Role found in database:', result.data.role);
+              role = result.data.role as 'admin' | 'client';
+            } else if (result.error?.message === 'timeout') {
+              console.warn('[onAuthStateChange] Query timed out, using default');
+              role = 'client';
             } else {
               console.warn('[onAuthStateChange] No user record found, using default role');
               role = 'client';
