@@ -183,24 +183,23 @@ export const LGBTSection = () => {
               {/* Gender Identity */}
               <div>
                 <h3 className="font-serif text-xl font-bold text-foreground mb-4">1. Identificação de Gênero <span className="text-sm font-normal text-gold">*</span></h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'masculino', label: 'Masculino' },
-                    { value: 'feminino', label: 'Feminino' },
-                    { value: 'homem-trans', label: 'Homem Trans' },
-                    { value: 'mulher-trans', label: 'Mulher Trans' },
-                    { value: 'nao-binario', label: 'Não-Binário' },
-                    { value: 'outro', label: 'Outro / Prefiro Não Dizer' },
-                  ].map((option) => (
-                    <label key={option.value} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-gold/40 cursor-pointer transition-colors">
-                      <Checkbox
-                        checked={formData.identidadeGenero.includes(option.value)}
-                        onCheckedChange={() => toggleCheckbox('identidadeGenero', option.value)}
-                      />
-                      <span className="text-sm text-foreground">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
+                <RadioGroup value={formData.identidadeGenero} onValueChange={(value) => setFormData({ ...formData, identidadeGenero: value })}>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {[
+                      { value: 'masculino', label: 'Masculino' },
+                      { value: 'feminino', label: 'Feminino' },
+                      { value: 'homem-trans', label: 'Homem Trans' },
+                      { value: 'mulher-trans', label: 'Mulher Trans' },
+                      { value: 'nao-binario', label: 'Não-Binário' },
+                      { value: 'outro', label: 'Outro / Prefiro Não Dizer' },
+                    ].map((option) => (
+                      <label key={option.value} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-gold/40 cursor-pointer transition-colors">
+                        <RadioGroupItem value={option.value} id={`identidade-${option.value}`} />
+                        <span className="text-sm text-foreground">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </RadioGroup>
               </div>
 
               {/* Sexual Orientation */}
