@@ -247,11 +247,14 @@ export const usersService = {
         .single();
 
       if (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
         console.error('[usersService] Update error:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
         });
         throw error;
       }
@@ -265,17 +268,15 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
-        password: data.password,
       };
 
       console.log('[usersService] User updated successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-      console.error('[usersService] Error updating user:', {
-        message: errorMessage,
-        error,
-      });
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error updating user:', errorMessage);
       return { data: null, error };
     }
   },
