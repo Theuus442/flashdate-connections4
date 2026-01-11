@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -9,6 +11,18 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { signIn, isAuthenticated, user } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/user-profile');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +43,17 @@ export default function LoginPage() {
         return;
       }
 
-      setError('Autenticação com Supabase não configurada. Por favor, configure as variáveis de ambiente do Supabase.');
-      setIsLoading(false);
+      const result = await signIn(email, password);
+
+      if (result.success) {
+        toast.success('Login realizado com sucesso!');
+        // Navigation will happen via the useEffect above
+      } else {
+        setError(result.error || 'Erro ao fazer login');
+      }
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
+    } finally {
       setIsLoading(false);
     }
   };
