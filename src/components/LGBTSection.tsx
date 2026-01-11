@@ -69,7 +69,7 @@ export const LGBTSection = () => {
       return;
     }
 
-    if (formData.identidadeGenero.length === 0) {
+    if (!formData.identidadeGenero) {
       toast.error('Por favor, selecione sua identidade de gênero');
       return;
     }
