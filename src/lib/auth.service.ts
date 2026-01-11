@@ -258,13 +258,31 @@ export const authService = {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        // Get role from user metadata, default to 'client'
-        const roleFromMetadata = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+        // Try to get role from database first (most reliable source)
+        let role: 'admin' | 'client' = 'client';
+
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', session.user.email)
+            .single();
+
+          if (!error && userData?.role) {
+            role = userData.role as 'admin' | 'client';
+          } else {
+            // Fallback to user metadata if not found in database
+            role = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+          }
+        } catch (err) {
+          // If there's an error querying database, use metadata
+          role = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+        }
 
         callback({
           id: session.user.id,
           email: session.user.email || '',
-          role: roleFromMetadata,
+          role,
         });
       } else {
         callback(null);
