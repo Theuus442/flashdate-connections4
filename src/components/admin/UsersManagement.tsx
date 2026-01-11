@@ -567,6 +567,15 @@ export const UsersManagement = () => {
                           src={user.profileImage}
                           alt={user.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('[UsersManagement] Image load failed for user:', user.name);
+                            console.error('[UsersManagement] Image URL:', user.profileImage);
+                            console.error('[UsersManagement] Error:', e);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                          onLoad={() => {
+                            console.log('[UsersManagement] Image loaded successfully:', user.profileImage);
+                          }}
                         />
                       ) : (
                         <span className="text-lg font-bold text-gold">{user.name.charAt(0)}</span>
