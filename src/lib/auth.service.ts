@@ -189,7 +189,11 @@ export const authService = {
         // Try to get role from database first (most reliable source)
         let role: 'admin' | 'client' = 'client';
 
+        console.log('[AUTH:STATE] Auth state change detected for user:', session.user.id);
+
         try {
+          console.log('[AUTH:STATE] Querying database for user role...');
+
           // Query by user ID (more reliable than email)
           const { data: userData, error } = await supabase
             .from('users')
@@ -198,24 +202,27 @@ export const authService = {
             .single();
 
           if (!error && userData?.role) {
+            console.log('[AUTH:STATE] Found role in database:', userData.role);
             role = userData.role as 'admin' | 'client';
           } else {
             // Fallback to 'client' if not found
-            console.log('Role not found in database during auth state change');
+            console.log('[AUTH:STATE] Role not found in database, using default: client', error?.message);
             role = 'client';
           }
         } catch (err) {
           // If there's an error querying database, use 'client' as default
-          console.warn('Error fetching role in onAuthStateChange:', err);
+          console.warn('[AUTH:STATE] Error fetching role:', err);
           role = 'client';
         }
 
+        console.log('[AUTH:STATE] Callback with role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
           role,
         });
       } else {
+        console.log('[AUTH:STATE] No session, clearing user');
         callback(null);
       }
     });
