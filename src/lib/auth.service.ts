@@ -48,10 +48,7 @@ export const authService = {
    * Sign in with email and password
    */
   async signIn(email: string, password: string) {
-    console.log('[AUTH] Sign in attempt:', email);
-
     if (!isSupabaseConfigured()) {
-      console.error('[AUTH] ❌ Supabase not configured');
       return {
         user: null,
         session: null,
@@ -60,27 +57,19 @@ export const authService = {
     }
 
     try {
-      console.log('[AUTH] Calling Supabase signInWithPassword');
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('[AUTH] ✅ Supabase response received:', { userId: data?.user?.id, hasError: !!error });
-
       if (error) {
-        console.error('[AUTH] ❌ Supabase auth error:', error);
         throw error;
       }
 
       // SUCCESS: Return immediately without querying database
       // The onAuthStateChange listener will fetch the role in the background
-      console.log('[AUTH] ✅ Sign in successful, returning user immediately');
-      console.log('[AUTH] Role will be fetched by onAuthStateChange listener...');
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
-      console.error('[AUTH] Sign in failed:', error);
       return { user: null, session: null, error };
     }
   },
