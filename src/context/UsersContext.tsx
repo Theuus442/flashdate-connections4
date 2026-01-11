@@ -33,6 +33,7 @@ const initialUsers: User[] = [
     email: 'maria@example.com',
     whatsapp: '(11) 98765-4321',
     gender: 'F',
+    role: 'client',
   },
   {
     id: '2',
@@ -41,6 +42,7 @@ const initialUsers: User[] = [
     email: 'joao@example.com',
     whatsapp: '(11) 99876-5432',
     gender: 'M',
+    role: 'client',
   },
   {
     id: '3',
@@ -49,6 +51,7 @@ const initialUsers: User[] = [
     email: 'ana@example.com',
     whatsapp: '(11) 98765-5321',
     gender: 'F',
+    role: 'admin',
   },
   {
     id: '4',
@@ -57,6 +60,7 @@ const initialUsers: User[] = [
     email: 'carlos@example.com',
     whatsapp: '(11) 97654-3210',
     gender: 'M',
+    role: 'client',
   },
   {
     id: '5',
@@ -65,6 +69,7 @@ const initialUsers: User[] = [
     email: 'beatriz@example.com',
     whatsapp: '(11) 96543-2109',
     gender: 'F',
+    role: 'client',
   },
   {
     id: '6',
@@ -73,6 +78,7 @@ const initialUsers: User[] = [
     email: 'roberto@example.com',
     whatsapp: '(11) 95432-1098',
     gender: 'M',
+    role: 'client',
   },
 ];
 
