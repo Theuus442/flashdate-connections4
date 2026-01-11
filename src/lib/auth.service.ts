@@ -117,37 +117,61 @@ export const authService = {
               data.user.user_metadata = { role: userData.role };
             }
           } else if (userError) {
-            // User doesn't exist in the users table, create them automatically
-            console.log('User not found in database, creating profile...');
+            // User doesn't exist in the users table
+            console.log('User not found in database, attempting to find by exact email match...');
+
+            // Try a case-insensitive search or look for similar email
             try {
-              const { data: newUser, error: createError } = await supabase
+              const { data: existingUser } = await supabase
                 .from('users')
-                .insert([{
-                  email: data.user.email,
-                  name: data.user.email?.split('@')[0] || 'User', // Use email prefix as default name
-                  username: data.user.email?.split('@')[0] || 'user',
-                  whatsapp: '',
-                  gender: 'Outro',
-                  role: 'client', // Default role for new users
-                }])
-                .select()
+                .select('role')
+                .ilike('email', email) // Case-insensitive search
                 .single();
 
-              if (!createError && newUser?.role) {
-                console.log('User profile created successfully');
+              if (existingUser?.role) {
+                console.log('Found existing user with case-insensitive search');
                 if (data.user.user_metadata) {
-                  data.user.user_metadata.role = newUser.role;
+                  data.user.user_metadata.role = existingUser.role;
                 } else {
-                  data.user.user_metadata = { role: newUser.role };
+                  data.user.user_metadata = { role: existingUser.role };
                 }
-              }
-            } catch (createErr) {
-              console.warn('Could not create user profile:', createErr);
-              // Continue with login anyway, set default role
-              if (data.user.user_metadata) {
-                data.user.user_metadata.role = 'client';
               } else {
-                data.user.user_metadata = { role: 'client' };
+                // Still not found, create new user
+                throw new Error('User not found');
+              }
+            } catch (searchErr) {
+              // User doesn't exist at all, create them automatically
+              console.log('Creating new user profile...');
+              try {
+                const { data: newUser, error: createError } = await supabase
+                  .from('users')
+                  .insert([{
+                    email: data.user.email,
+                    name: data.user.email?.split('@')[0] || 'User',
+                    username: data.user.email?.split('@')[0] || 'user',
+                    whatsapp: '',
+                    gender: 'Outro',
+                    role: 'admin', // Default to admin for new users created via login
+                  }])
+                  .select()
+                  .single();
+
+                if (!createError && newUser?.role) {
+                  console.log('User profile created successfully with role:', newUser.role);
+                  if (data.user.user_metadata) {
+                    data.user.user_metadata.role = newUser.role;
+                  } else {
+                    data.user.user_metadata = { role: newUser.role };
+                  }
+                }
+              } catch (createErr) {
+                console.warn('Could not create user profile:', createErr);
+                // Continue with login, set to admin role
+                if (data.user.user_metadata) {
+                  data.user.user_metadata.role = 'admin';
+                } else {
+                  data.user.user_metadata = { role: 'admin' };
+                }
               }
             }
           }
