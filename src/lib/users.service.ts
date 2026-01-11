@@ -276,7 +276,6 @@ export const usersService = {
       // If select() didn't return data (RLS issue), fetch the user separately
       let userData: any;
       if (!data || data.length === 0) {
-        console.warn('[usersService] Update .select() returned no data, fetching user separately...');
         const { data: fetchedUser, error: fetchError } = await supabase
           .from('users')
           .select('*')
@@ -294,13 +293,8 @@ export const usersService = {
         }
 
         userData = fetchedUser;
-        console.log('[usersService] Successfully fetched user after update');
-        console.log('[usersService] Fetched user data from DB:', userData);
-        console.log('[usersService] 🖼️ profile_image_url from DB:', userData.profile_image_url);
       } else {
         userData = data[0];
-        console.log('[usersService] Using user data from update .select()');
-        console.log('[usersService] 🖼️ profile_image_url from update:', userData.profile_image_url);
       }
       const transformedData: User = {
         id: userData.id,
