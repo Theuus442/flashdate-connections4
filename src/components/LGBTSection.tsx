@@ -89,7 +89,7 @@ export const LGBTSection = () => {
       nome: '',
       email: '',
       whatsapp: '',
-      identidadeGenero: [],
+      identidadeGenero: '',
       orientacao: '',
       generoBusca: [],
       estado: '',
