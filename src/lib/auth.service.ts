@@ -165,18 +165,20 @@ export const authService = {
       });
 
       if (error) {
-        console.error('[authService] Error creating auth user:', error);
+        const errorMsg = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
+        console.error('[authService] Error creating auth user:', errorMsg);
         throw error;
       }
 
       console.log('[authService] Auth user created:', data.user?.id);
       return { data: data.user, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-      console.error('[authService] Error creating user as admin:', {
-        message: errorMessage,
-        error,
-      });
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[authService] Error creating user as admin:', errorMessage);
       return { data: null, error };
     }
   },
