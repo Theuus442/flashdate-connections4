@@ -3,12 +3,12 @@ import { useUsers } from '@/context/UsersContext';
 import { Heart, Users, X } from 'lucide-react';
 
 export const SelectionsManagement = () => {
-  const { getSelectionsByType } = useSelections();
+  const { getSelectionsByVote } = useSelections();
   const { users } = useUsers();
 
-  const matches = getSelectionsByType('match');
-  const friendships = getSelectionsByType('friendship');
-  const noInterests = getSelectionsByType('no-interest');
+  const matches = getSelectionsByVote('SIM');
+  const maybe = getSelectionsByVote('TALVEZ');
+  const noInterests = getSelectionsByVote('NÃO');
 
   const getUserName = (userId: string) => {
     return users.find(u => u.id === userId)?.name || 'Usuário desconhecido';
@@ -24,7 +24,7 @@ export const SelectionsManagement = () => {
     icon: React.ComponentType<{ size: number }>;
     title: string;
     count: number;
-    selections: Array<{ userId: string; type: string }>;
+    selections: Array<{ selectedUserId: string; vote: string }>;
     color: string;
   }) => (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -44,24 +44,24 @@ export const SelectionsManagement = () => {
         <div className="space-y-2">
           {selections.map(selection => (
             <div
-              key={selection.userId}
+              key={selection.selectedUserId}
               className={`flex items-center justify-between p-3 rounded-lg border ${
-                title === 'Matches'
+                title === 'SIM'
                   ? 'bg-gold/10 border-gold/20'
-                  : title === 'Amizades'
+                  : title === 'TALVEZ'
                   ? 'bg-secondary/10 border-secondary/20'
                   : 'bg-destructive/10 border-destructive/20'
               }`}
             >
               <span className="text-sm font-medium text-foreground">
-                {getUserName(selection.userId)}
+                {getUserName(selection.selectedUserId)}
               </span>
               <span className={`text-xs font-semibold px-3 py-1 rounded-full ${color}`}>
-                {title === 'Matches'
-                  ? '💕 Match'
-                  : title === 'Amizades'
-                  ? '👥 Amizade'
-                  : '❌ Sem Interesse'}
+                {title === 'SIM'
+                  ? '💕 SIM'
+                  : title === 'TALVEZ'
+                  ? '👥 TALVEZ'
+                  : '❌ NÃO'}
               </span>
             </div>
           ))}
@@ -93,15 +93,15 @@ export const SelectionsManagement = () => {
       {/* Stats Overview */}
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Matches</p>
+          <p className="text-xs text-muted-foreground mb-1">SIM</p>
           <p className="text-3xl font-bold text-gold">{matches.length}</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Amizades</p>
-          <p className="text-3xl font-bold text-secondary">{friendships.length}</p>
+          <p className="text-xs text-muted-foreground mb-1">TALVEZ</p>
+          <p className="text-3xl font-bold text-secondary">{maybe.length}</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Sem Interesse</p>
+          <p className="text-xs text-muted-foreground mb-1">NÃO</p>
           <p className="text-3xl font-bold text-destructive">{noInterests.length}</p>
         </div>
       </div>
@@ -110,21 +110,21 @@ export const SelectionsManagement = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <SelectionCard
           icon={Heart}
-          title="Matches"
+          title="SIM"
           count={matches.length}
           selections={matches}
           color="text-gold"
         />
         <SelectionCard
           icon={Users}
-          title="Amizades"
-          count={friendships.length}
-          selections={friendships}
+          title="TALVEZ"
+          count={maybe.length}
+          selections={maybe}
           color="text-secondary"
         />
         <SelectionCard
           icon={X}
-          title="Sem Interesse"
+          title="NÃO"
           count={noInterests.length}
           selections={noInterests}
           color="text-destructive"
@@ -139,57 +139,57 @@ export const SelectionsManagement = () => {
           </h2>
 
           <div className="space-y-6">
-            {/* Matches Detail */}
+            {/* SIM Detail */}
             {matches.length > 0 && (
               <div>
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Heart size={20} className="text-gold" />
-                  Matches ({matches.length})
+                  SIM ({matches.length})
                 </h3>
                 <div className="space-y-2 ml-6">
                   {matches.map(match => (
-                    <div key={match.userId} className="text-sm text-foreground">
-                      💕 <span className="font-medium">{getUserName(match.userId)}</span>
+                    <div key={match.selectedUserId} className="text-sm text-foreground">
+                      💕 <span className="font-medium">{getUserName(match.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Friendships Detail */}
-            {friendships.length > 0 && (
+            {/* TALVEZ Detail */}
+            {maybe.length > 0 && (
               <div className={matches.length > 0 ? 'pt-6 border-t border-border' : ''}>
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Users size={20} className="text-secondary" />
-                  Amizades ({friendships.length})
+                  TALVEZ ({maybe.length})
                 </h3>
                 <div className="space-y-2 ml-6">
-                  {friendships.map(friendship => (
-                    <div key={friendship.userId} className="text-sm text-foreground">
-                      👥 <span className="font-medium">{getUserName(friendship.userId)}</span>
+                  {maybe.map(m => (
+                    <div key={m.selectedUserId} className="text-sm text-foreground">
+                      👥 <span className="font-medium">{getUserName(m.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* No Interest Detail */}
+            {/* NÃO Detail */}
             {noInterests.length > 0 && (
               <div
                 className={
-                  matches.length > 0 || friendships.length > 0
+                  matches.length > 0 || maybe.length > 0
                     ? 'pt-6 border-t border-border'
                     : ''
                 }
               >
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <X size={20} className="text-destructive" />
-                  Sem Interesse ({noInterests.length})
+                  NÃO ({noInterests.length})
                 </h3>
                 <div className="space-y-2 ml-6">
                   {noInterests.map(noInterest => (
-                    <div key={noInterest.userId} className="text-sm text-foreground">
-                      ❌ <span className="font-medium">{getUserName(noInterest.userId)}</span>
+                    <div key={noInterest.selectedUserId} className="text-sm text-foreground">
+                      ❌ <span className="font-medium">{getUserName(noInterest.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>

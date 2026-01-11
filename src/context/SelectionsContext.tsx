@@ -3,22 +3,27 @@ import { selectionsService } from '@/lib/selections.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 export interface Selection {
+  id?: string;
+  eventId: string;
   userId: string;
-  type: 'match' | 'friendship' | 'no-interest';
+  selectedUserId: string;
+  vote: 'SIM' | 'TALVEZ' | 'NÃO';
   timestamp: number;
 }
 
 interface SelectionsContextType {
   selections: Selection[];
+  currentEventId: string | null;
   currentUserId: string | null;
+  setCurrentEventId: (eventId: string | null) => void;
   setCurrentUserId: (userId: string | null) => void;
-  addSelection: (userId: string, selectedUserId: string, type: Selection['type']) => Promise<void>;
-  removeSelection: (userId: string, selectedUserId: string) => Promise<void>;
-  updateSelection: (userId: string, selectedUserId: string, type: Selection['type']) => Promise<void>;
-  getSelectionsByType: (type: Selection['type']) => Selection[];
-  getMatchCount: () => number;
-  getFriendshipCount: () => number;
-  getNoInterestCount: () => number;
+  addSelection: (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => Promise<void>;
+  removeSelection: (eventId: string, userId: string, selectedUserId: string) => Promise<void>;
+  updateSelection: (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => Promise<void>;
+  getSelectionsByVote: (vote: 'SIM' | 'TALVEZ' | 'NÃO') => Selection[];
+  getSimCount: () => number;
+  getTalvezCount: () => number;
+  getNaoCount: () => number;
   isLoading: boolean;
 }
 
@@ -26,20 +31,21 @@ const SelectionsContext = createContext<SelectionsContextType | undefined>(undef
 
 export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [selections, setSelections] = useState<Selection[]>([]);
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const supabaseConfigured = isSupabaseConfigured();
 
-  // Load selections when currentUserId changes
+  // Load selections when currentEventId and currentUserId change
   useEffect(() => {
     const loadSelections = async () => {
-      if (!currentUserId || !supabaseConfigured) {
+      if (!currentEventId || !currentUserId || !supabaseConfigured) {
         return;
       }
 
       setIsLoading(true);
       try {
-        const { data, error } = await selectionsService.getSelectionsForUser(currentUserId);
+        const { data, error } = await selectionsService.getSelectionsForUserInEvent(currentEventId, currentUserId);
         if (error) {
           console.error('Error loading selections:', error);
         } else if (data) {
@@ -53,25 +59,25 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
     };
 
     loadSelections();
-  }, [currentUserId, supabaseConfigured]);
+  }, [currentEventId, currentUserId, supabaseConfigured]);
 
-  const addSelection = async (userId: string, selectedUserId: string, type: Selection['type']) => {
+  const addSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!supabaseConfigured) {
       // Fallback to local state
-      setSelections(prev => [...prev, { userId: selectedUserId, type, timestamp: Date.now() }]);
+      setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
       return;
     }
 
     try {
-      const { data, error } = await selectionsService.addSelection(userId, selectedUserId, type);
+      const { data, error } = await selectionsService.addSelection(eventId, userId, selectedUserId, vote);
       if (error) {
         console.error('Error adding selection:', error);
         return;
       }
       if (data) {
         setSelections(prev => {
-          // Remove existing selection for this user if it exists
-          const filtered = prev.filter(s => s.userId !== selectedUserId);
+          // Remove existing selection for this selected user if it exists
+          const filtered = prev.filter(s => s.selectedUserId !== selectedUserId);
           return [...filtered, data];
         });
       }
@@ -80,48 +86,48 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   };
 
-  const removeSelection = async (userId: string, selectedUserId: string) => {
+  const removeSelection = async (eventId: string, userId: string, selectedUserId: string) => {
     if (!supabaseConfigured) {
       // Fallback to local state
-      setSelections(prev => prev.filter(s => s.userId !== selectedUserId));
+      setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
       return;
     }
 
     try {
-      const { error } = await selectionsService.removeSelection(userId, selectedUserId);
+      const { error } = await selectionsService.removeSelection(eventId, userId, selectedUserId);
       if (error) {
         console.error('Error removing selection:', error);
         return;
       }
-      setSelections(prev => prev.filter(s => s.userId !== selectedUserId));
+      setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
     } catch (error) {
       console.error('Error removing selection:', error);
     }
   };
 
-  const updateSelection = async (userId: string, selectedUserId: string, type: Selection['type']) => {
+  const updateSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!supabaseConfigured) {
       // Fallback to local state
-      const existingIndex = selections.findIndex(s => s.userId === selectedUserId);
+      const existingIndex = selections.findIndex(s => s.selectedUserId === selectedUserId);
       if (existingIndex >= 0) {
         const updated = [...selections];
-        updated[existingIndex] = { userId: selectedUserId, type, timestamp: Date.now() };
+        updated[existingIndex] = { eventId, userId, selectedUserId, vote, timestamp: Date.now() };
         setSelections(updated);
       } else {
-        setSelections(prev => [...prev, { userId: selectedUserId, type, timestamp: Date.now() }]);
+        setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
       }
       return;
     }
 
     try {
-      const { data, error } = await selectionsService.updateSelection(userId, selectedUserId, type);
+      const { data, error } = await selectionsService.updateSelection(eventId, userId, selectedUserId, vote);
       if (error) {
         console.error('Error updating selection:', error);
         return;
       }
       if (data) {
         setSelections(prev => {
-          const filtered = prev.filter(s => s.userId !== selectedUserId);
+          const filtered = prev.filter(s => s.selectedUserId !== selectedUserId);
           return [...filtered, data];
         });
       }
@@ -130,33 +136,35 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   };
 
-  const getSelectionsByType = (type: Selection['type']): Selection[] => {
-    return selections.filter(s => s.type === type);
+  const getSelectionsByVote = (vote: 'SIM' | 'TALVEZ' | 'NÃO'): Selection[] => {
+    return selections.filter(s => s.vote === vote);
   };
 
-  const getMatchCount = (): number => {
-    return selections.filter(s => s.type === 'match').length;
+  const getSimCount = (): number => {
+    return selections.filter(s => s.vote === 'SIM').length;
   };
 
-  const getFriendshipCount = (): number => {
-    return selections.filter(s => s.type === 'friendship').length;
+  const getTalvezCount = (): number => {
+    return selections.filter(s => s.vote === 'TALVEZ').length;
   };
 
-  const getNoInterestCount = (): number => {
-    return selections.filter(s => s.type === 'no-interest').length;
+  const getNaoCount = (): number => {
+    return selections.filter(s => s.vote === 'NÃO').length;
   };
 
   const value: SelectionsContextType = {
     selections,
+    currentEventId,
     currentUserId,
+    setCurrentEventId,
     setCurrentUserId,
     addSelection,
     removeSelection,
     updateSelection,
-    getSelectionsByType,
-    getMatchCount,
-    getFriendshipCount,
-    getNoInterestCount,
+    getSelectionsByVote,
+    getSimCount,
+    getTalvezCount,
+    getNaoCount,
     isLoading,
   };
 

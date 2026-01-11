@@ -26,6 +26,7 @@ export const usersService = {
         email: user.email,
         whatsapp: user.whatsapp,
         gender: user.gender,
+        role: user.role || 'client',
         profileImage: user.profile_image_url,
       }));
 
@@ -59,6 +60,7 @@ export const usersService = {
         email: data.email,
         whatsapp: data.whatsapp,
         gender: data.gender,
+        role: data.role || 'client',
         profileImage: data.profile_image_url,
       } : null;
 
@@ -97,6 +99,7 @@ export const usersService = {
           email: user.email,
           whatsapp: user.whatsapp,
           gender: user.gender,
+          role: user.role || 'client',
           profile_image_url: profileImageUrl,
         }])
         .select()
@@ -111,6 +114,7 @@ export const usersService = {
         email: data.email,
         whatsapp: data.whatsapp,
         gender: data.gender,
+        role: data.role || 'client',
         profileImage: data.profile_image_url,
       };
 
@@ -144,7 +148,9 @@ export const usersService = {
       if (updates.email) updateData.email = updates.email;
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
+      if (updates.role) updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
+      updateData.updated_at = new Date().toISOString();
 
       const { data, error } = await supabase
         .from('users')
@@ -162,6 +168,7 @@ export const usersService = {
         email: data.email,
         whatsapp: data.whatsapp,
         gender: data.gender,
+        role: data.role || 'client',
         profileImage: data.profile_image_url,
       };
 

@@ -9,7 +9,7 @@ import { useSelections } from '@/context/SelectionsContext';
 export default function UserProfile() {
   const navigate = useNavigate();
   const { users: allUsers, updateUser } = useUsers();
-  const { updateSelection, setCurrentUserId, getSelectionsByType } = useSelections();
+  const { updateSelection, setCurrentUserId, setCurrentEventId, getSelectionsByVote } = useSelections();
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
@@ -18,8 +18,11 @@ export default function UserProfile() {
   useEffect(() => {
     if (currentUser) {
       setCurrentUserId(currentUser.id);
+      // For demo purposes, use a fixed event ID
+      // In a real app, this would come from the current event context
+      setCurrentEventId('default-event-id');
     }
-  }, [currentUser, setCurrentUserId]);
+  }, [currentUser, setCurrentUserId, setCurrentEventId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
@@ -75,25 +78,28 @@ export default function UserProfile() {
     }
   };
 
-  const handleSelection = async (selectedUserId: string, type: 'match' | 'friendship' | 'no-interest') => {
+  const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!currentUser) return;
     try {
-      await updateSelection(currentUser.id, selectedUserId, type);
+      // For demo purposes, use a fixed event ID
+      const eventId = 'default-event-id';
+      await updateSelection(eventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
     }
   };
 
-  const matchCount = getSelectionsByType('match').length;
-  const friendshipCount = getSelectionsByType('friendship').length;
-  const allSelections = getSelectionsByType('match').concat(
-    getSelectionsByType('friendship'),
-    getSelectionsByType('no-interest')
+  const matchCount = getSelectionsByVote('SIM').length;
+  const talvezCount = getSelectionsByVote('TALVEZ').length;
+  const naoCount = getSelectionsByVote('NÃO').length;
+  const allSelections = getSelectionsByVote('SIM').concat(
+    getSelectionsByVote('TALVEZ'),
+    getSelectionsByVote('NÃO')
   );
 
   const getSelectionForUser = (userId: string) => {
-    return allSelections.find(s => s.userId === userId);
+    return allSelections.find(s => s.selectedUserId === userId);
   };
 
   if (!currentUser) {
@@ -182,7 +188,7 @@ export default function UserProfile() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Matches ({matchCount})
+                SIM ({matchCount})
                 {activeTab === 'matches' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
                 )}
@@ -248,40 +254,40 @@ export default function UserProfile() {
                         {/* Action Buttons */}
                         <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
-                            onClick={() => handleSelection(user.id, 'match')}
+                            onClick={() => handleSelection(user.id, 'SIM')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'match'
+                              selection?.vote === 'SIM'
                                 ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Match"
+                            title="SIM"
                           >
-                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Match</span>
+                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'friendship')}
+                            onClick={() => handleSelection(user.id, 'TALVEZ')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'friendship'
+                              selection?.vote === 'TALVEZ'
                                 ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Amizade"
+                            title="TALVEZ"
                           >
-                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Amigos</span>
+                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'no-interest')}
+                            onClick={() => handleSelection(user.id, 'NÃO')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'no-interest'
+                              selection?.vote === 'NÃO'
                                 ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Não faz meu tipo"
+                            title="NÃO"
                           >
-                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Não meu tipo</span>
+                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
                           </button>
                         </div>
                       </div>
@@ -381,15 +387,15 @@ export default function UserProfile() {
                   {/* Stats */}
                   <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Matches</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">SIM</p>
                       <p className="text-3xl font-bold text-gold">{matchCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Amizades</p>
-                      <p className="text-3xl font-bold text-secondary">{friendshipCount}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">TALVEZ</p>
+                      <p className="text-3xl font-bold text-secondary">{talvezCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Seleções</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Total</p>
                       <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
                     </div>
                   </div>
@@ -401,10 +407,10 @@ export default function UserProfile() {
           {/* Matches View */}
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
-              {getSelectionsByType('match').length > 0 ? (
+              {getSelectionsByVote('SIM').length > 0 ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getSelectionsByType('match').map(sel => {
-                    const user = allUsers.find(u => u.id === sel.userId);
+                  {getSelectionsByVote('SIM').map(sel => {
+                    const user = allUsers.find(u => u.id === sel.selectedUserId);
                     if (!user) return null;
                     return (
                       <div
@@ -425,7 +431,7 @@ export default function UserProfile() {
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                             <div className="text-white text-center">
                               <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                              <p className="text-xs font-medium">Match</p>
+                              <p className="text-xs font-medium">SIM</p>
                             </div>
                           </div>
                         </div>
@@ -456,8 +462,8 @@ export default function UserProfile() {
                 <div className="text-center py-12 flex-1 flex items-center justify-center">
                   <div>
                     <Heart size={64} className="text-gold/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground text-lg">Nenhum match ainda</p>
-                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "Match" com outros participantes</p>
+                    <p className="text-muted-foreground text-lg">Nenhum SIM ainda</p>
+                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "SIM" em outros participantes</p>
                   </div>
                 </div>
               )}
