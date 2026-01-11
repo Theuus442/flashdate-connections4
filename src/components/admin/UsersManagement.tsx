@@ -113,9 +113,10 @@ export const UsersManagement = () => {
             description: 'Usuário cadastrado com sucesso!',
           });
         } else {
+          console.error('[UsersManagement] Failed to add user - no result returned');
           toast({
             title: 'Erro',
-            description: 'Falha ao cadastrar usuário',
+            description: 'Falha ao cadastrar usuário - verifique o console para detalhes',
             variant: 'destructive',
           });
         }
