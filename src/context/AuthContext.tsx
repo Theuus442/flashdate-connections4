@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, AuthUser } from '@/lib/auth.service';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -11,14 +12,57 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Get user role from the users table in Supabase
+ */
+const getUserRoleFromDatabase = async (email: string): Promise<'admin' | 'client'> => {
+  if (!isSupabaseConfigured()) {
+    return 'client';
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('email', email)
+      .single();
+
+    if (error) {
+      console.warn('Error fetching user role from database:', error);
+      return 'client';
+    }
+
+    return (data?.role || 'client') as 'admin' | 'client';
+  } catch (error) {
+    console.warn('Error getting user role:', error);
+    return 'client';
+  }
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChange((authUser) => {
-      setUser(authUser);
+    const unsubscribe = authService.onAuthStateChange(async (authUser) => {
+      if (authUser) {
+        // Try to get role from user metadata first
+        let role = (authUser.role || 'client') as 'admin' | 'client';
+
+        // If role is not in metadata, fetch from database
+        if (authUser.role === 'client' || !authUser.role) {
+          role = await getUserRoleFromDatabase(authUser.email);
+        }
+
+        setUser({
+          id: authUser.id,
+          email: authUser.email,
+          role,
+        });
+      } else {
+        setUser(null);
+      }
       setIsLoading(false);
     });
 
@@ -28,17 +72,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const signIn = async (email: string, password: string) => {
     try {
       const { user: authUser, error } = await authService.signIn(email, password);
-      
+
       if (error) {
         return { success: false, error: 'Email ou senha inválidos' };
       }
 
       if (authUser) {
-        // Extract role from user metadata
-        const role = (authUser.user_metadata?.role || 'client') as 'admin' | 'client';
+        // Try to get role from user metadata first
+        let role = (authUser.role || 'client') as 'admin' | 'client';
+
+        // If role is not in metadata, fetch from database
+        if (role === 'client' || !authUser.role) {
+          role = await getUserRoleFromDatabase(authUser.email);
+        }
+
         setUser({
           id: authUser.id,
-          email: authUser.email || '',
+          email: authUser.email,
           role,
         });
         return { success: true };
