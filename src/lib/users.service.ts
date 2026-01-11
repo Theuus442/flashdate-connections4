@@ -251,4 +251,42 @@ export const usersService = {
       return { error };
     }
   },
+
+  /**
+   * Delete all users by role
+   */
+  async deleteAllByRole(role: 'admin' | 'client'): Promise<{ count: number; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { count: 0, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[usersService] Deleting all users with role:', role);
+
+      // First, get count of users to delete
+      const { data: countData, error: countError } = await supabase
+        .from('users')
+        .select('id', { count: 'exact' })
+        .eq('role', role);
+
+      if (countError) throw countError;
+      const count = countData?.length || 0;
+
+      console.log('[usersService] Found', count, 'users to delete');
+
+      // Then delete them
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('role', role);
+
+      if (error) throw error;
+
+      console.log('[usersService] Successfully deleted', count, 'users with role:', role);
+      return { count, error: null };
+    } catch (error) {
+      console.error('[usersService] Error deleting users by role:', error);
+      return { count: 0, error };
+    }
+  },
 };
