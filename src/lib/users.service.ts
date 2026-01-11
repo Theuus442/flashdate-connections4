@@ -250,8 +250,7 @@ export const usersService = {
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
-      console.log('[usersService] Update data to send:', updateData);
-      console.log('[usersService] Sending update request to Supabase for user:', id);
+      console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
       const { data, error } = await supabase
         .from('users')
@@ -274,13 +273,29 @@ export const usersService = {
         throw error;
       }
 
-      // Check if any rows were affected
+      // If select() didn't return data (RLS issue), fetch the user separately
+      let userData: any;
       if (!data || data.length === 0) {
-        console.error('[usersService] No user found with ID:', id);
-        throw new Error(`User with ID ${id} not found`);
-      }
+        const { data: fetchedUser, error: fetchError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', id)
+          .single();
 
-      const userData = data[0];
+        if (fetchError) {
+          console.error('[usersService] Failed to fetch updated user:', fetchError);
+          throw new Error(`User with ID ${id} not found`);
+        }
+
+        if (!fetchedUser) {
+          console.error('[usersService] No user found with ID:', id);
+          throw new Error(`User with ID ${id} not found`);
+        }
+
+        userData = fetchedUser;
+      } else {
+        userData = data[0];
+      }
       const transformedData: User = {
         id: userData.id,
         name: userData.name,
@@ -292,7 +307,7 @@ export const usersService = {
         profileImage: userData.profile_image_url,
       };
 
-      console.log('[usersService] User updated successfully:', transformedData);
+      console.log('[usersService] User updated successfully');
       return { data: transformedData, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error

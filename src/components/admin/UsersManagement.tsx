@@ -107,17 +107,28 @@ export const UsersManagement = () => {
 
         const result = await updateUser(editingId, updates, selectedImageFile);
 
-        console.log('[UsersManagement] Update result:', result);
         if (result) {
           toast({
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
           });
+          setFormData({
+            name: '',
+            username: '',
+            email: '',
+            whatsapp: '',
+            gender: 'Outro',
+            password: '',
+            role: 'client',
+          });
+          setSelectedImageFile(undefined);
+          setImagePreview(undefined);
           setEditingId(null);
+          setShowForm(false);
         } else {
           toast({
             title: 'Erro',
-            description: 'Falha ao atualizar usuário',
+            description: 'Falha ao atualizar usuário - verifique o console para detalhes',
             variant: 'destructive',
           });
         }
@@ -564,9 +575,19 @@ export const UsersManagement = () => {
                     <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center overflow-hidden">
                       {user.profileImage ? (
                         <img
+                          key={`img-${user.id}-${user.profileImage}`}
                           src={user.profileImage}
                           alt={user.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Show initial instead of broken image
+                            (e.target as HTMLImageElement).replaceWith(
+                              Object.assign(document.createElement('span'), {
+                                className: 'text-lg font-bold text-gold',
+                                textContent: user.name.charAt(0)
+                              })
+                            );
+                          }}
                         />
                       ) : (
                         <span className="text-lg font-bold text-gold">{user.name.charAt(0)}</span>
