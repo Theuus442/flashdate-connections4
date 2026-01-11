@@ -174,7 +174,7 @@ export const UsersManagement = () => {
       email: user.email,
       whatsapp: user.whatsapp,
       gender: user.gender,
-      password: user.password || '',
+      password: '', // Leave empty for optional password change on edit
       role: user.role || 'client',
     });
     setImagePreview(user.profileImage);
