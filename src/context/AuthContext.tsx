@@ -41,18 +41,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('[AuthContext:signIn] Starting sign in...');
       const { user: authUser, error } = await authService.signIn(email, password);
 
+      console.log('[AuthContext:signIn] Service returned:', { hasUser: !!authUser, hasError: !!error });
+
       if (error) {
+        console.error('[AuthContext:signIn] Error:', error);
         return { success: false, error: 'Email ou senha inválidos' };
       }
 
       if (authUser) {
-        // Get role from user metadata (which was set during signIn after database lookup)
         const roleFromMetadata = authUser.user_metadata?.role;
-        // Default to 'client' only if role is not found
         const role = (roleFromMetadata || 'client') as 'admin' | 'client';
 
+        console.log('[AuthContext:signIn] Setting user state:', { id: authUser.id, role });
         setUser({
           id: authUser.id,
           email: authUser.email,
@@ -61,8 +64,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return { success: true };
       }
 
+      console.log('[AuthContext:signIn] No user returned');
       return { success: false, error: 'Falha ao fazer login' };
     } catch (err) {
+      console.error('[AuthContext:signIn] Caught error:', err);
       return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
     }
   };
