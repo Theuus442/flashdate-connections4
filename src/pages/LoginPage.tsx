@@ -15,7 +15,9 @@ export default function LoginPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
+    console.log('[LoginPage] Auth state changed:', { isAuthenticated, userRole: user?.role });
     if (isAuthenticated && user) {
+      console.log('[LoginPage] Redirecting to', user.role === 'admin' ? '/admin' : '/user-profile');
       if (user.role === 'admin') {
         navigate('/admin');
       } else {
