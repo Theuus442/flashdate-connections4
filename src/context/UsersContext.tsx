@@ -41,19 +41,13 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const { data, error } = await usersService.getUsers();
         if (error) {
           console.error('Error loading users:', error);
-          // Use fallback mock data if there's an error
-          setUsers(initialUsers);
-        } else if (data && data.length > 0) {
+          setUsers([]);
+        } else if (data) {
           setUsers(data);
-        } else {
-          // Use fallback mock data if no users found in database
-          console.warn('No users found in database, using fallback mock data');
-          setUsers(initialUsers);
         }
       } catch (error) {
         console.error('Error loading users:', error);
-        // Use fallback mock data on exception
-        setUsers(initialUsers);
+        setUsers([]);
       } finally {
         setIsLoading(false);
       }
