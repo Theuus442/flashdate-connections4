@@ -286,14 +286,14 @@ export const LGBTSection = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Estado</label>
-                    <Select value={formData.estado} onValueChange={handleEstadoChange}>
+                    <Select value={formData.estado} onValueChange={handleEstadoChange} disabled={loadingEstados}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o estado" />
+                        <SelectValue placeholder={loadingEstados ? "Carregando..." : "Selecione o estado"} />
                       </SelectTrigger>
                       <SelectContent>
                         {estados.map((estado) => (
-                          <SelectItem key={estado.value} value={estado.value}>
-                            {estado.label}
+                          <SelectItem key={estado.id} value={estado.id.toString()}>
+                            {estado.nome}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -301,14 +301,14 @@ export const LGBTSection = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Cidade</label>
-                    <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })}>
-                      <SelectTrigger disabled={!formData.estado}>
-                        <SelectValue placeholder={formData.estado ? "Selecione a cidade" : "Selecione um estado primeiro"} />
+                    <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })} disabled={!formData.estado || loadingMunicipios}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={!formData.estado ? "Selecione um estado primeiro" : loadingMunicipios ? "Carregando..." : "Selecione a cidade"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {cidadesDisponiveis.map((cidade) => (
-                          <SelectItem key={cidade} value={cidade}>
-                            {cidade}
+                        {municipios.map((municipio) => (
+                          <SelectItem key={municipio.id} value={municipio.nome}>
+                            {municipio.nome}
                           </SelectItem>
                         ))}
                       </SelectContent>
