@@ -54,16 +54,17 @@ export const UsersManagement = () => {
     console.log('[UsersManagement] Form submitted with data:', formData);
     setIsLoading(true);
 
-    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp || !formData.password) {
       console.warn('[UsersManagement] Validation failed - missing fields:', {
         name: !!formData.name,
         username: !!formData.username,
         email: !!formData.email,
         whatsapp: !!formData.whatsapp,
+        password: !!formData.password,
       });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos (Nome, Apelido, Email, Telefone)',
+        description: 'Por favor, preencha todos os campos (Nome, Apelido, Email, Telefone, Senha)',
         variant: 'destructive',
       });
       setIsLoading(false);
