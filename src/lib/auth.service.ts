@@ -147,43 +147,12 @@ export const authService = {
 
       if (session?.user) {
         console.log('[onAuthStateChange] User detected:', session.user.id, session.user.email);
+        console.log('[onAuthStateChange] User metadata:', session.user.user_metadata);
 
-        // Get role from user metadata first
-        let role: 'admin' | 'client' = (session.user.user_metadata?.role as 'admin' | 'client') || 'client';
+        // Get role from user metadata (set via Supabase dashboard or updateUser)
+        const role: 'admin' | 'client' = (session.user.user_metadata?.role as 'admin' | 'client') || 'client';
 
-        // If no role in metadata, try to sync from database
-        if (!session.user.user_metadata?.role) {
-          console.log('[onAuthStateChange] No role in metadata, syncing from database...');
-          try {
-            const { data: userData } = await supabase
-              .from('users')
-              .select('role')
-              .eq('id', session.user.id)
-              .maybeSingle();
-
-            if (userData?.role) {
-              console.log('[onAuthStateChange] Found role in database:', userData.role);
-              role = userData.role as 'admin' | 'client';
-
-              // Update metadata for future logins
-              try {
-                await supabase.auth.updateUser({
-                  data: {
-                    ...session.user.user_metadata,
-                    role: userData.role,
-                  }
-                });
-                console.log('[onAuthStateChange] Updated metadata with role:', userData.role);
-              } catch (err) {
-                console.warn('[onAuthStateChange] Could not update metadata:', err);
-              }
-            }
-          } catch (err) {
-            console.warn('[onAuthStateChange] Could not sync from database:', err);
-          }
-        }
-
-        console.log('[onAuthStateChange] Final role:', role);
+        console.log('[onAuthStateChange] User role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
