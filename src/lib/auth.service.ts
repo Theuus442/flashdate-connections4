@@ -96,10 +96,18 @@ export const authService = {
 
     try {
       console.log('[AUTH] Calling Supabase signInWithPassword');
-      const { data, error } = await supabase.auth.signInWithPassword({
+
+      // Wrap with timeout to prevent hanging
+      const signInPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Sign in request timeout (10s)')), 10000)
+      );
+
+      const { data, error } = await Promise.race([signInPromise, timeoutPromise]) as any;
 
       console.log('[AUTH] Supabase response received:', { userId: data?.user?.id, hasError: !!error });
 
