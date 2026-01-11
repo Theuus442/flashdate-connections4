@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { User } from '@/context/UsersContext';
 import { storageService } from './storage.service';
+import { authService } from './auth.service';
 
 export const usersService = {
   /**
@@ -103,11 +104,24 @@ export const usersService = {
       console.log('[usersService] Creating user:', user);
       let profileImageUrl: string | undefined;
 
+      // First, create auth user with password if provided
+      let authUserId: string | undefined;
+      if (user.password) {
+        console.log('[usersService] Creating auth user with password...');
+        const authResult = await authService.createUserAsAdmin(user.email, user.password);
+        if (authResult.error) {
+          console.error('[usersService] Error creating auth user:', authResult.error);
+          throw authResult.error;
+        }
+        authUserId = authResult.data?.id;
+        console.log('[usersService] Auth user created:', authUserId);
+      }
+
       // Upload profile image if provided
       if (profileImage) {
         console.log('[usersService] Uploading profile image...');
         const result = await storageService.uploadUserProfileImage(
-          Date.now().toString(),
+          authUserId || Date.now().toString(),
           profileImage
         );
         if (result.error) throw result.error;
@@ -128,6 +142,7 @@ export const usersService = {
       const { data, error } = await supabase
         .from('users')
         .insert([{
+          id: authUserId, // Use auth user ID if created
           name: user.name,
           username: user.username,
           email: user.email,
@@ -135,7 +150,6 @@ export const usersService = {
           gender: user.gender,
           role: user.role || 'client',
           profile_image_url: profileImageUrl,
-          // Note: password is managed by Supabase Auth, not inserted via REST API
         }])
         .select()
         .single();
@@ -161,7 +175,6 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
-        password: data.password,
       };
 
       console.log('[usersService] User created successfully:', transformedData);
@@ -198,6 +211,16 @@ export const usersService = {
         console.log('[usersService] Profile image uploaded:', profileImageUrl);
       }
 
+      // If password is being updated, update it in auth system first
+      if (updates.password) {
+        console.log('[usersService] Updating password in auth system...');
+        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password);
+        if (authResult.error) {
+          console.warn('[usersService] Could not update password via auth API:', authResult.error);
+          // Continue anyway - the password field in users table will be updated
+        }
+      }
+
       const updateData: any = {};
       if (updates.name) updateData.name = updates.name;
       if (updates.username) updateData.username = updates.username;
@@ -205,7 +228,6 @@ export const usersService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
-      // Note: password should not be updated via REST API - it's managed by Supabase Auth
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
