@@ -1,55 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
+import { eventsService, EventData } from '@/lib/events.service';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
-interface EventData {
-  id: string;
-  title: string;
-  location: string;
-  city: string;
-  date: string;
-  nextDate: string;
-  schedule: string;
-  checkIn: string;
-  environment: string;
-  music: string;
-  dressCode: string;
-  parking: string;
-  price: string;
-  description: string;
-  eventImage: string;
-  email: string;
-  whatsapp: string;
-  vagas: string;
-  vagasLimitDate: string;
-}
+const defaultEventData: EventData = {
+  id: '1',
+  title: 'Armazém São Caetano',
+  location: 'Armazém São Caetano',
+  city: 'São Caetano do Sul, SP',
+  date: 'Sábados com eventos regulares',
+  nextDate: '25/01/2026',
+  schedule: 'Conforme agendado',
+  checkIn: '15-30 min antes',
+  environment: 'Rústico e elegante',
+  music: 'Música ao vivo a partir das 19h',
+  dressCode: 'Esporte Fino / Casual Elegante',
+  parking: 'Zona Azul gratuita a partir das 13h (aos sábados)',
+  price: 'R$ 40,00',
+  description: 'Encontros Presenciais com Inteligência Artificial',
+  eventImage: 'https://images.unsplash.com/photo-1519167758481-dc80e6f0b6da?w=600&h=400',
+  email: 'contato@flashdate.com.br',
+  whatsapp: '(11) 97032-9710',
+  vagas: '1',
+  vagasLimitDate: '25/01/2026',
+};
 
 export const EventsManagement = () => {
-  const [eventData, setEventData] = useState<EventData>({
-    id: '1',
-    title: 'Armazém São Caetano',
-    location: 'Armazém São Caetano',
-    city: 'São Caetano do Sul, SP',
-    date: 'Sábados com eventos regulares',
-    nextDate: '25/01/2026',
-    schedule: 'Conforme agendado',
-    checkIn: '15-30 min antes',
-    environment: 'Rústico e elegante',
-    music: 'Música ao vivo a partir das 19h',
-    dressCode: 'Esporte Fino / Casual Elegante',
-    parking: 'Zona Azul gratuita a partir das 13h (aos sábados)',
-    price: 'R$ 40,00',
-    description: 'Encontros Presenciais com Inteligência Artificial',
-    eventImage: 'https://images.unsplash.com/photo-1519167758481-dc80e6f0b6da?w=600&h=400',
-    email: 'contato@flashdate.com.br',
-    whatsapp: '(11) 97032-9710',
-    vagas: '(1)',
-    vagasLimitDate: '25/01/2026',
-  });
-
+  const { toast } = useToast();
+  const supabaseConfigured = isSupabaseConfigured();
+  const [eventData, setEventData] = useState<EventData>(defaultEventData);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(eventData);
+  const [formData, setFormData] = useState<EventData>(eventData);
   const [imagePreview, setImagePreview] = useState(eventData.eventImage);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+
+  // Load event from Supabase on mount
+  useEffect(() => {
+    const loadEvent = async () => {
+      if (!supabaseConfigured) {
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const events = await eventsService.getEvents();
+        if (events.data && events.data.length > 0) {
+          // Get the first event (or latest)
+          const event = events.data[0];
+          setEventData(event);
+          setFormData(event);
+          setImagePreview(event.eventImage);
+        }
+      } catch (error) {
+        console.error('Error loading event:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEvent();
+  }, [supabaseConfigured]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
