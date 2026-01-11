@@ -181,8 +181,9 @@ export const UsersManagement = () => {
       username: '',
       email: '',
       whatsapp: '',
-      profileImage: undefined,
+      gender: 'Outro',
     });
+    setSelectedImageFile(undefined);
     setImagePreview(undefined);
   };
 
