@@ -2,21 +2,25 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
+import { useToast } from '@/hooks/use-toast';
 
 export const UsersManagement = () => {
   const { users, addUser, updateUser, deleteUser } = useUsers();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
     username: '',
     email: '',
     whatsapp: '',
-    profileImage: undefined as string | undefined,
+    gender: 'Outro' as 'M' | 'F' | 'Outro',
   });
 
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
