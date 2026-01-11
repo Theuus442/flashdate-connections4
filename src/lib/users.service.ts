@@ -307,8 +307,7 @@ export const usersService = {
         profileImage: userData.profile_image_url,
       };
 
-      console.log('[usersService] User updated successfully:', transformedData);
-      console.log('[usersService] 🖼️ Profile image in returned user:', userData.profile_image_url);
+      console.log('[usersService] User updated successfully');
       return { data: transformedData, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
