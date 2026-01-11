@@ -74,10 +74,12 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.log('[UsersContext] Calling usersService.createUser...');
       const { data, error } = await usersService.createUser(user, profileImage);
 
-      console.log('[UsersContext] createUser response:', { hasData: !!data, hasError: !!error, error });
+      const errorMessage = error instanceof Error ? error.message : (error?.message || JSON.stringify(error));
+      console.log('[UsersContext] createUser response:', { hasData: !!data, hasError: !!error, errorMessage });
 
       if (error) {
-        console.error('[UsersContext] Error adding user:', error);
+        console.error('[UsersContext] Error adding user:', errorMessage);
+        console.error('[UsersContext] Full error:', error);
         return null;
       }
       if (data) {
