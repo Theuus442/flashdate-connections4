@@ -218,21 +218,24 @@ export const authService = {
         let role: 'admin' | 'client' = 'client';
 
         try {
+          // Query by user ID (more reliable than email)
           const { data: userData, error } = await supabase
             .from('users')
             .select('role')
-            .eq('email', session.user.email)
+            .eq('id', session.user.id)
             .single();
 
           if (!error && userData?.role) {
             role = userData.role as 'admin' | 'client';
           } else {
-            // Fallback to user metadata if not found in database
-            role = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+            // Fallback to 'client' if not found
+            console.log('Role not found in database during auth state change');
+            role = 'client';
           }
         } catch (err) {
-          // If there's an error querying database, use metadata
-          role = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+          // If there's an error querying database, use 'client' as default
+          console.warn('Error fetching role in onAuthStateChange:', err);
+          role = 'client';
         }
 
         callback({
