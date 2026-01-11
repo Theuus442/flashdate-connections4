@@ -252,8 +252,7 @@ export const usersService = {
         .from('users')
         .update(updateData)
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         const errorMessage = error instanceof Error
@@ -268,15 +267,22 @@ export const usersService = {
         throw error;
       }
 
+      // Check if any rows were affected
+      if (!data || data.length === 0) {
+        console.error('[usersService] No user found with ID:', id);
+        throw new Error(`User with ID ${id} not found`);
+      }
+
+      const userData = data[0];
       const transformedData: User = {
-        id: data.id,
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        gender: data.gender,
-        role: data.role || 'client',
-        profileImage: data.profile_image_url,
+        id: userData.id,
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        whatsapp: userData.whatsapp,
+        gender: userData.gender,
+        role: userData.role || 'client',
+        profileImage: userData.profile_image_url,
       };
 
       console.log('[usersService] User updated successfully:', transformedData);
