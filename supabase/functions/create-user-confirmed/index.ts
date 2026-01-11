@@ -13,33 +13,33 @@ interface CreateUserRequest {
 }
 
 export default async (req: Request) => {
+  console.log("[create-user-confirmed] Function called");
+  console.log("[create-user-confirmed] Request method:", req.method);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("[create-user-confirmed] Handling CORS preflight");
     return new Response("ok", { headers: corsHeaders });
   }
 
-  try {
-    // Parse request body
-    let email: string;
-    let password: string;
+  if (req.method !== "POST") {
+    console.log("[create-user-confirmed] Invalid method:", req.method);
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-    try {
-      const body = await req.json() as CreateUserRequest;
-      email = body.email;
-      password = body.password;
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      return new Response(
-        JSON.stringify({ error: "Invalid JSON in request body" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
+  try {
+    console.log("[create-user-confirmed] Parsing request body");
+    const body = await req.json() as CreateUserRequest;
+    const { email, password } = body;
+
+    console.log("[create-user-confirmed] Received email:", email);
+    console.log("[create-user-confirmed] Password provided:", !!password);
 
     if (!email || !password) {
-      console.error("Missing required fields:", { email, password });
+      console.log("[create-user-confirmed] Missing required fields");
       return new Response(
         JSON.stringify({ error: "Email and password are required" }),
         {
@@ -49,31 +49,17 @@ export default async (req: Request) => {
       );
     }
 
-    console.log("Creating user:", email);
-
-    // Get the service role key from environment
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    console.log("Service role key available:", !!serviceRoleKey);
-
-    if (!serviceRoleKey) {
-      console.error("Service role key not configured");
-      return new Response(
-        JSON.stringify({ error: "Service role key not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Get Supabase URL from environment
+    // Get environment variables
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    console.log("Supabase URL:", supabaseUrl);
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!supabaseUrl) {
-      console.error("Supabase URL not configured");
+    console.log("[create-user-confirmed] Supabase URL exists:", !!supabaseUrl);
+    console.log("[create-user-confirmed] Service role key exists:", !!serviceRoleKey);
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error("[create-user-confirmed] Missing environment variables");
       return new Response(
-        JSON.stringify({ error: "Supabase URL not configured" }),
+        JSON.stringify({ error: "Server configuration error" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -81,8 +67,8 @@ export default async (req: Request) => {
       );
     }
 
-    // Create admin client with service role key
-    console.log("Creating Supabase admin client...");
+    // Create Supabase admin client
+    console.log("[create-user-confirmed] Creating Supabase client");
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -90,33 +76,38 @@ export default async (req: Request) => {
       },
     });
 
-    console.log("Creating auth user as admin...");
-    // Create user as admin - this creates user already confirmed without email
+    // Create user via admin API
+    console.log("[create-user-confirmed] Calling auth.admin.createUser");
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Automatically confirm the email
+      email_confirm: true,
     });
 
     if (error) {
-      console.error("Auth admin createUser error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.error("[create-user-confirmed] createUser error:", error);
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    console.log("User created successfully:", data?.user?.id);
-    return new Response(JSON.stringify({ data }), {
-      status: 201,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.log("[create-user-confirmed] User created successfully:", data?.user?.id);
+    return new Response(
+      JSON.stringify({ data: { user: data?.user } }),
+      {
+        status: 201,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
-    console.error("Unexpected error:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[create-user-confirmed] Unexpected error:", error);
     return new Response(
       JSON.stringify({
-        error: errorMessage,
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
