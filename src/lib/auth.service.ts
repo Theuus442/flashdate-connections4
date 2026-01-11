@@ -174,47 +174,31 @@ export const authService = {
         console.log('[onAuthStateChange] User detected:', session.user.id, session.user.email);
         let role: 'admin' | 'client' = 'client';
 
-        // Try to fetch user role with timeout
-        try {
-          console.log('[onAuthStateChange] Querying users table...');
+        // Check metadata first
+        const metadataRole = session.user.user_metadata?.role;
+        if (metadataRole) {
+          console.log('[onAuthStateChange] Role found in metadata:', metadataRole);
+          role = metadataRole as 'admin' | 'client';
+        } else {
+          // Try to fetch user role from database
+          console.log('[onAuthStateChange] No role in metadata, querying users table...');
+          try {
+            const { data: userData, error } = await supabase
+              .from('users')
+              .select('role')
+              .eq('id', session.user.id)
+              .maybeSingle();
 
-          // Create a promise that rejects after 5 seconds
-          const queryPromise = supabase
-            .from('users')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Query timeout')), 5000)
-          );
-
-          const { data: userData, error } = await Promise.race([
-            queryPromise,
-            timeoutPromise
-          ]) as any;
-
-          console.log('[onAuthStateChange] Query completed:', { userData, error: error?.message });
-
-          if (!error && userData?.role) {
-            console.log('[onAuthStateChange] Role found:', userData.role);
-            role = userData.role as 'admin' | 'client';
-          } else if (error) {
-            console.warn('[onAuthStateChange] Query error (using default role):', error?.message || error);
-            // Use default role from metadata if available
-            const metadataRole = session.user.user_metadata?.role;
-            if (metadataRole) {
-              console.log('[onAuthStateChange] Using metadata role:', metadataRole);
-              role = metadataRole as 'admin' | 'client';
+            if (!error && userData?.role) {
+              console.log('[onAuthStateChange] Role found in database:', userData.role);
+              role = userData.role as 'admin' | 'client';
+            } else {
+              console.warn('[onAuthStateChange] No user record found, using default role');
+              role = 'client';
             }
-          }
-        } catch (err) {
-          console.error('[onAuthStateChange] Caught error:', err);
-          // Use default role from metadata
-          const metadataRole = session.user.user_metadata?.role;
-          if (metadataRole) {
-            console.log('[onAuthStateChange] Using metadata role after error:', metadataRole);
-            role = metadataRole as 'admin' | 'client';
+          } catch (err) {
+            console.error('[onAuthStateChange] Error querying database:', err);
+            role = 'client';
           }
         }
 
