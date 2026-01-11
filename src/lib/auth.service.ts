@@ -170,38 +170,4 @@ export const authService = {
 
     return () => subscription?.unsubscribe();
   },
-
-  /**
-   * Check if user exists in database and has correct role
-   */
-  async ensureUserExists(userId: string, email: string): Promise<{ success: boolean; error?: string }> {
-    if (!isSupabaseConfigured()) {
-      return { success: false, error: 'Supabase is not configured' };
-    }
-
-    try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('id, role')
-        .eq('id', userId)
-        .single();
-
-      if (!error && userData) {
-        console.log('[AUTH] ✅ User exists in database with role:', userData.role);
-        return { success: true };
-      }
-
-      console.error('[AUTH] ❌ User does not exist in database:', error?.message);
-      return {
-        success: false,
-        error: `User record not found in database. Please contact administrator.`
-      };
-    } catch (err) {
-      console.error('[AUTH] ❌ Error checking user:', err);
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Error checking user'
-      };
-    }
-  },
 };
