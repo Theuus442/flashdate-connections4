@@ -91,15 +91,21 @@ export const UsersManagement = () => {
     try {
       if (editingId) {
         console.log('[UsersManagement] Updating user:', editingId);
-        const result = await updateUser(editingId, {
+        // Only include password if it's not empty
+        const updates: any = {
           name: formData.name,
           username: formData.username,
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          password: formData.password,
           role: formData.role,
-        }, selectedImageFile);
+        };
+
+        if (formData.password && formData.password.trim()) {
+          updates.password = formData.password;
+        }
+
+        const result = await updateUser(editingId, updates, selectedImageFile);
 
         console.log('[UsersManagement] Update result:', result);
         if (result) {
@@ -123,7 +129,7 @@ export const UsersManagement = () => {
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          password: formData.password,
+          password: formData.password.trim(),
           role: formData.role,
         }, selectedImageFile);
 
