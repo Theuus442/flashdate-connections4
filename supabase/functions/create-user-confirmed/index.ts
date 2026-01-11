@@ -17,7 +17,23 @@ export default async (req: Request) => {
   }
 
   try {
-    const { email, password } = await req.json() as CreateUserRequest;
+    // Parse request body
+    let email: string;
+    let password: string;
+
+    try {
+      const body = await req.json() as CreateUserRequest;
+      email = body.email;
+      password = body.password;
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     if (!email || !password) {
       return new Response(
