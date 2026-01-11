@@ -88,6 +88,22 @@ export const storageService = {
         .getPublicUrl(filePath);
 
       console.log('[storageService] Event image uploaded successfully:', data.publicUrl);
+      console.log('[storageService] File path in bucket:', filePath);
+      console.log('[storageService] Testing URL accessibility...');
+
+      // Test if URL is accessible
+      try {
+        const response = await fetch(data.publicUrl, { method: 'HEAD' });
+        if (response.ok) {
+          console.log('[storageService] ✅ URL is publicly accessible');
+        } else {
+          console.warn('[storageService] ⚠️  URL returned status:', response.status);
+          console.warn('[storageService] If 403: Bucket may not allow public read access');
+        }
+      } catch (e) {
+        console.warn('[storageService] ⚠️  Could not verify URL accessibility:', e);
+      }
+
       return { data: data.publicUrl, error: null };
     } catch (error) {
       console.error('[storageService] Error uploading event image:', error);
