@@ -323,15 +323,32 @@ export const UsersManagement = () => {
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Gênero
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as 'M' | 'F' | 'Outro' }))}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                >
+                  <option value="Outro">Outro</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                </select>
+              </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-4 justify-end">
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
                 Cancelar
               </Button>
-              <Button variant="gold" type="submit">
-                {editingId ? 'Atualizar' : 'Cadastrar'}
+              <Button variant="gold" type="submit" disabled={isLoading}>
+                {isLoading ? (editingId ? 'Atualizando...' : 'Cadastrando...') : (editingId ? 'Atualizar' : 'Cadastrar')}
               </Button>
             </div>
           </form>
