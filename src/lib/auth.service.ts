@@ -97,17 +97,10 @@ export const authService = {
     try {
       console.log('[AUTH] Calling Supabase signInWithPassword');
 
-      // Wrap with timeout to prevent hanging
-      const signInPromise = supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Sign in request timeout (10s)')), 10000)
-      );
-
-      const { data, error } = await Promise.race([signInPromise, timeoutPromise]) as any;
 
       console.log('[AUTH] Supabase response received:', { userId: data?.user?.id, hasError: !!error });
 
@@ -116,60 +109,10 @@ export const authService = {
         throw error;
       }
 
-      // After successful login, try to get the user's role from the users table
-      // This handles cases where the user was created via admin panel
-      if (data.user) {
-        console.log('[AUTH] Fetching user role for ID:', data.user.id);
-        try {
-          console.log('[AUTH] Querying users table for role...');
-
-          // Wrap with timeout to prevent hanging
-          const roleQueryPromise = supabase
-            .from('users')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-
-          const roleTimeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Role query timeout (3s)')), 3000)
-          );
-
-          const { data: userData, error: userError } = await Promise.race([
-            roleQueryPromise,
-            roleTimeoutPromise
-          ]) as any;
-
-          console.log('[AUTH] Users table query result:', { hasRole: !!userData?.role, error: userError?.message });
-
-          if (!userError && userData?.role) {
-            console.log('[AUTH] Found role in database:', userData.role);
-            // Update the user object with the role from database
-            if (data.user.user_metadata) {
-              data.user.user_metadata.role = userData.role;
-            } else {
-              data.user.user_metadata = { role: userData.role };
-            }
-          } else {
-            // Default to 'client' if not found or error
-            console.log('[AUTH] Role not found, using default: client', userError?.message);
-            if (data.user.user_metadata) {
-              data.user.user_metadata.role = 'client';
-            } else {
-              data.user.user_metadata = { role: 'client' };
-            }
-          }
-        } catch (err) {
-          console.warn('[AUTH] Error fetching user role:', err);
-          // Continue with login, set default role
-          if (data.user.user_metadata) {
-            data.user.user_metadata.role = 'client';
-          } else {
-            data.user.user_metadata = { role: 'client' };
-          }
-        }
-      }
-
-      console.log('[AUTH] Sign in successful, returning user');
+      // Don't query the database during sign in - let onAuthStateChange handle it
+      // This avoids timeout issues and makes the login flow faster
+      // The role will be fetched and set by onAuthStateChange
+      console.log('[AUTH] Sign in successful, role will be fetched by onAuthStateChange');
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       console.error('[AUTH] Sign in failed:', error);
