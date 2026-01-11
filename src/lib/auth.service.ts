@@ -159,12 +159,11 @@ export const authService = {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
       const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
-      // Call the Edge Function to create confirmed user
+      // Call the Edge Function to create confirmed user (no auth needed - public function)
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession())?.data?.session?.access_token || ''}`,
         },
         body: JSON.stringify({ email, password }),
       });
