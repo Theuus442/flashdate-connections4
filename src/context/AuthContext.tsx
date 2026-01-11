@@ -17,17 +17,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is already logged in on mount
   useEffect(() => {
+    console.log('[AuthContext] Setting up auth listener');
     const unsubscribe = authService.onAuthStateChange((authUser) => {
+      console.log('[AuthContext] Auth state changed:', { hasUser: !!authUser, role: authUser?.role });
       if (authUser) {
-        // Use role from auth metadata (set during signup/login)
         const role = (authUser.role || 'client') as 'admin' | 'client';
 
+        console.log('[AuthContext] Setting user:', { id: authUser.id, email: authUser.email, role });
         setUser({
           id: authUser.id,
           email: authUser.email,
           role,
         });
       } else {
+        console.log('[AuthContext] Clearing user');
         setUser(null);
       }
       setIsLoading(false);
@@ -38,16 +41,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('[AuthContext:signIn] Starting sign in...');
       const { user: authUser, error } = await authService.signIn(email, password);
 
+      console.log('[AuthContext:signIn] Service returned:', { hasUser: !!authUser, hasError: !!error });
+
       if (error) {
+        console.error('[AuthContext:signIn] Error:', error);
         return { success: false, error: 'Email ou senha inválidos' };
       }
 
       if (authUser) {
-        // Get role from user metadata (set during signin or from database lookup)
-        const role = (authUser.user_metadata?.role || 'client') as 'admin' | 'client';
+        const roleFromMetadata = authUser.user_metadata?.role;
+        const role = (roleFromMetadata || 'client') as 'admin' | 'client';
 
+        console.log('[AuthContext:signIn] Setting user state:', { id: authUser.id, role });
         setUser({
           id: authUser.id,
           email: authUser.email,
@@ -56,8 +64,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return { success: true };
       }
 
+      console.log('[AuthContext:signIn] No user returned');
       return { success: false, error: 'Falha ao fazer login' };
     } catch (err) {
+      console.error('[AuthContext:signIn] Caught error:', err);
       return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
     }
   };

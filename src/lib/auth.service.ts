@@ -11,34 +11,16 @@ export interface AuthUser {
   role: 'admin' | 'client';
 }
 
-// Fallback for local development without Supabase
-const TEST_CREDENTIALS = [
-  { 
-    email: 'admin@flashdate.com', 
-    password: 'admin123', 
-    role: 'admin' as const,
-    id: '1',
-    name: 'Admin User'
-  },
-  { 
-    email: 'cliente@flashdate.com', 
-    password: 'cliente123', 
-    role: 'client' as const,
-    id: '2',
-    name: 'Cliente User'
-  },
-];
-
 export const authService = {
   /**
    * Sign up a new user
    */
   async signUp(email: string, password: string, name: string, role: 'admin' | 'client' = 'client') {
     if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured, using mock auth');
+      console.error('❌ Supabase not configured');
       return {
-        user: { id: Date.now().toString(), email, role },
-        error: null,
+        user: null,
+        error: new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.'),
       };
     }
 
@@ -67,127 +49,31 @@ export const authService = {
    */
   async signIn(email: string, password: string) {
     if (!isSupabaseConfigured()) {
-      // Fallback to test credentials
-      const testUser = TEST_CREDENTIALS.find(
-        (cred) => cred.email === email && cred.password === password
-      );
-
-      if (testUser) {
-        return {
-          user: {
-            id: testUser.id,
-            email: testUser.email,
-            user_metadata: { role: testUser.role, name: testUser.name },
-          },
-          session: { access_token: 'mock-token' },
-          error: null,
-        };
-      }
-
       return {
         user: null,
         session: null,
-        error: new Error('Invalid credentials'),
+        error: new Error('Supabase is not configured'),
       };
     }
 
     try {
+      console.log('[signIn] Starting authentication...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      console.log('[signIn] Auth response received');
 
-      // After successful login, try to get the user's role from the users table
-      // This handles cases where the user was created via admin panel
-      if (data.user) {
-        try {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('email', email)
-            .single();
-
-          if (!userError && userData?.role) {
-            // Update the user object with the role from database
-            if (data.user.user_metadata) {
-              data.user.user_metadata.role = userData.role;
-            } else {
-              data.user.user_metadata = { role: userData.role };
-            }
-          } else if (userError) {
-            // User doesn't exist in the users table
-            console.log('User not found in database, attempting to find by exact email match...');
-
-            // Try a case-insensitive search or look for similar email
-            try {
-              const { data: existingUser } = await supabase
-                .from('users')
-                .select('role')
-                .ilike('email', email) // Case-insensitive search
-                .single();
-
-              if (existingUser?.role) {
-                console.log('Found existing user with case-insensitive search');
-                if (data.user.user_metadata) {
-                  data.user.user_metadata.role = existingUser.role;
-                } else {
-                  data.user.user_metadata = { role: existingUser.role };
-                }
-              } else {
-                // Still not found, create new user
-                throw new Error('User not found');
-              }
-            } catch (searchErr) {
-              // User doesn't exist at all, create them automatically
-              console.log('Creating new user profile...');
-              try {
-                const { data: newUser, error: createError } = await supabase
-                  .from('users')
-                  .insert([{
-                    email: data.user.email,
-                    name: data.user.email?.split('@')[0] || 'User',
-                    username: data.user.email?.split('@')[0] || 'user',
-                    whatsapp: '',
-                    gender: 'Outro',
-                    role: 'admin', // Default to admin for new users created via login
-                  }])
-                  .select()
-                  .single();
-
-                if (!createError && newUser?.role) {
-                  console.log('User profile created successfully with role:', newUser.role);
-                  if (data.user.user_metadata) {
-                    data.user.user_metadata.role = newUser.role;
-                  } else {
-                    data.user.user_metadata = { role: newUser.role };
-                  }
-                }
-              } catch (createErr) {
-                console.warn('Could not create user profile:', createErr);
-                // Continue with login, set to admin role
-                if (data.user.user_metadata) {
-                  data.user.user_metadata.role = 'admin';
-                } else {
-                  data.user.user_metadata = { role: 'admin' };
-                }
-              }
-            }
-          }
-        } catch (err) {
-          console.warn('Error during user profile check/creation:', err);
-          // Continue with login, set default role
-          if (data.user.user_metadata) {
-            data.user.user_metadata.role = 'client';
-          } else {
-            data.user.user_metadata = { role: 'client' };
-          }
-        }
+      if (error) {
+        console.error('[signIn] Auth error:', error.message);
+        throw error;
       }
 
+      console.log('[signIn] Success, user ID:', data.user?.id);
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
+      console.error('[signIn] Caught error:', error);
       return { user: null, session: null, error };
     }
   },
@@ -257,16 +143,42 @@ export const authService = {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        // Get role from user metadata, default to 'client'
-        const roleFromMetadata = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+      console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
 
+      if (session?.user) {
+        console.log('[onAuthStateChange] User detected, fetching role...');
+        let role: 'admin' | 'client' = 'client';
+
+        // Try to fetch role from database, but DON'T block if it fails
+        try {
+          console.log('[onAuthStateChange] Querying users table...');
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+          console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
+
+          if (!error && userData?.role) {
+            console.log('[onAuthStateChange] Role found:', userData.role);
+            role = userData.role as 'admin' | 'client';
+          } else {
+            console.warn('[onAuthStateChange] No role found, using default');
+          }
+        } catch (err) {
+          console.error('[onAuthStateChange] Query error:', err);
+          role = 'client';
+        }
+
+        console.log('[onAuthStateChange] Calling callback with role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
-          role: roleFromMetadata,
+          role,
         });
       } else {
+        console.log('[onAuthStateChange] No session');
         callback(null);
       }
     });
