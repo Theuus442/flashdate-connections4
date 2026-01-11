@@ -80,6 +80,7 @@ export const UsersManagement = () => {
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
+          password: formData.password,
           role: 'client',
         }, selectedImageFile);
 
