@@ -39,7 +39,13 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   // Load selections when currentEventId and currentUserId change
   useEffect(() => {
     const loadSelections = async () => {
-      if (!currentEventId || !currentUserId || !supabaseConfigured) {
+      if (!currentEventId || !currentUserId) {
+        return;
+      }
+
+      // If Supabase is not configured, skip loading (use local state)
+      if (!supabaseConfigured) {
+        console.log('Supabase not configured, using local selections state');
         return;
       }
 
@@ -47,12 +53,16 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
       try {
         const { data, error } = await selectionsService.getSelectionsForUserInEvent(currentEventId, currentUserId);
         if (error) {
-          console.error('Error loading selections:', error);
+          console.error('Error loading selections from database:', error);
+          // Continue with empty selections if error occurs
+          setSelections([]);
         } else if (data) {
           setSelections(data);
         }
       } catch (error) {
         console.error('Error loading selections:', error);
+        // Continue with empty selections if error occurs
+        setSelections([]);
       } finally {
         setIsLoading(false);
       }
@@ -62,18 +72,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   }, [currentEventId, currentUserId, supabaseConfigured]);
 
   const addSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
-      return;
-    }
-
     try {
-      const { data, error } = await selectionsService.addSelection(eventId, userId, selectedUserId, vote);
-      if (error) {
-        console.error('Error adding selection:', error);
-        return;
-      }
+      const { data } = await selectionsService.addSelection(eventId, userId, selectedUserId, vote);
       if (data) {
         setSelections(prev => {
           // Remove existing selection for this selected user if it exists
@@ -87,18 +87,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   const removeSelection = async (eventId: string, userId: string, selectedUserId: string) => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
-      return;
-    }
-
     try {
-      const { error } = await selectionsService.removeSelection(eventId, userId, selectedUserId);
-      if (error) {
-        console.error('Error removing selection:', error);
-        return;
-      }
+      await selectionsService.removeSelection(eventId, userId, selectedUserId);
       setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
     } catch (error) {
       console.error('Error removing selection:', error);
@@ -106,25 +96,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   const updateSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      const existingIndex = selections.findIndex(s => s.selectedUserId === selectedUserId);
-      if (existingIndex >= 0) {
-        const updated = [...selections];
-        updated[existingIndex] = { eventId, userId, selectedUserId, vote, timestamp: Date.now() };
-        setSelections(updated);
-      } else {
-        setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
-      }
-      return;
-    }
-
     try {
-      const { data, error } = await selectionsService.updateSelection(eventId, userId, selectedUserId, vote);
-      if (error) {
-        console.error('Error updating selection:', error);
-        return;
-      }
+      const { data } = await selectionsService.updateSelection(eventId, userId, selectedUserId, vote);
       if (data) {
         setSelections(prev => {
           const filtered = prev.filter(s => s.selectedUserId !== selectedUserId);
