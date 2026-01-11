@@ -88,13 +88,16 @@ export const storageService = {
     }
 
     try {
+      console.log('[storageService] Deleting profile image:', filePath);
       const { error } = await supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .remove([filePath]);
 
       if (error) throw error;
+      console.log('[storageService] Profile image deleted successfully');
       return { error: null };
     } catch (error) {
+      console.error('[storageService] Error deleting profile image:', error);
       return { error };
     }
   },
