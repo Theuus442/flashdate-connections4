@@ -70,7 +70,7 @@ export const selectionsService = {
    */
   async getSelectionsForUserInEvent(eventId: string, userId: string): Promise<{ data: Selection[] | null; error: any }> {
     if (!isSupabaseConfigured()) {
-      return { data: null, error: 'Supabase not configured' };
+      return { data: [], error: null };
     }
 
     try {
@@ -81,7 +81,10 @@ export const selectionsService = {
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error getting selections:', error);
+        throw error;
+      }
 
       const transformedData = data?.map((selection: any) => ({
         id: selection.id,
@@ -93,8 +96,10 @@ export const selectionsService = {
       }));
 
       return { data: transformedData || [], error: null };
-    } catch (error) {
-      return { data: null, error };
+    } catch (error: any) {
+      console.error('Exception getting selections:', error?.message || error);
+      // Return empty array instead of error to allow app to continue
+      return { data: [], error: null };
     }
   },
 
