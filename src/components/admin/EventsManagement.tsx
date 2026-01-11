@@ -147,6 +147,14 @@ export const EventsManagement = () => {
     setIsEditing(false);
   };
 
+  if (isLoading && !eventData.id) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-muted-foreground">Carregando evento...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -156,7 +164,7 @@ export const EventsManagement = () => {
           <p className="text-muted-foreground mt-2">Edite as informações do próximo evento</p>
         </div>
         {!isEditing && (
-          <Button variant="gold" onClick={() => setIsEditing(true)}>
+          <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
             Editar Evento
           </Button>
         )}
