@@ -113,11 +113,23 @@ export const UsersManagement = () => {
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
           });
+          setFormData({
+            name: '',
+            username: '',
+            email: '',
+            whatsapp: '',
+            gender: 'Outro',
+            password: '',
+            role: 'client',
+          });
+          setSelectedImageFile(undefined);
+          setImagePreview(undefined);
           setEditingId(null);
+          setShowForm(false);
         } else {
           toast({
             title: 'Erro',
-            description: 'Falha ao atualizar usuário',
+            description: 'Falha ao atualizar usuário - verifique o console para detalhes',
             variant: 'destructive',
           });
         }
