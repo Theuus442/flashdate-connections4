@@ -251,12 +251,15 @@ export const usersService = {
       updateData.updated_at = new Date().toISOString();
 
       console.log('[usersService] Update data to send:', updateData);
+      console.log('[usersService] Sending update request to Supabase for user:', id);
 
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
         .eq('id', id)
         .select();
+
+      console.log('[usersService] Update response received:', { hasData: !!data, hasError: !!error, dataLength: data?.length });
 
       if (error) {
         const errorMessage = error instanceof Error
