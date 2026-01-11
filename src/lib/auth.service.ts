@@ -169,6 +169,35 @@ export const authService = {
             if (!error && userData?.role) {
               console.log('[onAuthStateChange] Role found in database:', userData.role);
               role = userData.role as 'admin' | 'client';
+            } else if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+              // User doesn't exist in users table, create automatically with role from metadata or default
+              console.log('[onAuthStateChange] User not found in database, creating automatically...');
+              try {
+                const userRole = metadataRole || 'client';
+                const { data: newUser, error: createError } = await supabase
+                  .from('users')
+                  .insert([{
+                    id: session.user.id,
+                    email: session.user.email || '',
+                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                    username: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user',
+                    gender: 'Outro',
+                    role: userRole,
+                  }])
+                  .select('role')
+                  .single();
+
+                if (createError) {
+                  console.error('[onAuthStateChange] Error creating user:', createError.message);
+                  role = 'client';
+                } else if (newUser?.role) {
+                  console.log('[onAuthStateChange] User created successfully with role:', newUser.role);
+                  role = newUser.role as 'admin' | 'client';
+                }
+              } catch (createErr) {
+                console.error('[onAuthStateChange] Error creating user:', createErr);
+                role = 'client';
+              }
             } else {
               console.warn('[onAuthStateChange] No role found in database, using default');
               role = 'client';
