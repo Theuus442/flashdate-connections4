@@ -170,10 +170,23 @@ export const authService = {
               console.log('[onAuthStateChange] Role found in database:', userData.role);
               role = userData.role as 'admin' | 'client';
             } else if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
-              // User doesn't exist in users table, create automatically with role from metadata or default
+              // User doesn't exist in users table, create automatically
               console.log('[onAuthStateChange] User not found in database, creating automatically...');
               try {
-                const userRole = metadataRole || 'client';
+                // Check if there are any admin users
+                const { data: adminUsers, error: adminCheckError } = await supabase
+                  .from('users')
+                  .select('id')
+                  .eq('role', 'admin')
+                  .limit(1);
+
+                // If no admin exists, make this user admin. Otherwise, make them a client
+                let userRole: 'admin' | 'client' = 'client';
+                if (!adminCheckError && (!adminUsers || adminUsers.length === 0)) {
+                  console.log('[onAuthStateChange] No admin found, making this user admin');
+                  userRole = 'admin';
+                }
+
                 const { data: newUser, error: createError } = await supabase
                   .from('users')
                   .insert([{
