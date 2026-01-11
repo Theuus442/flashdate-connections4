@@ -194,12 +194,21 @@ export const authService = {
         try {
           console.log('[AUTH:STATE] Querying database for user role...');
 
+          // Create a timeout promise
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Query timeout')), 3000)
+          );
+
           // Query by user ID (more reliable than email)
-          const { data: userData, error } = await supabase
+          const queryPromise = supabase
             .from('users')
             .select('role')
             .eq('id', session.user.id)
             .single();
+
+          // Race between query and timeout
+          const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+          const { data: userData, error } = result;
 
           if (!error && userData?.role) {
             console.log('[AUTH:STATE] Found role in database:', userData.role);
@@ -210,8 +219,8 @@ export const authService = {
             role = 'client';
           }
         } catch (err) {
-          // If there's an error querying database, use 'client' as default
-          console.warn('[AUTH:STATE] Error fetching role:', err);
+          // If there's an error or timeout, use 'client' as default
+          console.warn('[AUTH:STATE] Error fetching role (timeout or error):', err instanceof Error ? err.message : err);
           role = 'client';
         }
 
