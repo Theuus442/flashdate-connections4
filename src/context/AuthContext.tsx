@@ -14,9 +14,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /**
  * Get user role from the users table in Supabase
+ * Falls back to 'client' if unable to fetch from database
  */
 const getUserRoleFromDatabase = async (email: string): Promise<'admin' | 'client'> => {
-  if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured() || !supabase) {
     return 'client';
   }
 
@@ -28,13 +29,15 @@ const getUserRoleFromDatabase = async (email: string): Promise<'admin' | 'client
       .single();
 
     if (error) {
-      console.warn('Error fetching user role from database:', error);
+      console.warn('Could not fetch user role from database (this is normal if RLS is enabled):', error?.message);
       return 'client';
     }
 
-    return (data?.role || 'client') as 'admin' | 'client';
+    const role = (data?.role || 'client') as 'admin' | 'client';
+    console.log(`User role fetched from database: ${role}`);
+    return role;
   } catch (error) {
-    console.warn('Error getting user role:', error);
+    console.warn('Error getting user role from database:', error);
     return 'client';
   }
 };
