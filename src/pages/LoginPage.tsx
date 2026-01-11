@@ -1,52 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
-import { toast } from 'sonner';
-
-interface Credentials {
-  email: string;
-  username?: string;
-  password: string;
-  role: 'admin' | 'client';
-  label: string;
-}
-
-const TEST_CREDENTIALS: Credentials[] = [
-  {
-    email: 'admin@flashdate.com',
-    username: 'admin',
-    password: 'admin123',
-    role: 'admin',
-    label: 'Admin - Painel de Administração',
-  },
-  {
-    email: 'cliente@flashdate.com',
-    username: 'cliente',
-    password: 'cliente123',
-    role: 'client',
-    label: 'Cliente - Perfil e Seleções',
-  },
-];
+import { ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const handleCopyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleAutoFill = (credentials: Credentials) => {
-    setEmail(credentials.username || credentials.email);
-    setPassword(credentials.password);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,31 +29,10 @@ export default function LoginPage() {
         return;
       }
 
-      // Check credentials (accept both email and username)
-      const credential = TEST_CREDENTIALS.find(
-        c => (c.email === email || c.username === email) && c.password === password
-      );
-
-      if (!credential) {
-        setError('Usuário/Email ou senha inválidos');
-        setIsLoading(false);
-        return;
-      }
-
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Success - redirect based on role
-      toast.success(`Bem-vindo de volta, ${credential.role === 'admin' ? 'Administrador' : 'Cliente'}!`);
-
-      if (credential.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/user-profile');
-      }
+      setError('Autenticação com Supabase não configurada. Por favor, configure as variáveis de ambiente do Supabase.');
+      setIsLoading(false);
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
-    } finally {
       setIsLoading(false);
     }
   };
