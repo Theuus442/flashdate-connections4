@@ -50,13 +50,19 @@ export default function AdminPanel() {
                 FlashDate<span className="text-gold">⚡</span>
               </span>
             </a>
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-foreground hover:text-gold transition-colors"
-            >
-              <ArrowLeft size={20} />
-              <span className="hidden sm:inline">Voltar</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:inline text-sm text-muted-foreground">
+                {user?.email}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-foreground hover:text-gold transition-colors px-3 py-2 rounded-lg hover:bg-muted"
+                title="Logout"
+              >
+                <LogOut size={20} />
+                <span className="hidden sm:inline text-sm">Sair</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
