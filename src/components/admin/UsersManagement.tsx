@@ -202,6 +202,7 @@ export const UsersManagement = () => {
       email: '',
       whatsapp: '',
       gender: 'Outro',
+      password: '',
     });
     setSelectedImageFile(undefined);
     setImagePreview(undefined);
