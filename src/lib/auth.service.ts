@@ -159,47 +159,28 @@ export const authService = {
         try {
           console.log('[AUTH:STATE] Querying database for user role...');
 
-          // Create a timeout promise
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Query timeout')), 3000)
-          );
-
-          // Query by user ID (more reliable than email)
-          const queryPromise = supabase
+          // Query by user ID
+          const { data: userData, error } = await supabase
             .from('users')
             .select('role')
             .eq('id', session.user.id)
             .single();
 
-          // Race between query and timeout
-          const result = await Promise.race([queryPromise, timeoutPromise]) as any;
-          const { data: userData, error } = result;
+          if (error) {
+            console.error('[AUTH:STATE] ❌ User not found in database:', error.message);
+            throw error;
+          }
 
-          if (!error && userData?.role) {
-            console.log('[AUTH:STATE] Found role in database:', userData.role);
+          if (userData?.role) {
+            console.log('[AUTH:STATE] ✅ Found role in database:', userData.role);
             role = userData.role as 'admin' | 'client';
           } else {
-            // Fallback: check if email is in admin list or use default
-            console.log('[AUTH:STATE] Role not found in database, checking email for admin status...');
-            const adminEmails = ['matheus@teste.com', 'admin@flashdate.com'];
-            if (adminEmails.includes(session.user.email || '')) {
-              console.log('[AUTH:STATE] Email is in admin list, setting role to admin');
-              role = 'admin';
-            } else {
-              console.log('[AUTH:STATE] Using default: client');
-              role = 'client';
-            }
+            console.error('[AUTH:STATE] ❌ No role found in user record');
+            throw new Error('User record exists but has no role');
           }
         } catch (err) {
-          // If there's an error or timeout, check email for admin status
-          console.warn('[AUTH:STATE] Error fetching role (timeout or error):', err instanceof Error ? err.message : err);
-          const adminEmails = ['matheus@teste.com', 'admin@flashdate.com'];
-          if (adminEmails.includes(session.user.email || '')) {
-            console.log('[AUTH:STATE] Query failed, but email is in admin list, setting role to admin');
-            role = 'admin';
-          } else {
-            role = 'client';
-          }
+          console.error('[AUTH:STATE] ❌ Error fetching user role:', err instanceof Error ? err.message : err);
+          throw err;
         }
 
         console.log('[AUTH:STATE] Callback with role:', role);
