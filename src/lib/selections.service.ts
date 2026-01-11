@@ -153,15 +153,16 @@ export const selectionsService = {
    * Add selection
    */
   async addSelection(eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
-    if (!isSupabaseConfigured()) {
-      // Return local selection object as fallback
-      const selection: Selection = {
-        eventId,
-        userId,
-        selectedUserId,
-        vote,
-        timestamp: Date.now(),
-      };
+    // Return local selection object as fallback (always works, even without Supabase or valid UUIDs)
+    const selection: Selection = {
+      eventId,
+      userId,
+      selectedUserId,
+      vote,
+      timestamp: Date.now(),
+    };
+
+    if (!isSupabaseConfigured() || !isValidUUID(eventId)) {
       return { data: selection, error: null };
     }
 
@@ -190,15 +191,8 @@ export const selectionsService = {
 
       return { data: transformedData, error: null };
     } catch (error: any) {
-      console.error('Error adding selection:', error?.message || error);
+      console.error('Error adding selection to database:', error?.message || error);
       // Return local selection object as fallback
-      const selection: Selection = {
-        eventId,
-        userId,
-        selectedUserId,
-        vote,
-        timestamp: Date.now(),
-      };
       return { data: selection, error: null };
     }
   },
