@@ -59,19 +59,22 @@ export const storageService = {
       const fileName = `${eventId}-${Date.now()}-${file.name}`;
       const filePath = `events/${fileName}`;
 
+      console.log('[storageService] Uploading event image to bucket: events');
       const { error: uploadError } = await supabase.storage
-        .from('event-images')
+        .from('events')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data } = supabase.storage
-        .from('event-images')
+        .from('events')
         .getPublicUrl(filePath);
 
+      console.log('[storageService] Event image uploaded successfully:', data.publicUrl);
       return { data: data.publicUrl, error: null };
     } catch (error) {
+      console.error('[storageService] Error uploading event image:', error);
       return { data: null, error };
     }
   },
