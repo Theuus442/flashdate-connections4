@@ -151,39 +151,36 @@ export const authService = {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        // Try to get role from database first (most reliable source)
         let role: 'admin' | 'client' = 'client';
 
-        console.log('[AUTH:STATE] Auth state change detected for user:', session.user.id);
+        console.log('[AUTH:STATE] ✅ Auth state change detected for user:', session.user.id, session.user.email);
 
+        // Try to fetch role from database, but DON'T block if it fails
         try {
-          console.log('[AUTH:STATE] Querying database for user role...');
+          console.log('[AUTH:STATE] Attempting to fetch user role from database...');
 
-          // Query by user ID
           const { data: userData, error } = await supabase
             .from('users')
             .select('role')
             .eq('id', session.user.id)
             .single();
 
-          if (error) {
-            console.error('[AUTH:STATE] ❌ User not found in database:', error.message);
-            throw error;
-          }
-
-          if (userData?.role) {
+          if (!error && userData?.role) {
             console.log('[AUTH:STATE] ✅ Found role in database:', userData.role);
             role = userData.role as 'admin' | 'client';
-          } else {
-            console.error('[AUTH:STATE] ❌ No role found in user record');
-            throw new Error('User record exists but has no role');
+          } else if (error) {
+            console.warn('[AUTH:STATE] ⚠️  Could not find user in database:', error.message);
+            // If user not found in DB, try to see if they're already known
+            console.log('[AUTH:STATE] Falling back to default role (client)');
+            role = 'client';
           }
         } catch (err) {
-          console.error('[AUTH:STATE] ❌ Error fetching user role:', err instanceof Error ? err.message : err);
-          throw err;
+          console.warn('[AUTH:STATE] ⚠️  Error querying database:', err instanceof Error ? err.message : err);
+          console.log('[AUTH:STATE] Continuing with default role (client)');
+          role = 'client';
         }
 
-        console.log('[AUTH:STATE] ✅ Callback with role:', role);
+        console.log('[AUTH:STATE] ✅ Calling callback with user:', { id: session.user.id, email: session.user.email, role });
         callback({
           id: session.user.id,
           email: session.user.email || '',
