@@ -20,19 +20,22 @@ export const storageService = {
       const fileName = `${userId}-${Date.now()}-${file.name}`;
       const filePath = `profiles/${fileName}`;
 
+      console.log('[storageService] Uploading profile image to bucket: profiles');
       const { error: uploadError } = await supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data } = supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .getPublicUrl(filePath);
 
+      console.log('[storageService] Profile image uploaded successfully:', data.publicUrl);
       return { data: data.publicUrl, error: null };
     } catch (error) {
+      console.error('[storageService] Error uploading profile image:', error);
       return { data: null, error };
     }
   },
@@ -56,19 +59,22 @@ export const storageService = {
       const fileName = `${eventId}-${Date.now()}-${file.name}`;
       const filePath = `events/${fileName}`;
 
+      console.log('[storageService] Uploading event image to bucket: events');
       const { error: uploadError } = await supabase.storage
-        .from('event-images')
+        .from('events')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data } = supabase.storage
-        .from('event-images')
+        .from('events')
         .getPublicUrl(filePath);
 
+      console.log('[storageService] Event image uploaded successfully:', data.publicUrl);
       return { data: data.publicUrl, error: null };
     } catch (error) {
+      console.error('[storageService] Error uploading event image:', error);
       return { data: null, error };
     }
   },
@@ -82,13 +88,16 @@ export const storageService = {
     }
 
     try {
+      console.log('[storageService] Deleting profile image:', filePath);
       const { error } = await supabase.storage
-        .from('user-profiles')
+        .from('profiles')
         .remove([filePath]);
 
       if (error) throw error;
+      console.log('[storageService] Profile image deleted successfully');
       return { error: null };
     } catch (error) {
+      console.error('[storageService] Error deleting profile image:', error);
       return { error };
     }
   },
@@ -102,13 +111,16 @@ export const storageService = {
     }
 
     try {
+      console.log('[storageService] Deleting event image:', filePath);
       const { error } = await supabase.storage
-        .from('event-images')
+        .from('events')
         .remove([filePath]);
 
       if (error) throw error;
+      console.log('[storageService] Event image deleted successfully');
       return { error: null };
     } catch (error) {
+      console.error('[storageService] Error deleting event image:', error);
       return { error };
     }
   },

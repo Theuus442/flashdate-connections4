@@ -11,6 +11,7 @@ export interface User {
   gender: 'M' | 'F' | 'Outro';
   role: 'admin' | 'client';
   profileImage?: string;
+  password?: string;
 }
 
 interface UsersContextType {
@@ -18,6 +19,7 @@ interface UsersContextType {
   addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<User | null>;
   updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
   deleteUser: (id: string) => Promise<boolean>;
+  deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
   getUserById: (id: string) => User | undefined;
   isLoading: boolean;
 }
@@ -33,20 +35,39 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     const loadUsers = async () => {
       if (!supabaseConfigured) {
+        console.log('[UsersContext] Supabase not configured, skipping user load');
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log('[UsersContext] Attempting to load users from Supabase...');
         const { data, error } = await usersService.getUsers();
+
         if (error) {
-          console.error('Error loading users:', error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          console.error('[UsersContext] Error loading users:', {
+            message: errorMessage,
+            isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
+            error,
+          });
+
+          // If it's a network error, show more helpful message
+          if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+            console.error('[UsersContext] Network Error: Cannot reach Supabase. This may be a temporary connectivity issue or a CORS/network isolation problem in your environment.');
+          }
+
           setUsers([]);
         } else if (data) {
+          console.log('[UsersContext] Successfully loaded users:', data.length);
           setUsers(data);
         }
       } catch (error) {
-        console.error('Error loading users:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('[UsersContext] Unexpected error loading users:', {
+          message: errorMessage,
+          error,
+        });
         setUsers([]);
       } finally {
         setIsLoading(false);
@@ -146,11 +167,40 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return users.find(user => user.id === id);
   };
 
+  const deleteAllByRole = async (role: 'admin' | 'client') => {
+    if (!supabaseConfigured) {
+      // Fallback to local state
+      const filteredUsers = users.filter(u => u.role !== role);
+      setUsers(filteredUsers);
+      return { count: users.length - filteredUsers.length, error: null };
+    }
+
+    try {
+      console.log('[UsersContext] Deleting all users with role:', role);
+      const result = await usersService.deleteAllByRole(role);
+
+      if (result.error) {
+        console.error('[UsersContext] Error deleting users by role:', result.error);
+        return result;
+      }
+
+      // Update local state to remove deleted users
+      setUsers(prev => prev.filter(u => u.role !== role));
+      console.log('[UsersContext] Successfully deleted', result.count, 'users with role:', role);
+
+      return result;
+    } catch (error) {
+      console.error('[UsersContext] Error deleting users by role:', error);
+      return { count: 0, error };
+    }
+  };
+
   const value: UsersContextType = {
     users,
     addUser,
     updateUser,
     deleteUser,
+    deleteAllByRole,
     getUserById,
     isLoading,
   };

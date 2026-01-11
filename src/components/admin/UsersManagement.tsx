@@ -5,7 +5,7 @@ import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
 
 export const UsersManagement = () => {
-  const { users, addUser, updateUser, deleteUser } = useUsers();
+  const { users, addUser, updateUser, deleteUser, deleteAllByRole } = useUsers();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -14,6 +14,8 @@ export const UsersManagement = () => {
     email: '',
     whatsapp: '',
     gender: 'Outro' as 'M' | 'F' | 'Outro',
+    password: '',
+    role: 'client' as 'admin' | 'client',
   });
 
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
@@ -21,6 +23,9 @@ export const UsersManagement = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [bulkDeleteRole, setBulkDeleteRole] = useState<'admin' | 'client'>('client');
+  const [bulkDeleteConfirmCount, setBulkDeleteConfirmCount] = useState(0);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,16 +58,18 @@ export const UsersManagement = () => {
     console.log('[UsersManagement] Form submitted with data:', formData);
     setIsLoading(true);
 
-    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp || !formData.password) {
       console.warn('[UsersManagement] Validation failed - missing fields:', {
         name: !!formData.name,
         username: !!formData.username,
         email: !!formData.email,
         whatsapp: !!formData.whatsapp,
+        password: !!formData.password,
+        role: !!formData.role,
       });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos (Nome, Apelido, Email, Telefone)',
+        description: 'Por favor, preencha todos os campos obrigatórios',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -78,7 +85,8 @@ export const UsersManagement = () => {
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          role: 'client',
+          password: formData.password,
+          role: formData.role,
         }, selectedImageFile);
 
         console.log('[UsersManagement] Update result:', result);
@@ -103,7 +111,8 @@ export const UsersManagement = () => {
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          role: 'client',
+          password: formData.password,
+          role: formData.role,
         }, selectedImageFile);
 
         console.log('[UsersManagement] Add user result:', result);
@@ -128,6 +137,8 @@ export const UsersManagement = () => {
         email: '',
         whatsapp: '',
         gender: 'Outro',
+        password: '',
+        role: 'client',
       });
       setSelectedImageFile(undefined);
       setImagePreview(undefined);
@@ -151,6 +162,8 @@ export const UsersManagement = () => {
       email: user.email,
       whatsapp: user.whatsapp,
       gender: user.gender,
+      password: user.password || '',
+      role: user.role || 'client',
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
@@ -196,9 +209,56 @@ export const UsersManagement = () => {
       email: '',
       whatsapp: '',
       gender: 'Outro',
+      password: '',
+      role: 'client',
     });
     setSelectedImageFile(undefined);
     setImagePreview(undefined);
+  };
+
+  const handleOpenBulkDeleteModal = (role: 'admin' | 'client') => {
+    const countToDelete = users.filter(u => u.role === role).length;
+    if (countToDelete === 0) {
+      toast({
+        title: 'Nenhum usuário',
+        description: `Não há ${role === 'admin' ? 'administradores' : 'clientes'} para deletar`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    setBulkDeleteRole(role);
+    setBulkDeleteConfirmCount(countToDelete);
+    setShowBulkDeleteModal(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    setIsLoading(true);
+    try {
+      const result = await deleteAllByRole(bulkDeleteRole);
+
+      if (result.error) {
+        toast({
+          title: 'Erro',
+          description: `Erro ao deletar ${bulkDeleteRole === 'admin' ? 'administradores' : 'clientes'}`,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Sucesso',
+          description: `${result.count} ${bulkDeleteRole === 'admin' ? 'administrador(es)' : 'cliente(s)'} deletado(s) com sucesso!`,
+        });
+        setShowBulkDeleteModal(false);
+      }
+    } catch (error) {
+      console.error('Error during bulk delete:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao deletar usuários',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -210,17 +270,78 @@ export const UsersManagement = () => {
           <p className="text-muted-foreground mt-2">Cadastre e gerencie os participantes do evento</p>
         </div>
         {!showForm && (
-          <Button
-            variant="gold"
-            onClick={() => setShowForm(true)}
-            disabled={isLoading}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Novo Usuário
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Button
+                variant="destructive"
+                disabled={isLoading}
+                className="flex items-center gap-2"
+              >
+                <Trash2 size={20} />
+                Deletar em Massa
+              </Button>
+              <div className="absolute right-0 mt-1 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <button
+                  onClick={() => handleOpenBulkDeleteModal('client')}
+                  disabled={isLoading || users.filter(u => u.role === 'client').length === 0}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted/50 first:rounded-t-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Deletar Todos Clientes ({users.filter(u => u.role === 'client').length})
+                </button>
+                <div className="border-t border-border" />
+                <button
+                  onClick={() => handleOpenBulkDeleteModal('admin')}
+                  disabled={isLoading || users.filter(u => u.role === 'admin').length === 0}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted/50 last:rounded-b-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Deletar Todos Admins ({users.filter(u => u.role === 'admin').length})
+                </button>
+              </div>
+            </div>
+            <Button
+              variant="gold"
+              onClick={() => setShowForm(true)}
+              disabled={isLoading}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Novo Usuário
+            </Button>
+          </div>
         )}
       </div>
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-sm mx-4">
+            <h2 className="font-serif text-2xl font-bold text-foreground mb-4">
+              Confirmação de Exclusão em Massa
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              Você está prestes a deletar <strong>{bulkDeleteConfirmCount}</strong> {bulkDeleteRole === 'admin' ? 'administrador(es)' : 'cliente(s)'}.
+              <br /><br />
+              <span className="text-destructive font-semibold">Esta ação é irreversível!</span>
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkDeleteModal(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmBulkDelete}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Deletando...' : 'Confirmar Exclusão'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form */}
       {showForm && (
@@ -338,6 +459,37 @@ export const UsersManagement = () => {
                 />
               </div>
 
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Senha
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Insira uma senha segura"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                />
+              </div>
+
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Cargo
+                </label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'admin' | 'client' }))}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                >
+                  <option value="client">Cliente</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
               {/* Gender */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
@@ -380,6 +532,7 @@ export const UsersManagement = () => {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Apelido</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Email</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Telefone</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Cargo</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gold">Ações</th>
               </tr>
             </thead>
@@ -403,6 +556,15 @@ export const UsersManagement = () => {
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.username}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.email}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.whatsapp}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      user.role === 'admin'
+                        ? 'bg-gold/20 text-gold'
+                        : 'bg-secondary/20 text-secondary'
+                    }`}>
+                      {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       <button

@@ -12,12 +12,18 @@ export const usersService = {
     }
 
     try {
+      console.log('[usersService] Fetching users from Supabase...');
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[usersService] Supabase error:', error);
+        throw error;
+      }
+
+      console.log('[usersService] Successfully fetched users, count:', data?.length || 0);
 
       const transformedData = data?.map((user: any) => ({
         id: user.id,
@@ -28,10 +34,23 @@ export const usersService = {
         gender: user.gender,
         role: user.role || 'client',
         profileImage: user.profile_image_url,
+        password: user.password,
       }));
 
       return { data: transformedData || [], error: null };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[usersService] Error fetching users:', {
+        message: errorMessage,
+        type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
+        error,
+      });
+
+      // Check if it's a network error
+      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+        console.error('[usersService] Network error detected - Supabase may be unreachable from this environment');
+      }
+
       return { data: null, error };
     }
   },
@@ -62,6 +81,7 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
+        password: data.password,
       } : null;
 
       return { data: transformedData, error: null };
@@ -115,6 +135,7 @@ export const usersService = {
           gender: user.gender,
           role: user.role || 'client',
           profile_image_url: profileImageUrl,
+          password: user.password,
         }])
         .select()
         .single();
@@ -140,6 +161,7 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
+        password: data.password,
       };
 
       console.log('[usersService] User created successfully:', transformedData);
@@ -177,6 +199,7 @@ export const usersService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
+      if (updates.password) updateData.password = updates.password;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
@@ -198,6 +221,7 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
+        password: data.password,
       };
 
       return { data: transformedData, error: null };
@@ -225,6 +249,44 @@ export const usersService = {
       return { error: null };
     } catch (error) {
       return { error };
+    }
+  },
+
+  /**
+   * Delete all users by role
+   */
+  async deleteAllByRole(role: 'admin' | 'client'): Promise<{ count: number; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { count: 0, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[usersService] Deleting all users with role:', role);
+
+      // First, get count of users to delete
+      const { data: countData, error: countError } = await supabase
+        .from('users')
+        .select('id', { count: 'exact' })
+        .eq('role', role);
+
+      if (countError) throw countError;
+      const count = countData?.length || 0;
+
+      console.log('[usersService] Found', count, 'users to delete');
+
+      // Then delete them
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('role', role);
+
+      if (error) throw error;
+
+      console.log('[usersService] Successfully deleted', count, 'users with role:', role);
+      return { count, error: null };
+    } catch (error) {
+      console.error('[usersService] Error deleting users by role:', error);
+      return { count: 0, error };
     }
   },
 };

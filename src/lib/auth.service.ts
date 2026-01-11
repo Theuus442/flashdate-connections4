@@ -73,7 +73,18 @@ export const authService = {
 
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
-      console.error('[signIn] Caught error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[signIn] Caught error:', {
+        message: errorMessage,
+        isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
+        error,
+      });
+
+      // Provide better error messages for network issues
+      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+        console.error('[signIn] Network Error: Cannot reach Supabase. This may be a temporary issue or a network isolation problem.');
+      }
+
       return { user: null, session: null, error };
     }
   },
@@ -137,6 +148,7 @@ export const authService = {
    */
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
     if (!isSupabaseConfigured()) {
+      console.warn('[onAuthStateChange] Supabase not configured');
       return () => {};
     }
 
@@ -179,7 +191,12 @@ export const authService = {
               }
             }
           } catch (err) {
-            console.warn('[onAuthStateChange] Could not fetch from database:', err);
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            if (err instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+              console.error('[onAuthStateChange] Network error while fetching user role from database');
+            } else {
+              console.warn('[onAuthStateChange] Could not fetch from database:', err);
+            }
           }
         }
 
