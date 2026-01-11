@@ -78,25 +78,28 @@ export default function UserProfile() {
     }
   };
 
-  const handleSelection = async (selectedUserId: string, type: 'match' | 'friendship' | 'no-interest') => {
+  const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!currentUser) return;
     try {
-      await updateSelection(currentUser.id, selectedUserId, type);
+      // For demo purposes, use a fixed event ID
+      const eventId = 'default-event-id';
+      await updateSelection(eventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
     }
   };
 
-  const matchCount = getSelectionsByType('match').length;
-  const friendshipCount = getSelectionsByType('friendship').length;
-  const allSelections = getSelectionsByType('match').concat(
-    getSelectionsByType('friendship'),
-    getSelectionsByType('no-interest')
+  const matchCount = getSelectionsByVote('SIM').length;
+  const talvezCount = getSelectionsByVote('TALVEZ').length;
+  const naoCount = getSelectionsByVote('NÃO').length;
+  const allSelections = getSelectionsByVote('SIM').concat(
+    getSelectionsByVote('TALVEZ'),
+    getSelectionsByVote('NÃO')
   );
 
   const getSelectionForUser = (userId: string) => {
-    return allSelections.find(s => s.userId === userId);
+    return allSelections.find(s => s.selectedUserId === userId);
   };
 
   if (!currentUser) {
