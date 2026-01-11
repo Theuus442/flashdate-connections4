@@ -365,6 +365,22 @@ export const UsersManagement = () => {
                 />
               </div>
 
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Cargo
+                </label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'admin' | 'client' }))}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                >
+                  <option value="client">Cliente</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
               {/* Gender */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
