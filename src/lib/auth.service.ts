@@ -99,6 +99,30 @@ export const authService = {
 
       if (error) throw error;
 
+      // After successful login, try to get the user's role from the users table
+      // This handles cases where the user was created via admin panel
+      if (data.user) {
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', email)
+            .single();
+
+          if (!userError && userData?.role) {
+            // Update the user object with the role from database
+            if (data.user.user_metadata) {
+              data.user.user_metadata.role = userData.role;
+            } else {
+              data.user.user_metadata = { role: userData.role };
+            }
+          }
+        } catch (err) {
+          console.warn('Could not fetch user role from database during login:', err);
+          // Continue with login even if we can't fetch the role
+        }
+      }
+
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       return { user: null, session: null, error };
