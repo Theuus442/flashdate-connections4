@@ -448,6 +448,15 @@ export const UsersManagement = () => {
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.email}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{user.whatsapp}</td>
                   <td className="px-6 py-4 text-sm">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      user.role === 'admin'
+                        ? 'bg-gold/20 text-gold'
+                        : 'bg-secondary/20 text-secondary'
+                    }`}>
+                      {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(user)}
