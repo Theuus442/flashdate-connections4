@@ -316,6 +316,7 @@ export const usersService = {
       };
 
       console.log('[usersService] User updated successfully:', transformedData);
+      console.log('[usersService] 🖼️ Profile image in returned user:', userData.profile_image_url);
       return { data: transformedData, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
