@@ -127,17 +127,27 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
 
     try {
+      console.log('[UsersContext] Updating user:', id, 'with updates:', updates);
       const { data, error } = await usersService.updateUser(id, updates, profileImage);
       if (error) {
-        console.error('Error updating user:', error);
+        const errorMessage = error instanceof Error ? error.message : (error?.message || JSON.stringify(error));
+        console.error('[UsersContext] Error updating user:', {
+          message: errorMessage,
+          error,
+        });
         return null;
       }
       if (data) {
+        console.log('[UsersContext] User updated successfully:', data);
         setUsers(prev => prev.map(u => (u.id === id ? data : u)));
         return data;
       }
     } catch (error) {
-      console.error('Error updating user:', error);
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[UsersContext] Error updating user:', {
+        message: errorMessage,
+        error,
+      });
     }
     return null;
   };
