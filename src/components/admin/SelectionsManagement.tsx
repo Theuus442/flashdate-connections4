@@ -139,57 +139,57 @@ export const SelectionsManagement = () => {
           </h2>
 
           <div className="space-y-6">
-            {/* Matches Detail */}
+            {/* SIM Detail */}
             {matches.length > 0 && (
               <div>
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Heart size={20} className="text-gold" />
-                  Matches ({matches.length})
+                  SIM ({matches.length})
                 </h3>
                 <div className="space-y-2 ml-6">
                   {matches.map(match => (
-                    <div key={match.userId} className="text-sm text-foreground">
-                      💕 <span className="font-medium">{getUserName(match.userId)}</span>
+                    <div key={match.selectedUserId} className="text-sm text-foreground">
+                      💕 <span className="font-medium">{getUserName(match.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Friendships Detail */}
-            {friendships.length > 0 && (
+            {/* TALVEZ Detail */}
+            {maybe.length > 0 && (
               <div className={matches.length > 0 ? 'pt-6 border-t border-border' : ''}>
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Users size={20} className="text-secondary" />
-                  Amizades ({friendships.length})
+                  TALVEZ ({maybe.length})
                 </h3>
                 <div className="space-y-2 ml-6">
-                  {friendships.map(friendship => (
-                    <div key={friendship.userId} className="text-sm text-foreground">
-                      👥 <span className="font-medium">{getUserName(friendship.userId)}</span>
+                  {maybe.map(m => (
+                    <div key={m.selectedUserId} className="text-sm text-foreground">
+                      👥 <span className="font-medium">{getUserName(m.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* No Interest Detail */}
+            {/* NÃO Detail */}
             {noInterests.length > 0 && (
               <div
                 className={
-                  matches.length > 0 || friendships.length > 0
+                  matches.length > 0 || maybe.length > 0
                     ? 'pt-6 border-t border-border'
                     : ''
                 }
               >
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <X size={20} className="text-destructive" />
-                  Sem Interesse ({noInterests.length})
+                  NÃO ({noInterests.length})
                 </h3>
                 <div className="space-y-2 ml-6">
                   {noInterests.map(noInterest => (
-                    <div key={noInterest.userId} className="text-sm text-foreground">
-                      ❌ <span className="font-medium">{getUserName(noInterest.userId)}</span>
+                    <div key={noInterest.selectedUserId} className="text-sm text-foreground">
+                      ❌ <span className="font-medium">{getUserName(noInterest.selectedUserId)}</span>
                     </div>
                   ))}
                 </div>
