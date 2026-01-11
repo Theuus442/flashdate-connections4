@@ -93,15 +93,15 @@ export const SelectionsManagement = () => {
       {/* Stats Overview */}
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Matches</p>
+          <p className="text-xs text-muted-foreground mb-1">SIM</p>
           <p className="text-3xl font-bold text-gold">{matches.length}</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Amizades</p>
-          <p className="text-3xl font-bold text-secondary">{friendships.length}</p>
+          <p className="text-xs text-muted-foreground mb-1">TALVEZ</p>
+          <p className="text-3xl font-bold text-secondary">{maybe.length}</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-xs text-muted-foreground mb-1">Sem Interesse</p>
+          <p className="text-xs text-muted-foreground mb-1">NÃO</p>
           <p className="text-3xl font-bold text-destructive">{noInterests.length}</p>
         </div>
       </div>
@@ -110,21 +110,21 @@ export const SelectionsManagement = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <SelectionCard
           icon={Heart}
-          title="Matches"
+          title="SIM"
           count={matches.length}
           selections={matches}
           color="text-gold"
         />
         <SelectionCard
           icon={Users}
-          title="Amizades"
-          count={friendships.length}
-          selections={friendships}
+          title="TALVEZ"
+          count={maybe.length}
+          selections={maybe}
           color="text-secondary"
         />
         <SelectionCard
           icon={X}
-          title="Sem Interesse"
+          title="NÃO"
           count={noInterests.length}
           selections={noInterests}
           color="text-destructive"
