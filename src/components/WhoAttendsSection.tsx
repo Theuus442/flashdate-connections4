@@ -33,13 +33,13 @@ export const WhoAttendsSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
-            Sobre Nós
+            Nosso Público
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Quem <span className="text-gradient-gold">Somos</span>
+            Quem <span className="text-gradient-gold">Frequenta</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Somos uma comunidade de pessoas maduras e genuínas que buscam conexões reais e significativas
+            Selecionamos cuidadosamente participantes que compartilham valores e objetivos semelhantes
           </p>
         </div>
 
