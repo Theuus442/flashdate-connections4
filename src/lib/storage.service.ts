@@ -1,0 +1,115 @@
+import { supabase, isSupabaseConfigured } from './supabase';
+
+export const storageService = {
+  /**
+   * Upload user profile image
+   */
+  async uploadUserProfileImage(userId: string, file: File): Promise<{ data: string | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      // Return a data URL for local development
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({ data: reader.result as string, error: null });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    try {
+      const fileName = `${userId}-${Date.now()}-${file.name}`;
+      const filePath = `profiles/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('user-profiles')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('user-profiles')
+        .getPublicUrl(filePath);
+
+      return { data: data.publicUrl, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Upload event image
+   */
+  async uploadEventImage(eventId: string, file: File): Promise<{ data: string | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      // Return a data URL for local development
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({ data: reader.result as string, error: null });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    try {
+      const fileName = `${eventId}-${Date.now()}-${file.name}`;
+      const filePath = `events/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('event-images')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('event-images')
+        .getPublicUrl(filePath);
+
+      return { data: data.publicUrl, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Delete user profile image
+   */
+  async deleteUserProfileImage(filePath: string): Promise<{ error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { error: null };
+    }
+
+    try {
+      const { error } = await supabase.storage
+        .from('user-profiles')
+        .remove([filePath]);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  /**
+   * Delete event image
+   */
+  async deleteEventImage(filePath: string): Promise<{ error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { error: null };
+    }
+
+    try {
+      const { error } = await supabase.storage
+        .from('event-images')
+        .remove([filePath]);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
+  },
+};
