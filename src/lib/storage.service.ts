@@ -111,13 +111,16 @@ export const storageService = {
     }
 
     try {
+      console.log('[storageService] Deleting event image:', filePath);
       const { error } = await supabase.storage
-        .from('event-images')
+        .from('events')
         .remove([filePath]);
 
       if (error) throw error;
+      console.log('[storageService] Event image deleted successfully');
       return { error: null };
     } catch (error) {
+      console.error('[storageService] Error deleting event image:', error);
       return { error };
     }
   },
