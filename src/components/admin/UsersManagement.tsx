@@ -14,6 +14,7 @@ export const UsersManagement = () => {
     email: '',
     whatsapp: '',
     gender: 'Outro' as 'M' | 'F' | 'Outro',
+    password: '',
   });
 
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
