@@ -238,11 +238,11 @@ export const FAQSection = () => {
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-primary text-sm font-medium tracking-widest uppercase mb-4">
             Tire Suas Dúvidas
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Central de <span className="text-gradient-gold">Dúvidas</span>
+            Central de <span className="text-primary">Dúvidas</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Encontre respostas para as perguntas mais frequentes sobre o Flashdate
@@ -264,9 +264,9 @@ export const FAQSection = () => {
                   <AccordionItem
                     key={index}
                     value={`${categoryIndex}-${index}`}
-                    className="bg-card rounded-xl border border-border px-6 data-[state=open]:border-gold/30 transition-colors"
+                    className="bg-card rounded-xl border border-border px-6 data-[state=open]:border-primary/30 transition-colors"
                   >
-                    <AccordionTrigger className="text-left font-medium text-foreground hover:text-gold py-5">
+                    <AccordionTrigger className="text-left font-medium text-foreground hover:text-primary py-5">
                       {item.q}
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
@@ -283,7 +283,7 @@ export const FAQSection = () => {
         <div className="max-w-5xl mx-auto mt-20">
           <div className="text-center mb-12">
             <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Veja Nossos Eventos em <span className="text-gradient-gold">Ação</span>
+              Veja Nossos Eventos em <span className="text-primary">Ação</span>
             </h3>
             <p className="text-muted-foreground text-lg">
               Confira como são nossos eventos de speed dating em ambientes elegantes e acolhedores
