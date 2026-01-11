@@ -106,25 +106,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   const updateSelection = async (eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      const existingIndex = selections.findIndex(s => s.selectedUserId === selectedUserId);
-      if (existingIndex >= 0) {
-        const updated = [...selections];
-        updated[existingIndex] = { eventId, userId, selectedUserId, vote, timestamp: Date.now() };
-        setSelections(updated);
-      } else {
-        setSelections(prev => [...prev, { eventId, userId, selectedUserId, vote, timestamp: Date.now() }]);
-      }
-      return;
-    }
-
     try {
-      const { data, error } = await selectionsService.updateSelection(eventId, userId, selectedUserId, vote);
-      if (error) {
-        console.error('Error updating selection:', error);
-        return;
-      }
+      const { data } = await selectionsService.updateSelection(eventId, userId, selectedUserId, vote);
       if (data) {
         setSelections(prev => {
           const filtered = prev.filter(s => s.selectedUserId !== selectedUserId);
