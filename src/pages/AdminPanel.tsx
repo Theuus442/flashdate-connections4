@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Calendar, Heart, LogOut } from 'lucide-react';
+import { Users, Calendar, Heart, LogOut } from 'lucide-react';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { EventsManagement } from '@/components/admin/EventsManagement';
 import { SelectionsManagement } from '@/components/admin/SelectionsManagement';
@@ -13,16 +12,7 @@ type AdminTab = 'users' | 'events' | 'selections';
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
   const navigate = useNavigate();
-  const { user, signOut, isAuthenticated } = useAuth();
-
-  // Protect admin route
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    } else if (user?.role !== 'admin') {
-      navigate('/user-profile');
-    }
-  }, [isAuthenticated, user, navigate]);
+  const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
     try {
