@@ -43,20 +43,15 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('[LOGIN] Submitting form with email:', email);
       const result = await signIn(email, password);
-      console.log('[LOGIN] signIn result:', result);
 
       if (result.success) {
-        console.log('[LOGIN] Sign in successful');
         toast.success('Login realizado com sucesso!');
         // Navigation will happen via the useEffect above
       } else {
-        console.error('[LOGIN] Sign in failed:', result.error);
         setError(result.error || 'Erro ao fazer login');
       }
     } catch (err) {
-      console.error('[LOGIN] Error during submit:', err);
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setIsLoading(false);
