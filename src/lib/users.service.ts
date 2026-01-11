@@ -199,7 +199,7 @@ export const usersService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
-      if (updates.password) updateData.password = updates.password;
+      // Note: password should not be updated via REST API - it's managed by Supabase Auth
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
