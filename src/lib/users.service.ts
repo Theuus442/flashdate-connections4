@@ -156,8 +156,7 @@ export const usersService = {
           role: user.role || 'client',
           profile_image_url: profileImageUrl,
         }])
-        .select()
-        .single();
+        .select();
 
       if (error) {
         const errorMsg = error instanceof Error
@@ -174,15 +173,20 @@ export const usersService = {
 
       if (error) throw error;
 
+      if (!data || data.length === 0) {
+        throw new Error('Failed to insert user - no data returned');
+      }
+
+      const userData = data[0];
       const transformedData: User = {
-        id: data.id,
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        gender: data.gender,
-        role: data.role || 'client',
-        profileImage: data.profile_image_url,
+        id: userData.id,
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        whatsapp: userData.whatsapp,
+        gender: userData.gender,
+        role: userData.role || 'client',
+        profileImage: userData.profile_image_url,
       };
 
       console.log('[usersService] User created successfully:', transformedData);
