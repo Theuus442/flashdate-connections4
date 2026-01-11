@@ -33,68 +33,101 @@ export const UsersManagement = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        setFormData(prev => ({
-          ...prev,
-          profileImage: imageUrl,
-        }));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleRemoveImage = () => {
+    setSelectedImageFile(undefined);
     setImagePreview(undefined);
-    setFormData(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
   };
 
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
-      alert('Por favor, preencha todos os campos');
+      toast({
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
       return;
     }
 
-    if (editingId) {
-      const updatedUser: User = {
-        id: editingId,
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        profileImage: formData.profileImage,
-      };
-      updateUser(editingId, updatedUser);
-      setEditingId(null);
-    } else {
-      const newUser: User = {
-        id: Date.now().toString(),
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        profileImage: formData.profileImage,
-      };
-      addUser(newUser);
-    }
+    try {
+      if (editingId) {
+        const result = await updateUser(editingId, {
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          gender: formData.gender,
+        }, selectedImageFile);
 
-    setFormData({
-      name: '',
-      username: '',
-      email: '',
-      whatsapp: '',
-      profileImage: undefined,
-    });
-    setImagePreview(undefined);
-    setShowForm(false);
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário atualizado com sucesso!',
+          });
+          setEditingId(null);
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao atualizar usuário',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        const result = await addUser({
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          gender: formData.gender,
+        }, selectedImageFile);
+
+        if (result) {
+          toast({
+            title: 'Sucesso',
+            description: 'Usuário cadastrado com sucesso!',
+          });
+        } else {
+          toast({
+            title: 'Erro',
+            description: 'Falha ao cadastrar usuário',
+            variant: 'destructive',
+          });
+        }
+      }
+
+      setFormData({
+        name: '',
+        username: '',
+        email: '',
+        whatsapp: '',
+        gender: 'Outro',
+      });
+      setSelectedImageFile(undefined);
+      setImagePreview(undefined);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao processar formulário',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleEdit = (user: User) => {
