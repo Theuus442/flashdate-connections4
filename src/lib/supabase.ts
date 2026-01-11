@@ -11,10 +11,23 @@ const isConfigured = !!(supabaseUrl && supabaseAnonKey);
 let supabaseClient: SupabaseClient | null = null;
 let supbaseInitError: string | null = null;
 
+// Log diagnostic information
+console.log('[Supabase] Initialization Check:');
+console.log('[Supabase]   - URL provided:', !!supabaseUrl);
+console.log('[Supabase]   - URL length:', supabaseUrl.length);
+console.log('[Supabase]   - Key provided:', !!supabaseAnonKey);
+console.log('[Supabase]   - Key length:', supabaseAnonKey.length);
+console.log('[Supabase]   - Mode:', isConfigured ? 'ENABLED' : 'DISABLED');
+
 if (!isConfigured) {
-  supbaseInitError = 'Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.';
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+  if (!supabaseAnonKey) missingVars.push('VITE_SUPABASE_ANON_KEY');
+
+  supbaseInitError = `Supabase not configured. Missing: ${missingVars.join(', ')}`;
   console.warn(
     '⚠️  Supabase não configurado. O aplicativo funcionará em modo local.\n' +
+    `Variáveis de ambiente faltando: ${missingVars.join(', ')}\n` +
     'Para ativar o Supabase, configure as variáveis de ambiente:\n' +
     '  VITE_SUPABASE_URL=https://seu-projeto.supabase.co\n' +
     '  VITE_SUPABASE_ANON_KEY=sua-chave-anonima\n' +
@@ -29,10 +42,10 @@ if (!isConfigured) {
         persistSession: true,
       },
     });
-    console.log('[Supabase] Client initialized successfully');
+    console.log('[Supabase] ✅ Client initialized successfully');
   } catch (error) {
     supbaseInitError = `Failed to initialize Supabase client: ${error instanceof Error ? error.message : String(error)}`;
-    console.error('[Supabase] Initialization error:', error);
+    console.error('[Supabase] ❌ Initialization error:', error);
     supabaseClient = null;
   }
 }
