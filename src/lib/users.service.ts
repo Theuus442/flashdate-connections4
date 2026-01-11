@@ -128,7 +128,9 @@ export const usersService = {
       console.log('[usersService] User created successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
-      console.error('[usersService] Error creating user:', error);
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[usersService] Error creating user:', errorMessage);
+      console.error('[usersService] Full error:', error);
       return { data: null, error };
     }
   },
