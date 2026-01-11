@@ -109,6 +109,13 @@ export const UsersManagement = () => {
 
         console.log('[UsersManagement] Update result:', result);
         if (result) {
+          console.log('[UsersManagement] 🎉 User updated successfully!');
+          console.log('[UsersManagement] 🖼️ Profile image from result:', result.profileImage);
+
+          // Check if the user is in the list now with the image
+          const updatedUserInList = users.find(u => u.id === result.id);
+          console.log('[UsersManagement] Updated user in list:', updatedUserInList);
+
           toast({
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
@@ -127,6 +134,7 @@ export const UsersManagement = () => {
           setEditingId(null);
           setShowForm(false);
         } else {
+          console.error('[UsersManagement] ❌ Update failed - no result returned');
           toast({
             title: 'Erro',
             description: 'Falha ao atualizar usuário - verifique o console para detalhes',
