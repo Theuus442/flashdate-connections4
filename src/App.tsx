@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UsersProvider } from "@/context/UsersContext";
 import { SelectionsProvider } from "@/context/SelectionsContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import AdminPanel from "./pages/AdminPanel";
