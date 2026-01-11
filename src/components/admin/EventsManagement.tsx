@@ -431,11 +431,11 @@ export const EventsManagement = () => {
 
             {/* Actions */}
             <div className="flex gap-4 justify-end border-t border-border pt-8">
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
                 Cancelar
               </Button>
-              <Button variant="gold" type="submit">
-                Salvar Alterações
+              <Button variant="gold" type="submit" disabled={isLoading}>
+                {isLoading ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </div>
           </form>
