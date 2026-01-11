@@ -58,18 +58,30 @@ export const UsersManagement = () => {
     console.log('[UsersManagement] Form submitted with data:', formData);
     setIsLoading(true);
 
-    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp || !formData.password) {
+    // Validate required fields
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
       console.warn('[UsersManagement] Validation failed - missing fields:', {
         name: !!formData.name,
         username: !!formData.username,
         email: !!formData.email,
         whatsapp: !!formData.whatsapp,
-        password: !!formData.password,
         role: !!formData.role,
       });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos obrigatórios',
+        description: 'Por favor, preencha todos os campos obrigatórios (Nome, Apelido, Email, Telefone)',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Password is required when creating new user
+    if (!editingId && !formData.password) {
+      console.warn('[UsersManagement] Password required for new user');
+      toast({
+        title: 'Erro',
+        description: 'Senha é obrigatória para novos usuários',
         variant: 'destructive',
       });
       setIsLoading(false);
