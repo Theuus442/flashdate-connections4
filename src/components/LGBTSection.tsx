@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,31 +7,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Phone, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
-const estados = [
-  { value: 'sp', label: 'São Paulo' },
-  { value: 'mg', label: 'Minas Gerais' },
-  { value: 'rj', label: 'Rio de Janeiro' },
-  { value: 'ba', label: 'Bahia' },
-  { value: 'rs', label: 'Rio Grande do Sul' },
-  { value: 'sc', label: 'Santa Catarina' },
-  { value: 'pr', label: 'Paraná' },
-  { value: 'pe', label: 'Pernambuco' },
-  { value: 'ce', label: 'Ceará' },
-  { value: 'df', label: 'Distrito Federal' },
-];
+interface Estado {
+  id: number;
+  nome: string;
+  sigla: string;
+}
 
-const cidades: { [key: string]: string[] } = {
-  sp: ['São Paulo', 'Santo André', 'São Bernardo', 'São Caetano'],
-  mg: ['Belo Horizonte', 'Contagem', 'Betim'],
-  rj: ['Rio de Janeiro', 'Niterói', 'Duque de Caxias'],
-  ba: ['Salvador', 'Feira de Santana', 'Vitória da Conquista'],
-  rs: ['Porto Alegre', 'Caxias do Sul', 'Novo Hamburgo'],
-  sc: ['Florianópolis', 'Joinville', 'Blumenau'],
-  pr: ['Curitiba', 'Londrina', 'Maringá'],
-  pe: ['Recife', 'Jaboatão', 'Olinda'],
-  ce: ['Fortaleza', 'Juazeiro', 'Maracanaú'],
-  df: ['Brasília'],
-};
+interface Municipio {
+  id: number;
+  nome: string;
+}
 
 export const LGBTSection = () => {
   const [formData, setFormData] = useState({
