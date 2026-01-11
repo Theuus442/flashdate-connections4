@@ -111,20 +111,19 @@ export const authService = {
       // After successful login, try to get the user's role from the users table
       // This handles cases where the user was created via admin panel
       if (data.user) {
+        console.log('[AUTH] Fetching user role for ID:', data.user.id);
         try {
-          // Simple, direct query with timeout protection
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
+          console.log('[AUTH] Querying users table for role...');
           const { data: userData, error: userError } = await supabase
             .from('users')
             .select('role')
             .eq('id', data.user.id) // Query by auth user ID (more reliable)
             .single();
 
-          clearTimeout(timeoutId);
+          console.log('[AUTH] Users table query result:', { hasRole: !!userData?.role, error: userError?.message });
 
           if (!userError && userData?.role) {
+            console.log('[AUTH] Found role in database:', userData.role);
             // Update the user object with the role from database
             if (data.user.user_metadata) {
               data.user.user_metadata.role = userData.role;
@@ -133,7 +132,7 @@ export const authService = {
             }
           } else {
             // Default to 'client' if not found or error
-            console.log('Role not found in database, using default', userError?.message);
+            console.log('[AUTH] Role not found, using default: client', userError?.message);
             if (data.user.user_metadata) {
               data.user.user_metadata.role = 'client';
             } else {
@@ -141,7 +140,7 @@ export const authService = {
             }
           }
         } catch (err) {
-          console.warn('Error fetching user role:', err);
+          console.warn('[AUTH] Error fetching user role:', err);
           // Continue with login, set default role
           if (data.user.user_metadata) {
             data.user.user_metadata.role = 'client';
@@ -151,8 +150,10 @@ export const authService = {
         }
       }
 
+      console.log('[AUTH] Sign in successful, returning user');
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
+      console.error('[AUTH] Sign in failed:', error);
       return { user: null, session: null, error };
     }
   },
