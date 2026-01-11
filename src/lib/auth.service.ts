@@ -67,17 +67,17 @@ export const authService = {
         password,
       });
 
-      console.log('[AUTH] Supabase response received:', { userId: data?.user?.id, hasError: !!error });
+      console.log('[AUTH] ✅ Supabase response received:', { userId: data?.user?.id, hasError: !!error });
 
       if (error) {
-        console.error('[AUTH] Supabase auth error:', error);
+        console.error('[AUTH] ❌ Supabase auth error:', error);
         throw error;
       }
 
-      // Don't query the database during sign in - let onAuthStateChange handle it
-      // This avoids timeout issues and makes the login flow faster
-      // The role will be fetched and set by onAuthStateChange
-      console.log('[AUTH] Sign in successful, role will be fetched by onAuthStateChange');
+      // SUCCESS: Return immediately without querying database
+      // The onAuthStateChange listener will fetch the role in the background
+      console.log('[AUTH] ✅ Sign in successful, returning user immediately');
+      console.log('[AUTH] Role will be fetched by onAuthStateChange listener...');
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       console.error('[AUTH] Sign in failed:', error);
