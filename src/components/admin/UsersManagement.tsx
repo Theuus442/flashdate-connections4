@@ -160,6 +160,7 @@ export const UsersManagement = () => {
       whatsapp: user.whatsapp,
       gender: user.gender,
       password: user.password || '',
+      role: user.role || 'client',
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
