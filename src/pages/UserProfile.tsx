@@ -104,10 +104,22 @@ export default function UserProfile() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Nenhum usuário disponível</p>
-          <Button onClick={() => navigate('/')} variant="gold">Voltar à Página Inicial</Button>
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="mb-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+              Nenhum usuário cadastrado
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              No momento, não existem usuários no sistema. Peça ao administrador para cadastrar participantes antes de prosseguir.
+            </p>
+          </div>
+          <Button onClick={() => navigate('/')} variant="gold" className="w-full">
+            Voltar à Página Inicial
+          </Button>
         </div>
       </div>
     );
