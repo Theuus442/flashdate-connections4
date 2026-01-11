@@ -70,7 +70,32 @@ export const authService = {
         throw error;
       }
 
-      console.log('[signIn] Success, user ID:', data.user?.id);
+      if (data.user) {
+        console.log('[signIn] Success, user ID:', data.user.id);
+
+        // Ensure user has role in metadata by fetching from users table
+        try {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+
+          if (userData?.role && !data.user.user_metadata?.role) {
+            console.log('[signIn] Updating user metadata with role:', userData.role);
+            await supabase.auth.updateUser({
+              data: {
+                ...data.user.user_metadata,
+                role: userData.role,
+              }
+            });
+          }
+        } catch (err) {
+          console.warn('[signIn] Could not update metadata:', err);
+          // Continue anyway, the onAuthStateChange will handle it
+        }
+      }
+
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       console.error('[signIn] Caught error:', error);
