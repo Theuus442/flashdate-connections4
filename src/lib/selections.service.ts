@@ -1,6 +1,14 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Selection } from '@/context/SelectionsContext';
 
+/**
+ * Check if a string is a valid UUID v4
+ */
+const isValidUUID = (uuid: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
 export const selectionsService = {
   /**
    * Get all selections
