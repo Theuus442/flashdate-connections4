@@ -407,10 +407,10 @@ export default function UserProfile() {
           {/* Matches View */}
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
-              {getSelectionsByType('match').length > 0 ? (
+              {getSelectionsByVote('SIM').length > 0 ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getSelectionsByType('match').map(sel => {
-                    const user = allUsers.find(u => u.id === sel.userId);
+                  {getSelectionsByVote('SIM').map(sel => {
+                    const user = allUsers.find(u => u.id === sel.selectedUserId);
                     if (!user) return null;
                     return (
                       <div
@@ -431,7 +431,7 @@ export default function UserProfile() {
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                             <div className="text-white text-center">
                               <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                              <p className="text-xs font-medium">Match</p>
+                              <p className="text-xs font-medium">SIM</p>
                             </div>
                           </div>
                         </div>
@@ -462,8 +462,8 @@ export default function UserProfile() {
                 <div className="text-center py-12 flex-1 flex items-center justify-center">
                   <div>
                     <Heart size={64} className="text-gold/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground text-lg">Nenhum match ainda</p>
-                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "Match" com outros participantes</p>
+                    <p className="text-muted-foreground text-lg">Nenhum SIM ainda</p>
+                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "SIM" em outros participantes</p>
                   </div>
                 </div>
               )}
