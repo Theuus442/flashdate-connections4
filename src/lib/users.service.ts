@@ -274,13 +274,31 @@ export const usersService = {
         throw error;
       }
 
-      // Check if any rows were affected
+      // If select() didn't return data (RLS issue), fetch the user separately
+      let userData: any;
       if (!data || data.length === 0) {
-        console.error('[usersService] No user found with ID:', id);
-        throw new Error(`User with ID ${id} not found`);
-      }
+        console.warn('[usersService] Update .select() returned no data, fetching user separately...');
+        const { data: fetchedUser, error: fetchError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', id)
+          .single();
 
-      const userData = data[0];
+        if (fetchError) {
+          console.error('[usersService] Failed to fetch updated user:', fetchError);
+          throw new Error(`User with ID ${id} not found`);
+        }
+
+        if (!fetchedUser) {
+          console.error('[usersService] No user found with ID:', id);
+          throw new Error(`User with ID ${id} not found`);
+        }
+
+        userData = fetchedUser;
+        console.log('[usersService] Successfully fetched user after update');
+      } else {
+        userData = data[0];
+      }
       const transformedData: User = {
         id: userData.id,
         name: userData.name,
