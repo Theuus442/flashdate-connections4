@@ -34,6 +34,7 @@ export const usersService = {
         gender: user.gender,
         role: user.role || 'client',
         profileImage: user.profile_image_url,
+        password: user.password,
       }));
 
       return { data: transformedData || [], error: null };
