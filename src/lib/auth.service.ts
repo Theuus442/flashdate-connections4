@@ -146,36 +146,54 @@ export const authService = {
       console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
 
       if (session?.user) {
-        console.log('[onAuthStateChange] User detected, fetching profile...');
+        console.log('[onAuthStateChange] User detected:', session.user.id, session.user.email);
         let role: 'admin' | 'client' = 'client';
-        let userFound = false;
 
-        // Check if user exists in users table
+        // Try to fetch user role with timeout
         try {
           console.log('[onAuthStateChange] Querying users table...');
-          const { data: userData, error } = await supabase
+
+          // Create a promise that rejects after 5 seconds
+          const queryPromise = supabase
             .from('users')
             .select('role')
             .eq('id', session.user.id)
             .single();
 
-          console.log('[onAuthStateChange] Query result:', { hasUser: !!userData, error: error?.message });
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Query timeout')), 5000)
+          );
+
+          const { data: userData, error } = await Promise.race([
+            queryPromise,
+            timeoutPromise
+          ]) as any;
+
+          console.log('[onAuthStateChange] Query completed:', { userData, error: error?.message });
 
           if (!error && userData?.role) {
-            console.log('[onAuthStateChange] User found with role:', userData.role);
+            console.log('[onAuthStateChange] Role found:', userData.role);
             role = userData.role as 'admin' | 'client';
-            userFound = true;
-          } else {
-            console.warn('[onAuthStateChange] User not found in database - user must be created by admin');
-            userFound = false;
-            role = 'client'; // Default role, but user won't have access
+          } else if (error) {
+            console.warn('[onAuthStateChange] Query error (using default role):', error?.message || error);
+            // Use default role from metadata if available
+            const metadataRole = session.user.user_metadata?.role;
+            if (metadataRole) {
+              console.log('[onAuthStateChange] Using metadata role:', metadataRole);
+              role = metadataRole as 'admin' | 'client';
+            }
           }
         } catch (err) {
-          console.error('[onAuthStateChange] Error querying user:', err);
-          userFound = false;
+          console.error('[onAuthStateChange] Caught error:', err);
+          // Use default role from metadata
+          const metadataRole = session.user.user_metadata?.role;
+          if (metadataRole) {
+            console.log('[onAuthStateChange] Using metadata role after error:', metadataRole);
+            role = metadataRole as 'admin' | 'client';
+          }
         }
 
-        console.log('[onAuthStateChange] Calling callback with role:', role, 'userFound:', userFound);
+        console.log('[onAuthStateChange] Final role:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
