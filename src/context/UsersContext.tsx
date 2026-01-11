@@ -11,6 +11,7 @@ export interface User {
   gender: 'M' | 'F' | 'Outro';
   role: 'admin' | 'client';
   profileImage?: string;
+  password?: string;
 }
 
 interface UsersContextType {
