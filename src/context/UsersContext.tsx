@@ -24,66 +24,8 @@ interface UsersContextType {
 
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
-// Mock initial users for fallback
-const initialUsers: User[] = [
-  {
-    id: '1',
-    name: 'Maria Silva',
-    username: 'maria.silva',
-    email: 'maria@example.com',
-    whatsapp: '(11) 98765-4321',
-    gender: 'F',
-    role: 'client',
-  },
-  {
-    id: '2',
-    name: 'João Santos',
-    username: 'joao.santos',
-    email: 'joao@example.com',
-    whatsapp: '(11) 99876-5432',
-    gender: 'M',
-    role: 'client',
-  },
-  {
-    id: '3',
-    name: 'Ana Costa',
-    username: 'ana.costa',
-    email: 'ana@example.com',
-    whatsapp: '(11) 98765-5321',
-    gender: 'F',
-    role: 'admin',
-  },
-  {
-    id: '4',
-    name: 'Carlos Mendes',
-    username: 'carlos.mendes',
-    email: 'carlos@example.com',
-    whatsapp: '(11) 97654-3210',
-    gender: 'M',
-    role: 'client',
-  },
-  {
-    id: '5',
-    name: 'Beatriz Lima',
-    username: 'beatriz.lima',
-    email: 'beatriz@example.com',
-    whatsapp: '(11) 96543-2109',
-    gender: 'F',
-    role: 'client',
-  },
-  {
-    id: '6',
-    name: 'Roberto Alves',
-    username: 'roberto.alves',
-    email: 'roberto@example.com',
-    whatsapp: '(11) 95432-1098',
-    gender: 'M',
-    role: 'client',
-  },
-];
-
 export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const supabaseConfigured = isSupabaseConfigured();
 
