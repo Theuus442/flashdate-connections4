@@ -81,6 +81,7 @@ export const usersService = {
         gender: data.gender,
         role: data.role || 'client',
         profileImage: data.profile_image_url,
+        password: data.password,
       } : null;
 
       return { data: transformedData, error: null };
