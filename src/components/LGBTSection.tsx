@@ -136,7 +136,7 @@ export const LGBTSection = () => {
 
       <div className="absolute -top-40 right-0 w-96 h-96 bg-gradient-to-br from-muted/15 via-primary/10 to-secondary/10 rounded-full blur-3xl" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 pt-8">
         <div className="max-w-5xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
