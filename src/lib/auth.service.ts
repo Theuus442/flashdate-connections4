@@ -130,18 +130,38 @@ export const authService = {
   },
 
   /**
-   * Sign out the current user
+   * Sign out the current user and clear all session data
    */
   async signOut() {
-    if (!isSupabaseConfigured()) {
-      return { error: null };
-    }
-
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Clear Supabase session if configured
+      if (isSupabaseConfigured()) {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      }
+
+      // Clear localStorage items that may contain session data
+      const storageKeys = Object.keys(localStorage);
+      storageKeys.forEach(key => {
+        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+
       return { error: null };
     } catch (error) {
+      console.error('Error during sign out:', error);
+      // Clear data anyway even if error occurs
+      const storageKeys = Object.keys(localStorage);
+      storageKeys.forEach(key => {
+        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+          localStorage.removeItem(key);
+        }
+      });
+      sessionStorage.clear();
       return { error };
     }
   },
