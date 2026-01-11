@@ -35,10 +35,10 @@ export const authService = {
    */
   async signUp(email: string, password: string, name: string, role: 'admin' | 'client' = 'client') {
     if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured, using mock auth');
+      console.error('❌ Supabase not configured');
       return {
-        user: { id: Date.now().toString(), email, role },
-        error: null,
+        user: null,
+        error: new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.'),
       };
     }
 
