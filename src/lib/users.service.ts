@@ -75,22 +75,27 @@ export const usersService = {
    */
   async createUser(user: Omit<User, 'id'>, profileImage?: File): Promise<{ data: User | null; error: any }> {
     if (!isSupabaseConfigured()) {
+      console.error('[usersService] Supabase not configured');
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
+      console.log('[usersService] Creating user:', user);
       let profileImageUrl: string | undefined;
 
       // Upload profile image if provided
       if (profileImage) {
+        console.log('[usersService] Uploading profile image...');
         const result = await storageService.uploadUserProfileImage(
           Date.now().toString(),
           profileImage
         );
         if (result.error) throw result.error;
         profileImageUrl = result.data;
+        console.log('[usersService] Image uploaded:', profileImageUrl);
       }
 
+      console.log('[usersService] Inserting user into database...');
       const { data, error } = await supabase
         .from('users')
         .insert([{
@@ -105,6 +110,8 @@ export const usersService = {
         .select()
         .single();
 
+      console.log('[usersService] Insert result:', { data, error: error?.message });
+
       if (error) throw error;
 
       const transformedData: User = {
@@ -118,8 +125,10 @@ export const usersService = {
         profileImage: data.profile_image_url,
       };
 
+      console.log('[usersService] User created successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
+      console.error('[usersService] Error creating user:', error);
       return { data: null, error };
     }
   },
