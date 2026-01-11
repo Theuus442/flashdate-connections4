@@ -57,19 +57,23 @@ export const authService = {
     }
 
     try {
+      console.log('[signIn] Starting authentication...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      console.log('[signIn] Auth response received');
+
       if (error) {
+        console.error('[signIn] Auth error:', error.message);
         throw error;
       }
 
-      // SUCCESS: Return immediately without querying database
-      // The onAuthStateChange listener will fetch the role in the background
+      console.log('[signIn] Success, user ID:', data.user?.id);
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
+      console.error('[signIn] Caught error:', error);
       return { user: null, session: null, error };
     }
   },
