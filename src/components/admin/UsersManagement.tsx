@@ -588,25 +588,13 @@ export const UsersManagement = () => {
                           alt={user.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.error('[UsersManagement] ❌ Image load failed for user:', user.name);
-                            console.error('[UsersManagement] Image URL:', user.profileImage);
-                            const event = e as any;
-                            console.error('[UsersManagement] Error event:', {
-                              status: event.target?.status,
-                              statusText: event.target?.statusText,
-                              response: event.target?.response
-                            });
-                            // Don't hide - show initial instead
+                            // Show initial instead of broken image
                             (e.target as HTMLImageElement).replaceWith(
                               Object.assign(document.createElement('span'), {
                                 className: 'text-lg font-bold text-gold',
                                 textContent: user.name.charAt(0)
                               })
                             );
-                          }}
-                          onLoad={() => {
-                            console.log('[UsersManagement] ✅ Image loaded successfully for:', user.name);
-                            console.log('[UsersManagement] URL:', user.profileImage);
                           }}
                         />
                       ) : (
