@@ -138,7 +138,6 @@ export const usersService = {
           whatsapp: user.whatsapp,
           gender: user.gender,
           role: user.role || 'client',
-          password: user.password ? user.password.trim() : null, // Store password as-is for local auth
           profile_image_url: profileImageUrl,
           created_at: new Date().toISOString(),
         }])
