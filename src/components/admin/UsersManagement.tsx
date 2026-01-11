@@ -126,7 +126,6 @@ export const UsersManagement = () => {
           setEditingId(null);
           setShowForm(false);
         } else {
-          console.error('[UsersManagement] ❌ Update failed - no result returned');
           toast({
             title: 'Erro',
             description: 'Falha ao atualizar usuário - verifique o console para detalhes',
