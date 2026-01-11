@@ -4,8 +4,7 @@ export const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative flex flex-col"
-      style={{ height: '100vh' }}
+      className="relative flex flex-col min-h-[calc(100vh-80px)]"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 top-0 overflow-hidden">
