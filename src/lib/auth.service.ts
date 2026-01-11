@@ -116,10 +116,49 @@ export const authService = {
             } else {
               data.user.user_metadata = { role: userData.role };
             }
+          } else if (userError) {
+            // User doesn't exist in the users table, create them automatically
+            console.log('User not found in database, creating profile...');
+            try {
+              const { data: newUser, error: createError } = await supabase
+                .from('users')
+                .insert([{
+                  email: data.user.email,
+                  name: data.user.email?.split('@')[0] || 'User', // Use email prefix as default name
+                  username: data.user.email?.split('@')[0] || 'user',
+                  whatsapp: '',
+                  gender: 'Outro',
+                  role: 'client', // Default role for new users
+                }])
+                .select()
+                .single();
+
+              if (!createError && newUser?.role) {
+                console.log('User profile created successfully');
+                if (data.user.user_metadata) {
+                  data.user.user_metadata.role = newUser.role;
+                } else {
+                  data.user.user_metadata = { role: newUser.role };
+                }
+              }
+            } catch (createErr) {
+              console.warn('Could not create user profile:', createErr);
+              // Continue with login anyway, set default role
+              if (data.user.user_metadata) {
+                data.user.user_metadata.role = 'client';
+              } else {
+                data.user.user_metadata = { role: 'client' };
+              }
+            }
           }
         } catch (err) {
-          console.warn('Could not fetch user role from database during login:', err);
-          // Continue with login even if we can't fetch the role
+          console.warn('Error during user profile check/creation:', err);
+          // Continue with login, set default role
+          if (data.user.user_metadata) {
+            data.user.user_metadata.role = 'client';
+          } else {
+            data.user.user_metadata = { role: 'client' };
+          }
         }
       }
 
