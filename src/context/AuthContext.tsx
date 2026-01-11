@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, AuthUser } from '@/lib/auth.service';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -11,36 +10,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-/**
- * Get user role from the users table in Supabase
- * Falls back to 'client' if unable to fetch from database
- */
-const getUserRoleFromDatabase = async (email: string): Promise<'admin' | 'client'> => {
-  if (!isSupabaseConfigured() || !supabase) {
-    return 'client';
-  }
-
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('role')
-      .eq('email', email)
-      .single();
-
-    if (error) {
-      console.warn('Could not fetch user role from database (this is normal if RLS is enabled):', error?.message);
-      return 'client';
-    }
-
-    const role = (data?.role || 'client') as 'admin' | 'client';
-    console.log(`User role fetched from database: ${role}`);
-    return role;
-  } catch (error) {
-    console.warn('Error getting user role from database:', error);
-    return 'client';
-  }
-};
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
