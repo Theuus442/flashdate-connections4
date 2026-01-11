@@ -145,7 +145,7 @@ export const authService = {
 
   /**
    * Create user as admin with email and password (for admin panel)
-   * This creates both an auth user and a profile record
+   * Uses Edge Function to create confirmed user without sending email
    */
   async createUserAsAdmin(email: string, password: string) {
     if (!isSupabaseConfigured()) {
@@ -153,26 +153,31 @@ export const authService = {
     }
 
     try {
-      console.log('[authService] Creating user as admin:', email);
+      console.log('[authService] Creating user as admin via Edge Function:', email);
 
-      // Create auth user without auto-confirming (simpler approach for admin)
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+      // Get the Supabase URL to construct the function URL
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
+
+      // Call the Edge Function to create confirmed user
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession())?.data?.session?.access_token || ''}`,
         },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        const errorMsg = error instanceof Error
-          ? error.message
-          : (error?.message || JSON.stringify(error));
-        console.error('[authService] Error creating auth user:', errorMsg);
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        console.error('[authService] Edge Function error:', errorMsg);
+        throw new Error(errorMsg);
       }
 
-      console.log('[authService] Auth user created:', data.user?.id);
+      const { data } = await response.json();
+      console.log('[authService] Auth user created via Edge Function:', data?.user?.id);
       return { data: data.user, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
