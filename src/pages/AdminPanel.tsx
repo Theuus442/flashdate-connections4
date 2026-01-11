@@ -1,16 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Calendar, Heart } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, Heart, LogOut } from 'lucide-react';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { EventsManagement } from '@/components/admin/EventsManagement';
 import { SelectionsManagement } from '@/components/admin/SelectionsManagement';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 type AdminTab = 'users' | 'events' | 'selections';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
   const navigate = useNavigate();
+  const { user, signOut, isAuthenticated } = useAuth();
+
+  // Protect admin route
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else if (user?.role !== 'admin') {
+      navigate('/user-profile');
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Logout realizado com sucesso!');
+      navigate('/');
+    } catch (err) {
+      toast.error('Erro ao fazer logout');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
