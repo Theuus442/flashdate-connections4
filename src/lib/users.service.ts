@@ -212,13 +212,19 @@ export const usersService = {
       }
 
       // If password is being updated, update it in auth system first
-      if (updates.password) {
+      if (updates.password && updates.password.trim()) {
         console.log('[usersService] Updating password in auth system...');
         const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password);
         if (authResult.error) {
-          console.warn('[usersService] Could not update password via auth API:', authResult.error);
-          // Continue anyway - the password field in users table will be updated
+          const errorMsg = authResult.error instanceof Error
+            ? authResult.error.message
+            : JSON.stringify(authResult.error);
+          console.warn('[usersService] Could not update password via auth API:', errorMsg);
+          // Don't throw error - password update is secondary, continue with other updates
         }
+      } else if (updates.password === '') {
+        // Empty password means don't update password - remove from updates
+        console.log('[usersService] Password field is empty, skipping password update');
       }
 
       const updateData: any = {};
