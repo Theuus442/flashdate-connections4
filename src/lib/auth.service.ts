@@ -70,30 +70,48 @@ export const authService = {
 
       console.log('[signIn] Success, user ID:', data.user?.id);
 
-      // Fetch user role from database and update metadata
+      // Always try to fetch and update user role from database
       if (data.user) {
         try {
           console.log('[signIn] Fetching user role from database...');
-          const { data: userData } = await supabase
+
+          // Use RLS-aware query or direct auth role
+          const { data: userData, error: queryError } = await supabase
             .from('users')
             .select('role')
             .eq('id', data.user.id)
             .maybeSingle();
 
-          if (userData?.role) {
+          let userRole = userData?.role || 'client';
+
+          if (queryError) {
+            console.warn('[signIn] Query error, will use default role:', queryError.message);
+            userRole = 'client';
+          } else if (userData?.role) {
             console.log('[signIn] Found role in database:', userData.role);
-            // Update user metadata with role
-            await supabase.auth.updateUser({
-              data: {
-                ...data.user.user_metadata,
-                role: userData.role,
-              }
-            });
-            console.log('[signIn] Updated user metadata with role:', userData.role);
+            userRole = userData.role;
+          } else {
+            console.log('[signIn] No user record found in database, using default role');
+            userRole = 'client';
+          }
+
+          // Update user metadata with role
+          console.log('[signIn] Updating metadata with role:', userRole);
+          const { error: updateError } = await supabase.auth.updateUser({
+            data: {
+              ...data.user.user_metadata,
+              role: userRole,
+            }
+          });
+
+          if (updateError) {
+            console.warn('[signIn] Could not update metadata:', updateError.message);
+          } else {
+            console.log('[signIn] Successfully updated metadata with role');
           }
         } catch (err) {
-          console.warn('[signIn] Could not fetch role from database:', err);
-          // Continue anyway - onAuthStateChange will handle it
+          console.warn('[signIn] Error handling role:', err);
+          // Continue anyway - the auth will work, just with default role
         }
       }
 
