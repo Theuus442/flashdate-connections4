@@ -162,10 +162,13 @@ export const UsersManagement = () => {
       setImagePreview(undefined);
       setShowForm(false);
     } catch (error) {
-      console.error('[UsersManagement] Error submitting form:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[UsersManagement] Error submitting form:', errorMessage);
       toast({
         title: 'Erro',
-        description: `Erro ao processar formulário: ${error instanceof Error ? error.message : 'Desconhecido'}`,
+        description: `Erro ao processar formulário: ${errorMessage || 'Desconhecido'}`,
         variant: 'destructive',
       });
     } finally {
