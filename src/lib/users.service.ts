@@ -247,16 +247,10 @@ export const usersService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
-      if (profileImageUrl) {
-        updateData.profile_image_url = profileImageUrl;
-        console.log('[usersService] 🖼️ Profile image URL to save:', profileImageUrl);
-      }
+      if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
-      console.log('[usersService] Update data to send:', updateData);
-      console.log('[usersService] Fields being updated:', Object.keys(updateData));
-      console.log('[usersService] Sending update request to Supabase for user:', id);
-      console.log('[usersService] Profile image URL included:', !!profileImageUrl);
+      console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
       const { data, error } = await supabase
         .from('users')
