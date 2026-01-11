@@ -39,7 +39,13 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   // Load selections when currentEventId and currentUserId change
   useEffect(() => {
     const loadSelections = async () => {
-      if (!currentEventId || !currentUserId || !supabaseConfigured) {
+      if (!currentEventId || !currentUserId) {
+        return;
+      }
+
+      // If Supabase is not configured, skip loading (use local state)
+      if (!supabaseConfigured) {
+        console.log('Supabase not configured, using local selections state');
         return;
       }
 
@@ -47,12 +53,16 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
       try {
         const { data, error } = await selectionsService.getSelectionsForUserInEvent(currentEventId, currentUserId);
         if (error) {
-          console.error('Error loading selections:', error);
+          console.error('Error loading selections from database:', error);
+          // Continue with empty selections if error occurs
+          setSelections([]);
         } else if (data) {
           setSelections(data);
         }
       } catch (error) {
         console.error('Error loading selections:', error);
+        // Continue with empty selections if error occurs
+        setSelections([]);
       } finally {
         setIsLoading(false);
       }
