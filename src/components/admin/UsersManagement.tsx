@@ -394,14 +394,6 @@ export const UsersManagement = () => {
                         src={imagePreview}
                         alt="Prévia do perfil"
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error('[UsersManagement] Preview image failed to load');
-                          console.error('[UsersManagement] Preview URL:', imagePreview);
-                          console.error('[UsersManagement] Error:', e);
-                        }}
-                        onLoad={() => {
-                          console.log('[UsersManagement] Preview image loaded:', imagePreview?.substring(0, 100) + '...');
-                        }}
                       />
                       <button
                         type="button"
