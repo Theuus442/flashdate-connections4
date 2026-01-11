@@ -87,18 +87,8 @@ export const SelectionsProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   const removeSelection = async (eventId: string, userId: string, selectedUserId: string) => {
-    if (!supabaseConfigured) {
-      // Fallback to local state
-      setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
-      return;
-    }
-
     try {
-      const { error } = await selectionsService.removeSelection(eventId, userId, selectedUserId);
-      if (error) {
-        console.error('Error removing selection:', error);
-        return;
-      }
+      await selectionsService.removeSelection(eventId, userId, selectedUserId);
       setSelections(prev => prev.filter(s => s.selectedUserId !== selectedUserId));
     } catch (error) {
       console.error('Error removing selection:', error);
