@@ -24,7 +24,7 @@ export const SelectionsManagement = () => {
     icon: React.ComponentType<{ size: number }>;
     title: string;
     count: number;
-    selections: Array<{ userId: string; type: string }>;
+    selections: Array<{ selectedUserId: string; vote: string }>;
     color: string;
   }) => (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -44,24 +44,24 @@ export const SelectionsManagement = () => {
         <div className="space-y-2">
           {selections.map(selection => (
             <div
-              key={selection.userId}
+              key={selection.selectedUserId}
               className={`flex items-center justify-between p-3 rounded-lg border ${
-                title === 'Matches'
+                title === 'SIM'
                   ? 'bg-gold/10 border-gold/20'
-                  : title === 'Amizades'
+                  : title === 'TALVEZ'
                   ? 'bg-secondary/10 border-secondary/20'
                   : 'bg-destructive/10 border-destructive/20'
               }`}
             >
               <span className="text-sm font-medium text-foreground">
-                {getUserName(selection.userId)}
+                {getUserName(selection.selectedUserId)}
               </span>
               <span className={`text-xs font-semibold px-3 py-1 rounded-full ${color}`}>
-                {title === 'Matches'
-                  ? '💕 Match'
-                  : title === 'Amizades'
-                  ? '👥 Amizade'
-                  : '❌ Sem Interesse'}
+                {title === 'SIM'
+                  ? '💕 SIM'
+                  : title === 'TALVEZ'
+                  ? '👥 TALVEZ'
+                  : '❌ NÃO'}
               </span>
             </div>
           ))}
