@@ -48,15 +48,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChange(async (authUser) => {
+    const unsubscribe = authService.onAuthStateChange((authUser) => {
       if (authUser) {
-        // Try to get role from user metadata first
-        let role = (authUser.role || 'client') as 'admin' | 'client';
-
-        // If role is not in metadata, fetch from database
-        if (authUser.role === 'client' || !authUser.role) {
-          role = await getUserRoleFromDatabase(authUser.email);
-        }
+        // Use role from auth metadata (set during signup/login)
+        const role = (authUser.role || 'client') as 'admin' | 'client';
 
         setUser({
           id: authUser.id,
