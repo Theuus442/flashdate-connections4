@@ -92,7 +92,7 @@ export const usersService = {
   },
 
   /**
-   * Create new user
+   * Create new user - creates user directly in database without auth emails
    */
   async createUser(user: Omit<User, 'id'>, profileImage?: File): Promise<{ data: User | null; error: any }> {
     if (!isSupabaseConfigured()) {
@@ -104,31 +104,14 @@ export const usersService = {
       console.log('[usersService] Creating user:', user);
       let profileImageUrl: string | undefined;
 
-      // First, create auth user with password if provided
-      let authUserId: string | undefined;
-      if (user.password && user.password.trim()) {
-        console.log('[usersService] Creating auth user with password...');
-        const authResult = await authService.createUserAsAdmin(user.email, user.password.trim());
-        if (authResult.error) {
-          const errorMsg = authResult.error instanceof Error
-            ? authResult.error.message
-            : JSON.stringify(authResult.error);
-          console.error('[usersService] Error creating auth user:', errorMsg);
-          throw authResult.error;
-        }
-        authUserId = authResult.data?.id;
-        console.log('[usersService] Auth user created:', authUserId);
-      } else {
-        console.log('[usersService] No password provided, user will need to set one later');
-      }
+      // Generate a unique ID for the user
+      const userId = crypto.randomUUID();
+      console.log('[usersService] Generated user ID:', userId);
 
       // Upload profile image if provided
       if (profileImage) {
         console.log('[usersService] Uploading profile image...');
-        const result = await storageService.uploadUserProfileImage(
-          authUserId || Date.now().toString(),
-          profileImage
-        );
+        const result = await storageService.uploadUserProfileImage(userId, profileImage);
         if (result.error) throw result.error;
         profileImageUrl = result.data;
         console.log('[usersService] Image uploaded:', profileImageUrl);
@@ -144,17 +127,21 @@ export const usersService = {
         hasImage: !!profileImageUrl,
       });
 
+      // Create user directly in database - no auth system needed!
+      // This avoids email confirmations completely
       const { data, error } = await supabase
         .from('users')
         .insert([{
-          id: authUserId, // Use auth user ID if created
+          id: userId,
           name: user.name,
           username: user.username,
           email: user.email,
           whatsapp: user.whatsapp,
           gender: user.gender,
           role: user.role || 'client',
+          password: user.password ? user.password.trim() : null, // Store password as-is for local auth
           profile_image_url: profileImageUrl,
+          created_at: new Date().toISOString(),
         }])
         .select();
 
@@ -168,10 +155,10 @@ export const usersService = {
           details: error?.details,
           hint: error?.hint,
         });
+        throw error;
       }
-      console.log('[usersService] Insert result:', { hasData: !!data, hasError: !!error });
 
-      if (error) throw error;
+      console.log('[usersService] Insert result:', { hasData: !!data, dataLength: data?.length });
 
       if (!data || data.length === 0) {
         throw new Error('Failed to insert user - no data returned');
