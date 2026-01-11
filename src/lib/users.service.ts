@@ -183,13 +183,19 @@ export const usersService = {
     }
 
     try {
+      console.log('[usersService] Updating user:', id);
       let profileImageUrl: string | undefined;
 
       // Upload profile image if provided
       if (profileImage) {
+        console.log('[usersService] Uploading profile image for user:', id);
         const result = await storageService.uploadUserProfileImage(id, profileImage);
-        if (result.error) throw result.error;
+        if (result.error) {
+          console.error('[usersService] Error uploading profile image:', result.error);
+          throw result.error;
+        }
         profileImageUrl = result.data;
+        console.log('[usersService] Profile image uploaded:', profileImageUrl);
       }
 
       const updateData: any = {};
@@ -203,6 +209,8 @@ export const usersService = {
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
       updateData.updated_at = new Date().toISOString();
 
+      console.log('[usersService] Update data to send:', updateData);
+
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
@@ -210,7 +218,15 @@ export const usersService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[usersService] Update error:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
 
       const transformedData: User = {
         id: data.id,
@@ -224,8 +240,14 @@ export const usersService = {
         password: data.password,
       };
 
+      console.log('[usersService] User updated successfully:', transformedData);
       return { data: transformedData, error: null };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error('[usersService] Error updating user:', {
+        message: errorMessage,
+        error,
+      });
       return { data: null, error };
     }
   },
