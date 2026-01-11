@@ -4,10 +4,11 @@ export const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col"
+      className="relative flex flex-col"
+      style={{ height: '100vh' }}
     >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 top-0 overflow-hidden">
         <img
           src="https://cdn.builder.io/api/v1/image/assets%2F4a212f387eb54876979913c5cf0408d5%2F6074e42db9fa4e5f936854eaea1be09c?format=webp&width=1920"
           alt="Flashdate - Encontros elegantes"
