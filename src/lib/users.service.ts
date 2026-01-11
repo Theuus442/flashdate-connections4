@@ -135,7 +135,7 @@ export const usersService = {
           gender: user.gender,
           role: user.role || 'client',
           profile_image_url: profileImageUrl,
-          password: user.password,
+          // Note: password is managed by Supabase Auth, not inserted via REST API
         }])
         .select()
         .single();
