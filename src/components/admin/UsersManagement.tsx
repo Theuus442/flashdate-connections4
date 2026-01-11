@@ -58,18 +58,30 @@ export const UsersManagement = () => {
     console.log('[UsersManagement] Form submitted with data:', formData);
     setIsLoading(true);
 
-    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp || !formData.password) {
+    // Validate required fields
+    if (!formData.name || !formData.username || !formData.email || !formData.whatsapp) {
       console.warn('[UsersManagement] Validation failed - missing fields:', {
         name: !!formData.name,
         username: !!formData.username,
         email: !!formData.email,
         whatsapp: !!formData.whatsapp,
-        password: !!formData.password,
         role: !!formData.role,
       });
       toast({
         title: 'Erro',
-        description: 'Por favor, preencha todos os campos obrigatórios',
+        description: 'Por favor, preencha todos os campos obrigatórios (Nome, Apelido, Email, Telefone)',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Password is required when creating new user
+    if (!editingId && !formData.password) {
+      console.warn('[UsersManagement] Password required for new user');
+      toast({
+        title: 'Erro',
+        description: 'Senha é obrigatória para novos usuários',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -79,15 +91,21 @@ export const UsersManagement = () => {
     try {
       if (editingId) {
         console.log('[UsersManagement] Updating user:', editingId);
-        const result = await updateUser(editingId, {
+        // Only include password if it's not empty
+        const updates: any = {
           name: formData.name,
           username: formData.username,
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          password: formData.password,
           role: formData.role,
-        }, selectedImageFile);
+        };
+
+        if (formData.password && formData.password.trim()) {
+          updates.password = formData.password;
+        }
+
+        const result = await updateUser(editingId, updates, selectedImageFile);
 
         console.log('[UsersManagement] Update result:', result);
         if (result) {
@@ -111,7 +129,7 @@ export const UsersManagement = () => {
           email: formData.email,
           whatsapp: formData.whatsapp,
           gender: formData.gender,
-          password: formData.password,
+          password: formData.password.trim(),
           role: formData.role,
         }, selectedImageFile);
 
@@ -144,10 +162,13 @@ export const UsersManagement = () => {
       setImagePreview(undefined);
       setShowForm(false);
     } catch (error) {
-      console.error('[UsersManagement] Error submitting form:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[UsersManagement] Error submitting form:', errorMessage);
       toast({
         title: 'Erro',
-        description: `Erro ao processar formulário: ${error instanceof Error ? error.message : 'Desconhecido'}`,
+        description: `Erro ao processar formulário: ${errorMessage || 'Desconhecido'}`,
         variant: 'destructive',
       });
     } finally {
@@ -162,7 +183,7 @@ export const UsersManagement = () => {
       email: user.email,
       whatsapp: user.whatsapp,
       gender: user.gender,
-      password: user.password || '',
+      password: '', // Leave empty for optional password change on edit
       role: user.role || 'client',
     });
     setImagePreview(user.profileImage);
@@ -462,14 +483,14 @@ export const UsersManagement = () => {
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Senha
+                  Senha {editingId ? '(Opcional)' : '(Obrigatória)'}
                 </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Insira uma senha segura"
+                  placeholder={editingId ? 'Deixe em branco para manter a senha atual' : 'Insira uma senha segura'}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
