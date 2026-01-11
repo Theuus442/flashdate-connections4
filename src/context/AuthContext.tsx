@@ -45,13 +45,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       if (authUser) {
-        // Try to get role from user metadata first
-        let role = (authUser.role || 'client') as 'admin' | 'client';
-
-        // If role is not in metadata, fetch from database
-        if (role === 'client' || !authUser.role) {
-          role = await getUserRoleFromDatabase(authUser.email);
-        }
+        // Get role from user metadata (set during signin or from database lookup)
+        const role = (authUser.user_metadata?.role || 'client') as 'admin' | 'client';
 
         setUser({
           id: authUser.id,
