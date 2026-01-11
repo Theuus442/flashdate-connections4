@@ -12,12 +12,18 @@ export const usersService = {
     }
 
     try {
+      console.log('[usersService] Fetching users from Supabase...');
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[usersService] Supabase error:', error);
+        throw error;
+      }
+
+      console.log('[usersService] Successfully fetched users, count:', data?.length || 0);
 
       const transformedData = data?.map((user: any) => ({
         id: user.id,
@@ -32,6 +38,18 @@ export const usersService = {
 
       return { data: transformedData || [], error: null };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[usersService] Error fetching users:', {
+        message: errorMessage,
+        type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
+        error,
+      });
+
+      // Check if it's a network error
+      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+        console.error('[usersService] Network error detected - Supabase may be unreachable from this environment');
+      }
+
       return { data: null, error };
     }
   },
