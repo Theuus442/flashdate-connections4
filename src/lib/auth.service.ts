@@ -69,6 +69,34 @@ export const authService = {
       }
 
       console.log('[signIn] Success, user ID:', data.user?.id);
+
+      // Fetch user role from database and update metadata
+      if (data.user) {
+        try {
+          console.log('[signIn] Fetching user role from database...');
+          const { data: userData } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          if (userData?.role) {
+            console.log('[signIn] Found role in database:', userData.role);
+            // Update user metadata with role
+            await supabase.auth.updateUser({
+              data: {
+                ...data.user.user_metadata,
+                role: userData.role,
+              }
+            });
+            console.log('[signIn] Updated user metadata with role:', userData.role);
+          }
+        } catch (err) {
+          console.warn('[signIn] Could not fetch role from database:', err);
+          // Continue anyway - onAuthStateChange will handle it
+        }
+      }
+
       return { user: data.user, session: data.session, error: null };
     } catch (error) {
       console.error('[signIn] Caught error:', error);
