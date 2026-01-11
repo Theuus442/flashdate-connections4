@@ -66,7 +66,10 @@ export const authService = {
    * Sign in with email and password
    */
   async signIn(email: string, password: string) {
+    console.log('[AUTH] Sign in attempt:', email);
+
     if (!isSupabaseConfigured()) {
+      console.warn('[AUTH] Supabase not configured, using test credentials');
       // Fallback to test credentials
       const testUser = TEST_CREDENTIALS.find(
         (cred) => cred.email === email && cred.password === password
@@ -92,12 +95,18 @@ export const authService = {
     }
 
     try {
+      console.log('[AUTH] Calling Supabase signInWithPassword');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      console.log('[AUTH] Supabase response received:', { userId: data?.user?.id, hasError: !!error });
+
+      if (error) {
+        console.error('[AUTH] Supabase auth error:', error);
+        throw error;
+      }
 
       // After successful login, try to get the user's role from the users table
       // This handles cases where the user was created via admin panel
