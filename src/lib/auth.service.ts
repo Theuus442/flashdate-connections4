@@ -146,82 +146,36 @@ export const authService = {
       console.log('[onAuthStateChange] Event:', event, 'Session:', !!session?.user);
 
       if (session?.user) {
-        console.log('[onAuthStateChange] User detected, checking role...');
+        console.log('[onAuthStateChange] User detected, fetching profile...');
         let role: 'admin' | 'client' = 'client';
+        let userFound = false;
 
-        // First check if role is in user metadata (set during signup)
-        const metadataRole = session.user.user_metadata?.role as 'admin' | 'client' | undefined;
-        if (metadataRole) {
-          console.log('[onAuthStateChange] Role found in metadata:', metadataRole);
-          role = metadataRole;
-        } else {
-          // If no role in metadata, try to fetch from database
-          try {
-            console.log('[onAuthStateChange] Querying users table for role...');
-            const { data: userData, error } = await supabase
-              .from('users')
-              .select('role')
-              .eq('id', session.user.id)
-              .single();
+        // Check if user exists in users table
+        try {
+          console.log('[onAuthStateChange] Querying users table...');
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
 
-            console.log('[onAuthStateChange] Query result:', { hasRole: !!userData?.role, error: error?.message });
+          console.log('[onAuthStateChange] Query result:', { hasUser: !!userData, error: error?.message });
 
-            if (!error && userData?.role) {
-              console.log('[onAuthStateChange] Role found in database:', userData.role);
-              role = userData.role as 'admin' | 'client';
-            } else if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
-              // User doesn't exist in users table, create automatically
-              console.log('[onAuthStateChange] User not found in database, creating automatically...');
-              try {
-                // Check if there are any admin users
-                const { data: adminUsers, error: adminCheckError } = await supabase
-                  .from('users')
-                  .select('id')
-                  .eq('role', 'admin')
-                  .limit(1);
-
-                // If no admin exists, make this user admin. Otherwise, make them a client
-                let userRole: 'admin' | 'client' = 'client';
-                if (!adminCheckError && (!adminUsers || adminUsers.length === 0)) {
-                  console.log('[onAuthStateChange] No admin found, making this user admin');
-                  userRole = 'admin';
-                }
-
-                const { data: newUser, error: createError } = await supabase
-                  .from('users')
-                  .insert([{
-                    id: session.user.id,
-                    email: session.user.email || '',
-                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                    username: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user',
-                    gender: 'Outro',
-                    role: userRole,
-                  }])
-                  .select('role')
-                  .single();
-
-                if (createError) {
-                  console.error('[onAuthStateChange] Error creating user:', createError.message);
-                  role = 'client';
-                } else if (newUser?.role) {
-                  console.log('[onAuthStateChange] User created successfully with role:', newUser.role);
-                  role = newUser.role as 'admin' | 'client';
-                }
-              } catch (createErr) {
-                console.error('[onAuthStateChange] Error creating user:', createErr);
-                role = 'client';
-              }
-            } else {
-              console.warn('[onAuthStateChange] No role found in database, using default');
-              role = 'client';
-            }
-          } catch (err) {
-            console.error('[onAuthStateChange] Query error:', err);
-            role = 'client';
+          if (!error && userData?.role) {
+            console.log('[onAuthStateChange] User found with role:', userData.role);
+            role = userData.role as 'admin' | 'client';
+            userFound = true;
+          } else {
+            console.warn('[onAuthStateChange] User not found in database - user must be created by admin');
+            userFound = false;
+            role = 'client'; // Default role, but user won't have access
           }
+        } catch (err) {
+          console.error('[onAuthStateChange] Error querying user:', err);
+          userFound = false;
         }
 
-        console.log('[onAuthStateChange] Calling callback with role:', role);
+        console.log('[onAuthStateChange] Calling callback with role:', role, 'userFound:', userFound);
         callback({
           id: session.user.id,
           email: session.user.email || '',
