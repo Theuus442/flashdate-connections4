@@ -151,10 +151,13 @@ export const authService = {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
+        // Get role from user metadata, default to 'client'
+        const roleFromMetadata = (session.user.user_metadata?.role || 'client') as 'admin' | 'client';
+
         callback({
           id: session.user.id,
           email: session.user.email || '',
-          role: (session.user.user_metadata?.role || 'client') as 'admin' | 'client',
+          role: roleFromMetadata,
         });
       } else {
         callback(null);
