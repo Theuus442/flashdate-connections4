@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, Heart, Users, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Heart, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Participant {
@@ -22,7 +22,6 @@ interface Selection {
 
 export default function EventUserSelection() {
   const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selections, setSelections] = useState<Selection[]>([]);
 
   // Mock current user (from admin dashboard)
@@ -81,44 +80,60 @@ export default function EventUserSelection() {
       bio: 'Gosto de coisas simples e boas',
       interests: ['Culinária', 'Vinho', 'Filosofia'],
     },
+    {
+      id: '6',
+      name: 'Carolina Silva',
+      age: 29,
+      gender: 'F',
+      profession: 'Arquiteta',
+      bio: 'Apaixonada por design e inovação',
+      interests: ['Design', 'Arquitetura', 'Viagens'],
+    },
+    {
+      id: '7',
+      name: 'Pedro Oliveira',
+      age: 34,
+      gender: 'M',
+      profession: 'Professor',
+      bio: 'Educador apaixonado',
+      interests: ['Educação', 'Livros', 'Esportes'],
+    },
+    {
+      id: '8',
+      name: 'Marina Costa',
+      age: 26,
+      gender: 'F',
+      profession: 'Jornalista',
+      bio: 'Contadora de histórias',
+      interests: ['Jornalismo', 'Viagens', 'Fotografia'],
+    },
+    {
+      id: '9',
+      name: 'Felipe Gomes',
+      age: 40,
+      gender: 'M',
+      profession: 'Empresário',
+      bio: 'Empreendedor serial',
+      interests: ['Negócios', 'Inovação', 'Tecnologia'],
+    },
   ];
 
-  const currentParticipant = participants[currentIndex];
-  const isSelected = selections.some(s => s.userId === currentParticipant.id);
-  const currentSelection = selections.find(s => s.userId === currentParticipant.id);
-
-  const handleSelection = (type: 'match' | 'friendship' | 'no-interest') => {
-    if (isSelected) {
-      // Update existing selection
-      setSelections(selections.map(s =>
-        s.userId === currentParticipant.id ? { ...s, type } : s
-      ));
+  const handleSelection = (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
+    const existingSelection = selections.find(s => s.userId === participantId);
+    
+    if (existingSelection) {
+      if (existingSelection.type === type) {
+        // Remove if clicking same button
+        setSelections(selections.filter(s => s.userId !== participantId));
+      } else {
+        // Update if clicking different button
+        setSelections(selections.map(s =>
+          s.userId === participantId ? { ...s, type } : s
+        ));
+      }
     } else {
       // Add new selection
-      setSelections([...selections, { userId: currentParticipant.id, type }]);
-    }
-
-    // Move to next participant
-    if (currentIndex < participants.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      toast.success('Seleções finalizadas!');
-    }
-  };
-
-  const handleRemoveSelection = (userId: string) => {
-    setSelections(selections.filter(s => s.userId !== userId));
-  };
-
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex < participants.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      setSelections([...selections, { userId: participantId, type }]);
     }
   };
 
@@ -127,8 +142,18 @@ export default function EventUserSelection() {
       toast.error('Faça pelo menos uma seleção antes de finalizar');
       return;
     }
-    toast.success(`Seleções finalizadas com sucesso! ${selections.length} pessoa(s) selecionada(s)`);
+    const matchCount = selections.filter(s => s.type === 'match').length;
+    const friendshipCount = selections.filter(s => s.type === 'friendship').length;
+    toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
     navigate('/dashboard');
+  };
+
+  const getGenderLabel = (gender: string) => {
+    switch(gender) {
+      case 'M': return 'Masculino';
+      case 'F': return 'Feminino';
+      default: return 'Outro';
+    }
   };
 
   const matchCount = selections.filter(s => s.type === 'match').length;
@@ -183,116 +208,110 @@ export default function EventUserSelection() {
             </div>
           </div>
 
-          {/* Main Card */}
-          <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
-            <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-lg flex flex-col h-full">
-              {/* Image Section */}
-              <div className="relative w-full bg-gradient-to-br from-amber-100 to-amber-200 aspect-square flex items-center justify-center">
-                {currentParticipant.profileImage ? (
-                  <img
-                    src={currentParticipant.profileImage}
-                    alt={currentParticipant.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-9xl font-bold text-amber-300/80">
-                    {currentParticipant.name.charAt(0)}
-                  </span>
-                )}
-              </div>
+          {/* Grid of Participant Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
+            {participants.map((participant) => {
+              const selection = selections.find(s => s.userId === participant.id);
+              const isMatched = selection?.type === 'match';
+              const isFriend = selection?.type === 'friendship';
+              const isNoInterest = selection?.type === 'no-interest';
 
-              {/* Content Section */}
-              <div className="p-8 flex-1 flex flex-col">
-                {/* User Info */}
-                <div className="mb-8">
-                  <h2 className="font-serif text-3xl font-bold text-foreground">
-                    {currentParticipant.name}
-                  </h2>
-                  <p className="text-lg text-muted-foreground mt-1">
-                    {currentParticipant.age} anos • {currentParticipant.gender === 'M' ? 'Masculino' : currentParticipant.gender === 'F' ? 'Feminino' : 'Outro'} • {currentParticipant.profession}
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3 mt-auto">
-                  <Button
-                    onClick={() => handleSelection('match')}
-                    className={`w-full py-3 text-base font-medium transition-all ${
-                      currentSelection?.type === 'match'
-                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
-                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
-                    }`}
-                    variant="outline"
-                  >
-                    <Heart className="w-5 h-5 mr-2" />
-                    Match
-                  </Button>
-                  <Button
-                    onClick={() => handleSelection('friendship')}
-                    className={`w-full py-3 text-base font-medium transition-all ${
-                      currentSelection?.type === 'friendship'
-                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
-                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
-                    }`}
-                    variant="outline"
-                  >
-                    <Users className="w-5 h-5 mr-2" />
-                    Amizade
-                  </Button>
-                  <Button
-                    onClick={() => handleSelection('no-interest')}
-                    className={`w-full py-3 text-base font-medium transition-all ${
-                      currentSelection?.type === 'no-interest'
-                        ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
-                        : 'bg-blue-100 text-blue-800 hover:bg-blue-150'
-                    }`}
-                    variant="outline"
-                  >
-                    <X className="w-5 h-5 mr-2" />
-                    Sem Interesse
-                  </Button>
-                </div>
-              </div>
-
-              {/* Navigation Controls */}
-              <div className="flex items-center justify-between mt-8 gap-4 px-8 pb-8">
-                <Button
-                  onClick={handlePrevious}
-                  disabled={currentIndex === 0}
-                  variant="outline"
-                  size="lg"
+              return (
+                <div
+                  key={participant.id}
+                  className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col h-full"
                 >
-                  <ChevronLeft className="w-5 h-5" />
-                </Button>
+                  {/* Image Section */}
+                  <div className="relative w-full bg-gradient-to-br from-amber-100 to-amber-200 aspect-square flex items-center justify-center overflow-hidden">
+                    {participant.profileImage ? (
+                      <img
+                        src={participant.profileImage}
+                        alt={participant.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-6xl font-bold text-amber-300/80">
+                        {participant.name.charAt(0)}
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex-1 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    {currentIndex + 1} de {participants.length}
-                  </p>
+                  {/* Content Section */}
+                  <div className="p-5 flex-1 flex flex-col">
+                    {/* User Info */}
+                    <div className="mb-4">
+                      <h3 className="font-serif text-xl font-bold text-foreground">
+                        {participant.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {participant.age} anos • {getGenderLabel(participant.gender)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {participant.profession}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-2 mt-auto">
+                      <Button
+                        onClick={() => handleSelection(participant.id, 'match')}
+                        className={`w-full py-2 text-sm font-medium transition-all ${
+                          isMatched
+                            ? 'bg-rose-200 text-rose-900 hover:bg-rose-300'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                        variant="outline"
+                      >
+                        <Heart className="w-4 h-4 mr-2" />
+                        Match
+                      </Button>
+                      <Button
+                        onClick={() => handleSelection(participant.id, 'friendship')}
+                        className={`w-full py-2 text-sm font-medium transition-all ${
+                          isFriend
+                            ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                        variant="outline"
+                      >
+                        <Users className="w-4 h-4 mr-2" />
+                        Amizade
+                      </Button>
+                      <Button
+                        onClick={() => handleSelection(participant.id, 'no-interest')}
+                        className={`w-full py-2 text-sm font-medium transition-all ${
+                          isNoInterest
+                            ? 'bg-red-200 text-red-900 hover:bg-red-300'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                        variant="outline"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Sem Interesse
+                      </Button>
+                    </div>
+                  </div>
                 </div>
+              );
+            })}
+          </div>
 
-                <Button
-                  onClick={handleNext}
-                  disabled={currentIndex === participants.length - 1}
-                  variant="outline"
-                  size="lg"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </div>
-
-              {/* Finish Button */}
-              <div className="px-8 pb-8">
-                <Button
-                  onClick={handleFinish}
-                  variant="hero"
-                  className="w-full py-3 text-base"
-                  disabled={selections.length === 0}
-                >
-                  Finalizar Seleção ({selections.length})
-                </Button>
-              </div>
+          {/* Finish Button */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-sm text-muted-foreground">Seleções feitas</p>
+              <p className="text-2xl font-bold text-foreground">
+                {matchCount} <span className="text-rose-500">♥</span> {friendshipCount} <span className="text-blue-500">👥</span>
+              </p>
             </div>
+            <Button
+              onClick={handleFinish}
+              variant="hero"
+              className="px-8 py-3 text-base"
+              disabled={selections.length === 0}
+            >
+              Finalizar Seleção ({selections.length})
+            </Button>
           </div>
         </div>
       </div>
