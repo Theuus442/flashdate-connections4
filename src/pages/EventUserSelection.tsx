@@ -1,19 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, Heart, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Participant {
-  id: string;
-  name: string;
-  age: number;
-  profession: string;
-  gender: 'M' | 'F' | 'Outro';
-  profileImage?: string;
-  bio?: string;
-  interests?: string[];
-}
+import { useAuth } from '@/context/AuthContext';
+import { useUsers } from '@/context/UsersContext';
+import { User } from '@/context/UsersContext';
 
 interface Selection {
   userId: string;
@@ -22,101 +14,34 @@ interface Selection {
 
 export default function EventUserSelection() {
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
+  const { users, isLoading } = useUsers();
   const [selections, setSelections] = useState<Selection[]>([]);
+  const [participants, setParticipants] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // Mock current user (from admin dashboard)
-  const currentUser = {
-    id: 'current-user',
-    name: 'Maria Silva',
-    age: 32,
-    email: 'maria@example.com',
-    profileImage: undefined,
-  };
+  // Load current user and participants from database
+  useEffect(() => {
+    if (!authUser || !users.length) return;
 
-  // Mock participant data
-  const participants: Participant[] = [
-    {
-      id: '1',
-      name: 'João Santos',
-      age: 35,
-      gender: 'M',
-      profession: 'Engenheiro de Software',
-      bio: 'Apaixonado por viagens e livros',
-      interests: ['Viagens', 'Leitura', 'Tecnologia'],
-    },
-    {
-      id: '2',
-      name: 'Ana Costa',
-      age: 28,
-      gender: 'F',
-      profession: 'Designer Gráfico',
-      bio: 'Amante de arte e cultura',
-      interests: ['Arte', 'Museu', 'Cinema'],
-    },
-    {
-      id: '3',
-      name: 'Carlos Mendes',
-      age: 38,
-      gender: 'M',
-      profession: 'Médico',
-      bio: 'Esportista nas horas vagas',
-      interests: ['Esportes', 'Natureza', 'Culinária'],
-    },
-    {
-      id: '4',
-      name: 'Beatriz Lima',
-      age: 30,
-      gender: 'F',
-      profession: 'Psicóloga',
-      bio: 'Apaixonada por desenvolvimento pessoal',
-      interests: ['Meditação', 'Yoga', 'Desenvolvimento'],
-    },
-    {
-      id: '5',
-      name: 'Roberto Alves',
-      age: 36,
-      gender: 'M',
-      profession: 'Advogado',
-      bio: 'Gosto de coisas simples e boas',
-      interests: ['Culinária', 'Vinho', 'Filosofia'],
-    },
-    {
-      id: '6',
-      name: 'Carolina Silva',
-      age: 29,
-      gender: 'F',
-      profession: 'Arquiteta',
-      bio: 'Apaixonada por design e inovação',
-      interests: ['Design', 'Arquitetura', 'Viagens'],
-    },
-    {
-      id: '7',
-      name: 'Pedro Oliveira',
-      age: 34,
-      gender: 'M',
-      profession: 'Professor',
-      bio: 'Educador apaixonado',
-      interests: ['Educação', 'Livros', 'Esportes'],
-    },
-    {
-      id: '8',
-      name: 'Marina Costa',
-      age: 26,
-      gender: 'F',
-      profession: 'Jornalista',
-      bio: 'Contadora de histórias',
-      interests: ['Jornalismo', 'Viagens', 'Fotografia'],
-    },
-    {
-      id: '9',
-      name: 'Felipe Gomes',
-      age: 40,
-      gender: 'M',
-      profession: 'Empresário',
-      bio: 'Empreendedor serial',
-      interests: ['Negócios', 'Inovação', 'Tecnologia'],
-    },
-  ];
+    console.log('[EventUserSelection] Loading data...');
+
+    // Get current user from users array
+    const user = users.find(u => u.id === authUser.id);
+    if (user) {
+      console.log('[EventUserSelection] Current user loaded:', user.name);
+      setCurrentUser(user);
+    }
+
+    // Get other participants (excluding current user and admin users)
+    const otherUsers = users.filter(u => u.id !== authUser.id && u.role === 'client');
+    console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
+    setParticipants(otherUsers);
+
+    if (otherUsers.length === 0) {
+      toast.warning('Nenhum outro participante disponível');
+    }
+  }, [authUser, users]);
 
   const handleSelection = (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
     const existingSelection = selections.find(s => s.userId === participantId);
