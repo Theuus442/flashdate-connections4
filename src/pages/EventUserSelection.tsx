@@ -251,13 +251,63 @@ export default function EventUserSelection() {
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground">Total de participantes</p>
-              <p className="text-4xl font-bold text-gold">{participants.length}</p>
+              <p className="text-4xl font-bold text-gold">{filteredParticipants.length}</p>
             </div>
+          </div>
+
+          {/* Filters Section */}
+          <div className="bg-muted/30 rounded-xl p-6 mb-8 border border-border">
+            <h3 className="text-sm font-semibold text-foreground mb-4">Filtros</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Sort By */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Ordenar por</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'name' | 'original')}
+                  className="px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                >
+                  <option value="original">Ordem Original</option>
+                  <option value="name">Ordem Alfabética (A-Z)</option>
+                </select>
+              </div>
+
+              {/* Gender Filter */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground">Filtrar por Gênero</label>
+                <select
+                  value={genderFilter}
+                  onChange={(e) => setGenderFilter(e.target.value as 'all' | 'M' | 'F' | 'Outro')}
+                  className="px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                >
+                  <option value="all">Todos os Gêneros</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Active Filters Badge */}
+            {(sortBy !== 'original' || genderFilter !== 'all') && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {sortBy !== 'original' && (
+                  <div className="bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-medium">
+                    Ordenado alfabeticamente
+                  </div>
+                )}
+                {genderFilter !== 'all' && (
+                  <div className="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-xs font-medium">
+                    {genderFilter === 'M' ? 'Masculino' : genderFilter === 'F' ? 'Feminino' : 'Outro'}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Grid of Participant Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
-            {participants.map((participant) => {
+            {filteredParticipants.map((participant) => {
               const selection = selections.find(s => s.userId === participant.id);
               const isMatched = selection?.type === 'match';
               const isFriend = selection?.type === 'friendship';
