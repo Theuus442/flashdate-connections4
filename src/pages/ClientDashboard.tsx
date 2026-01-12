@@ -58,13 +58,35 @@ export default function ClientDashboard() {
             message: errorMessage,
             error,
           });
-          setClientUser(null);
+
+          // Fallback: Create a minimal user object from auth data so user can still see and edit profile
+          console.log('[ClientDashboard] Creating fallback user from auth data...');
+          const fallbackUser = {
+            id: authUser.id,
+            name: 'Usuário',
+            username: 'usuario',
+            email: authUser.email || '',
+            whatsapp: '',
+            gender: 'Outro' as const,
+            role: authUser.role || 'client',
+          };
+          setClientUser(fallbackUser);
         } else if (data) {
           console.log('[ClientDashboard] User data loaded successfully:', data);
           setClientUser(data);
         } else {
-          console.warn('[ClientDashboard] No user data returned');
-          setClientUser(null);
+          console.warn('[ClientDashboard] No user data returned, using fallback');
+          // Fallback: Create a minimal user object from auth data
+          const fallbackUser = {
+            id: authUser.id,
+            name: 'Usuário',
+            username: 'usuario',
+            email: authUser.email || '',
+            whatsapp: '',
+            gender: 'Outro' as const,
+            role: authUser.role || 'client',
+          };
+          setClientUser(fallbackUser);
         }
       } catch (error) {
         const errorMessage = error instanceof Error
@@ -75,7 +97,18 @@ export default function ClientDashboard() {
           message: errorMessage,
           error,
         });
-        setClientUser(null);
+
+        // Fallback: Create a minimal user object from auth data
+        const fallbackUser = {
+          id: authUser.id,
+          name: 'Usuário',
+          username: 'usuario',
+          email: authUser.email || '',
+          whatsapp: '',
+          gender: 'Outro' as const,
+          role: authUser.role || 'client',
+        };
+        setClientUser(fallbackUser);
       } finally {
         setIsLoadingUserData(false);
       }
