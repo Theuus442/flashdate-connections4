@@ -461,9 +461,9 @@ export const usersService = {
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        : serializeError(error);
       console.error('[usersService] Error creating user:', errorMessage);
-      return { data: null, error };
+      return { data: null, error: errorMessage };
     }
   },
 
