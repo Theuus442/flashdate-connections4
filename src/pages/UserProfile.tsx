@@ -358,12 +358,15 @@ export default function UserProfile() {
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'NÃO')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'NÃO'
                                 ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="NÃO"
+                            title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
                           >
                             <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
