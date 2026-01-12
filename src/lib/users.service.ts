@@ -529,11 +529,11 @@ export const usersService = {
           }
 
           console.log('[usersService] User synced successfully, retrying update...');
-          // Retry the update with synced user
+          // Retry the update with synced user (use validId to ensure we have the right ID)
           const { data: retryData, error: retryError } = await supabase
             .from('users')
             .update(updateData)
-            .eq('id', id)
+            .eq('id', validId)
             .select();
 
           if (retryError || !retryData || retryData.length === 0) {
