@@ -123,7 +123,7 @@ export default function ClientDashboard() {
                 Selecionar Matches
               </Button>
               <span className="hidden sm:inline text-sm text-muted-foreground">
-                Bem-vindo, <span className="text-foreground font-medium">{clientUser.name}</span>
+                Bem-vindo, <span className="text-foreground font-medium">{clientUser?.name || 'Usuário'}</span>
               </span>
               <Button
                 variant="ghost"
