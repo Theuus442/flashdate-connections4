@@ -62,9 +62,9 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       try {
         console.log('[UsersContext] Attempting to load users from Supabase...');
 
-        // Set a timeout to prevent infinite loading
+        // Set a longer timeout to account for retries (1s + 2s + 4s = 7s base, plus network latency)
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('User load timeout after 10 seconds')), 10000)
+          setTimeout(() => reject(new Error('User load timeout after 20 seconds')), 20000)
         );
 
         const loadPromise = (async () => {
@@ -90,12 +90,16 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               console.error('[UsersContext] App will continue with empty user list.');
             }
 
-            // In case of network error, return empty array (not an error)
+            // In case of network error or any error, return empty array (not an error)
             // This prevents the app from breaking completely
+            console.log('[UsersContext] Setting empty user list as fallback');
             setUsers([]);
           } else if (data) {
             console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
             setUsers(data);
+          } else {
+            console.log('[UsersContext] No data returned, setting empty list');
+            setUsers([]);
           }
         })();
 
