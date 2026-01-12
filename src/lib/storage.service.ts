@@ -21,12 +21,12 @@ export const storageService = {
       // Sanitize filename to remove accents and special characters
       const sanitizedFileName = sanitizeFilename(file.name);
       const fileName = `${userId}-${Date.now()}-${sanitizedFileName}`;
-      const filePath = `profiles/${fileName}`;
+      const filePath = fileName;
 
-      console.log('[storageService] Uploading profile image to bucket: profiles');
+      console.log('[storageService] Uploading profile image');
       console.log('[storageService] Original filename:', file.name);
       console.log('[storageService] Sanitized filename:', sanitizedFileName);
-      console.log('[storageService] Full file path:', filePath);
+      console.log('[storageService] File path (within bucket):', filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('profiles')
@@ -66,12 +66,12 @@ export const storageService = {
       // Sanitize filename to remove accents and special characters
       const sanitizedFileName = sanitizeFilename(file.name);
       const fileName = `${eventId}-${Date.now()}-${sanitizedFileName}`;
-      const filePath = `events/${fileName}`;
+      const filePath = fileName;
 
-      console.log('[storageService] Uploading event image to bucket: events');
+      console.log('[storageService] Uploading event image');
       console.log('[storageService] Original filename:', file.name);
       console.log('[storageService] Sanitized filename:', sanitizedFileName);
-      console.log('[storageService] Full file path:', filePath);
+      console.log('[storageService] File path (within bucket):', filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('events')

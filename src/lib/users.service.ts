@@ -5,6 +5,83 @@ import { authService } from './auth.service';
 
 export const usersService = {
   /**
+   * Sync user from Auth to Database if missing
+   * Creates a database record for an auth user that doesn't exist in DB
+   */
+  async syncAuthUserToDatabase(authUser: { id: string; email: string; user_metadata?: any }): Promise<{ data: User | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[usersService] Attempting to sync auth user to database:', authUser.email);
+
+      // Extract metadata from auth user
+      const name = authUser.user_metadata?.name || authUser.email.split('@')[0];
+      const username = authUser.user_metadata?.username || authUser.email.split('@')[0];
+
+      // Try to insert user record
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{
+          id: authUser.id,
+          email: authUser.email,
+          name,
+          username,
+          whatsapp: '',
+          gender: 'Outro',
+          role: 'client',
+          created_at: new Date().toISOString(),
+        }])
+        .select();
+
+      if (error) {
+        // If it's a duplicate key error, the user already exists - that's fine
+        if (error.code === '23505') {
+          console.log('[usersService] User already exists in database');
+          // Try to fetch existing user
+          return this.getUserById(authUser.id);
+        }
+
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
+        console.error('[usersService] Error syncing user:', {
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+        });
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('Failed to sync user - no data returned');
+      }
+
+      const userData = data[0];
+      const transformedData: User = {
+        id: userData.id,
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        whatsapp: userData.whatsapp,
+        gender: userData.gender,
+        role: userData.role || 'client',
+        profileImage: userData.profile_image_url,
+      };
+
+      console.log('[usersService] User synced to database successfully:', transformedData);
+      return { data: transformedData, error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error syncing auth user:', errorMessage);
+      return { data: null, error };
+    }
+  },
+
+  /**
    * Get all users
    */
   async getUsers(): Promise<{ data: User[] | null; error: any }> {
@@ -319,13 +396,35 @@ export const usersService = {
     }
 
     try {
-      console.log('[usersService] Updating user:', id);
+      console.log('[usersService] Updating user:', { id, email: updates.email });
       let profileImageUrl: string | undefined;
+
+      // Validate that the ID exists in database before proceeding
+      let validId = id;
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (!existingUser && updates.email) {
+        console.warn('[usersService] ID not found in database, checking by email:', updates.email);
+        const { data: userByEmail } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', updates.email)
+          .maybeSingle();
+
+        if (userByEmail) {
+          console.log('[usersService] Found user by email, using database ID:', userByEmail.id);
+          validId = userByEmail.id;
+        }
+      }
 
       // Upload profile image if provided
       if (profileImage) {
-        console.log('[usersService] Uploading profile image for user:', id);
-        const result = await storageService.uploadUserProfileImage(id, profileImage);
+        console.log('[usersService] Uploading profile image for user:', validId);
+        const result = await storageService.uploadUserProfileImage(validId, profileImage);
         if (result.error) {
           console.error('[usersService] Error uploading profile image:', result.error);
           throw result.error;
@@ -362,11 +461,11 @@ export const usersService = {
 
       console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
-      // First attempt: try normal update
+      // First attempt: try normal update with validated ID
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
-        .eq('id', id)
+        .eq('id', validId)
         .select();
 
       console.log('[usersService] Update response received:', { hasData: !!data, hasError: !!error, dataLength: data?.length });
@@ -375,12 +474,27 @@ export const usersService = {
         const errorMessage = error instanceof Error
           ? error.message
           : (error?.message || JSON.stringify(error));
+
+        // Detect RLS policy violations
+        const isRLSError = errorMessage.includes('new row violates row-level security policy') ||
+                          errorMessage.includes('row-level security policy') ||
+                          errorMessage.includes('permission denied') ||
+                          error?.code === 'PGRST301';
+
         console.error('[usersService] Update error:', {
           message: errorMessage,
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
+          isRLSError,
         });
+
+        if (isRLSError) {
+          console.error('[usersService] 🔐 RLS POLICY ERROR DETECTED!');
+          console.error('[usersService] User role may not have permission to update');
+          throw new Error(`Erro de permissão (RLS): Você não tem permissão para atualizar este perfil. Se é admin, verifique as RLS policies.`);
+        }
+
         throw error;
       }
 
@@ -389,39 +503,115 @@ export const usersService = {
       if (!data || data.length === 0) {
         // Update affected 0 rows - try to find user by email instead
         console.warn('[usersService] Update affected 0 rows for ID:', id);
-        console.warn('[usersService] Attempting fallback: updating by email instead:', updates.email);
+        console.warn('[usersService] User ID:', id, 'Email:', updates.email);
 
         if (!updates.email) {
           console.error('[usersService] No email provided for fallback update');
-          throw new Error(`User with ID ${id} not found and no email provided for fallback`);
+          throw new Error(`Usuário com ID ${id} não foi encontrado. Verifique sua conexão com o servidor.`);
         }
 
-        // Try to update by email instead
-        const { data: emailUpdateData, error: emailUpdateError } = await supabase
+        // First, let's check if user exists by email
+        const { data: existingUser } = await supabase
           .from('users')
-          .update(updateData)
+          .select('id, email')
           .eq('email', updates.email)
-          .select();
+          .maybeSingle();
 
-        if (emailUpdateError) {
-          const emailErrorMsg = emailUpdateError instanceof Error
-            ? emailUpdateError.message
-            : (emailUpdateError?.message || 'Unknown error');
-          console.error('[usersService] Email-based update failed:', {
-            message: emailErrorMsg,
-            code: emailUpdateError?.code,
-            details: emailUpdateError?.details,
+        if (!existingUser) {
+          console.error('[usersService] User not found with email:', updates.email);
+          console.warn('[usersService] Attempting to sync user from Auth to Database...');
+
+          // Try to sync the user from Auth system
+          const syncResult = await this.syncAuthUserToDatabase({
+            id,
+            email: updates.email,
+            user_metadata: {
+              name: updates.name,
+              username: updates.username,
+            }
           });
-          throw new Error(`Could not update user by email: ${emailErrorMsg}`);
-        }
 
-        if (!emailUpdateData || emailUpdateData.length === 0) {
-          console.error('[usersService] Email-based update affected 0 rows:', updates.email);
-          throw new Error(`User with email ${updates.email} not found in database`);
-        }
+          if (syncResult.error) {
+            const syncErrorMsg = syncResult.error instanceof Error
+              ? syncResult.error.message
+              : (typeof syncResult.error === 'object' ? JSON.stringify(syncResult.error) : String(syncResult.error));
+            console.error('[usersService] Sync failed:', syncErrorMsg);
+            throw new Error(`Usuário não encontrado. Erro ao sincronizar: ${syncErrorMsg}`);
+          }
 
-        userData = emailUpdateData[0];
-        console.log('[usersService] User updated successfully via email fallback');
+          if (!syncResult.data) {
+            throw new Error(`Falha ao sincronizar usuário ${updates.email} com o banco de dados.`);
+          }
+
+          console.log('[usersService] User synced successfully, retrying update...');
+          // Retry the update with synced user (use validId to ensure we have the right ID)
+          const { data: retryData, error: retryError } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('id', validId)
+            .select();
+
+          if (retryError || !retryData || retryData.length === 0) {
+            throw new Error(`Falha ao salvar dados após sincronização.`);
+          }
+
+          userData = retryData[0];
+          console.log('[usersService] User updated successfully after sync');
+        } else {
+          // User exists with email, update by email
+          console.log('[usersService] User found by email, preparing to update:', {
+            email: updates.email,
+            existingUserId: existingUser?.id,
+            updateDataFields: Object.keys(updateData),
+            updateDataValues: updateData,
+          });
+
+          const { data: emailUpdateData, error: emailUpdateError } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('email', updates.email)
+            .select();
+
+          if (emailUpdateError) {
+            const emailErrorMsg = emailUpdateError instanceof Error
+              ? emailErrorError.message
+              : (emailUpdateError?.message || 'Erro desconhecido');
+            console.error('[usersService] Email-based update error response:', {
+              message: emailErrorMsg,
+              code: emailUpdateError?.code,
+              details: emailUpdateError?.details,
+              hint: emailUpdateError?.hint,
+            });
+            throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
+          }
+
+          console.log('[usersService] Email-based update response:', {
+            hasData: !!emailUpdateData,
+            dataLength: emailUpdateData?.length || 0,
+            data: emailUpdateData,
+          });
+
+          if (!emailUpdateData || emailUpdateData.length === 0) {
+            console.error('[usersService] Email-based update affected 0 rows:', {
+              email: updates.email,
+              updateDataKeys: Object.keys(updateData),
+            });
+
+            // Try to debug: check if user still exists
+            const { data: debugUser } = await supabase
+              .from('users')
+              .select('id, email, updated_at')
+              .eq('email', updates.email)
+              .maybeSingle();
+
+            console.error('[usersService] Debug: User exists after failed update?', debugUser);
+
+            throw new Error(`Falha ao salvar alterações no usuário ${updates.email}. Verifique sua conexão e tente novamente.`);
+          }
+
+          userData = emailUpdateData[0];
+          console.log('[usersService] User updated successfully via email');
+        }
       } else {
         userData = data[0];
         console.log('[usersService] User updated successfully via ID');

@@ -152,10 +152,13 @@ export default function ClientDashboard() {
       console.log('[ClientDashboard] Saving profile with image:', {
         hasImage: !!selectedImageFile,
         fileName: selectedImageFile?.name,
+        userId: clientUser.id,
+        authId: authUser.id,
       });
 
-      // Pass the selected image file if available
-      const result = await updateUser(authUser.id, updatedData, selectedImageFile);
+      // Use clientUser.id (from database) not authUser.id (from auth)
+      // They may be different due to auth/db sync issues
+      const result = await updateUser(clientUser.id, updatedData, selectedImageFile);
 
       if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
@@ -166,11 +169,16 @@ export default function ClientDashboard() {
         console.error('Error updating profile:', errorMsg);
 
         // Check if it's a user not found error
-        if (errorMsg && errorMsg.includes('does not exist')) {
-          toast.error('Sua sessão expirou. Por favor, faça login novamente.');
+        if (errorMsg && (errorMsg.includes('does not exist') || errorMsg.includes('não foi encontrado'))) {
+          console.warn('[ClientDashboard] User not found in database. Auth ID:', authUser?.id, 'Email:', authUser?.email);
+          toast.error('Erro: Sua conta não foi encontrada no servidor. Faça login novamente.');
           setTimeout(() => {
+            signOut();
             navigate('/login');
           }, 2000);
+        } else if (errorMsg && errorMsg.includes('sincronizada')) {
+          toast.error(errorMsg);
+          console.warn('[ClientDashboard] Data synchronization issue detected');
         } else {
           toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
         }
