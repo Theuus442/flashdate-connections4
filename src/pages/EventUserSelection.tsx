@@ -96,10 +96,12 @@ export default function EventUserSelection() {
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
-              Nenhum participante disponível
+              {users.length === 0 ? 'Carregando...' : 'Nenhum participante disponível'}
             </h2>
             <p className="text-muted-foreground mb-6">
-              No momento não há outros participantes para você selecionar.
+              {users.length === 0
+                ? 'Não conseguimos carregar os usuários. Tente recarregar a página ou entre em contato com o suporte.'
+                : 'No momento não há outros participantes para você selecionar.'}
             </p>
           </div>
           <Button onClick={() => navigate('/dashboard')} variant="gold" className="w-full">
