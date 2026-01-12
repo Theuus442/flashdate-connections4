@@ -184,6 +184,29 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return users.find(user => user.id === id);
   };
 
+  const refreshUsers = async () => {
+    if (!supabaseConfigured) {
+      console.log('[UsersContext] Supabase not configured, skipping refresh');
+      return;
+    }
+
+    try {
+      console.log('[UsersContext] Refreshing users from Supabase...');
+      const { data, error } = await usersService.getUsers();
+
+      if (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('[UsersContext] Error refreshing users:', errorMessage);
+      } else if (data) {
+        console.log('[UsersContext] Successfully refreshed users:', data.length);
+        setUsers(data);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[UsersContext] Unexpected error refreshing users:', errorMessage);
+    }
+  };
+
   const deleteAllByRole = async (role: 'admin' | 'client') => {
     if (!supabaseConfigured) {
       // Fallback to local state
