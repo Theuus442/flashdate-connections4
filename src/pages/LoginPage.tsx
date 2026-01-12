@@ -1,52 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Credentials {
-  email: string;
-  username?: string;
-  password: string;
-  role: 'admin' | 'client';
-  label: string;
-}
-
-const TEST_CREDENTIALS: Credentials[] = [
-  {
-    email: 'admin@flashdate.com',
-    username: 'admin',
-    password: 'admin123',
-    role: 'admin',
-    label: 'Admin - Painel de Administração',
-  },
-  {
-    email: 'cliente@flashdate.com',
-    username: 'cliente',
-    password: 'cliente123',
-    role: 'client',
-    label: 'Cliente - Perfil e Seleções',
-  },
-];
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const handleCopyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleAutoFill = (credentials: Credentials) => {
-    setEmail(credentials.username || credentials.email);
-    setPassword(credentials.password);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
