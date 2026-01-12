@@ -115,6 +115,19 @@ export const UsersManagement = () => {
       return;
     }
 
+    // Validate no duplicates in email or username
+    const duplicateCheck = checkDuplicateField(users, formData.email, formData.username, editingId);
+    if (duplicateCheck.isDuplicate) {
+      console.warn('[UsersManagement] Duplicate field detected:', duplicateCheck);
+      toast({
+        title: 'Erro',
+        description: `Este ${duplicateCheck.field} já está registrado no sistema. Escolha um ${duplicateCheck.field} único.`,
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
     // Password is required when creating new user
     if (!editingId && !formData.password) {
       console.warn('[UsersManagement] Password required for new user');
