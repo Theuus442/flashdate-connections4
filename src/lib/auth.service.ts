@@ -236,7 +236,8 @@ export const authService = {
     name?: string,
     username?: string,
     whatsapp?: string,
-    gender?: string
+    gender?: string,
+    role: 'admin' | 'client' = 'client'
   ) {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
