@@ -354,7 +354,7 @@ export const usersService = {
   },
 
   /**
-   * Delete all users by role
+   * Delete all users by role - uses Edge Function with SERVICE_ROLE permissions
    */
   async deleteAllByRole(role: 'admin' | 'client'): Promise<{ count: number; error: any }> {
     if (!isSupabaseConfigured()) {
@@ -362,38 +362,47 @@ export const usersService = {
     }
 
     try {
-      console.log('[usersService] Deleting all users with role:', role);
+      console.log('[usersService] Deleting all users with role via Edge Function:', role);
 
-      // First, fetch ALL users with this role to count them
-      const { data: usersToDelete, error: fetchError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('role', role);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      const functionUrl = `${supabaseUrl}/functions/v1/delete-users-by-role`;
 
-      if (fetchError) {
-        console.error('[usersService] Error fetching users:', fetchError);
-        throw fetchError;
+      console.log('[usersService] Calling Edge Function at:', functionUrl);
+
+      const response = await Promise.race([
+        fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${anonKey}`,
+            'apikey': anonKey,
+          },
+          body: JSON.stringify({ role }),
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Edge function timeout')), 10000)
+        ),
+      ]);
+
+      const status = (response as Response).status;
+      console.log('[usersService] Edge Function response - status:', status);
+
+      if (!(response as Response).ok) {
+        let errorData: { error?: string; details?: string; message?: string } | null = null;
+        try {
+          errorData = await (response as Response).json();
+        } catch {
+          errorData = null;
+        }
+
+        const errorMsg = errorData?.error || errorData?.details || `HTTP ${status}`;
+        console.error('[usersService] Edge Function error:', errorMsg);
+        throw new Error(errorMsg);
       }
 
-      const count = usersToDelete?.length || 0;
-      console.log('[usersService] Found', count, 'users with role:', role);
-
-      if (count === 0) {
-        console.log('[usersService] No users to delete');
-        return { count: 0, error: null };
-      }
-
-      // Delete all users with this role
-      console.log('[usersService] Deleting', count, 'users with role:', role);
-      const { error: deleteError } = await supabase
-        .from('users')
-        .delete()
-        .eq('role', role);
-
-      if (deleteError) {
-        console.error('[usersService] Error deleting users:', deleteError);
-        throw deleteError;
-      }
+      const responseData = await (response as Response).json();
+      const count = responseData.count || 0;
 
       console.log('[usersService] Successfully deleted', count, 'users with role:', role);
       return { count, error: null };
