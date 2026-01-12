@@ -320,64 +320,6 @@ export const usersService = {
 
     try {
       console.log('[usersService] Updating user:', id);
-
-      // Verify user exists before attempting update using maybeSingle to avoid errors
-      const { data: existingUser, error: existsError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (existsError) {
-        const existsErrorMsg = existsError instanceof Error
-          ? existsError.message
-          : (existsError?.message || 'Database error');
-        const errorDetails = {
-          userId: id,
-          message: existsErrorMsg,
-          code: existsError?.code,
-          details: existsError?.details,
-        };
-        console.error('[usersService] Error checking if user exists:', errorDetails);
-        throw new Error(`Error verifying user: ${existsErrorMsg}`);
-      }
-
-      if (!existingUser) {
-        // User doesn't exist - try to create a minimal user record from the updates
-        console.warn('[usersService] User does not exist in database, attempting to create minimal record:', {
-          userId: id,
-        });
-
-        // Create a minimal user record with provided data
-        const { error: createError } = await supabase
-          .from('users')
-          .insert([{
-            id: id,
-            name: updates.name || 'Usuário',
-            username: updates.username || `user-${id.slice(0, 8)}`,
-            email: updates.email || '',
-            whatsapp: updates.whatsapp || '',
-            gender: updates.gender || 'Outro',
-            role: 'client',
-            created_at: new Date().toISOString(),
-          }]);
-
-        if (createError) {
-          const createErrorMsg = createError instanceof Error
-            ? createError.message
-            : (createError?.message || 'Failed to create user');
-          console.error('[usersService] Failed to create user record:', {
-            userId: id,
-            message: createErrorMsg,
-            code: createError?.code,
-          });
-          throw new Error(`User with ID ${id} not found and could not be created`);
-        }
-
-        console.log('[usersService] User record created successfully, proceeding with update:', id);
-      } else {
-        console.log('[usersService] User exists, proceeding with update:', id);
-      }
       let profileImageUrl: string | undefined;
 
       // Upload profile image if provided
