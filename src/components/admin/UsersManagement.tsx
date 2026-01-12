@@ -27,8 +27,28 @@ export const UsersManagement = () => {
   const [bulkDeleteRole, setBulkDeleteRole] = useState<'admin' | 'client'>('client');
   const [bulkDeleteConfirmCount, setBulkDeleteConfirmCount] = useState(0);
 
+  const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const cleaned = value.replace(/\D/g, '');
+
+    // Limit to 11 digits (Brazilian phone format)
+    const limited = cleaned.slice(0, 11);
+
+    // Format: (XX) XXXXX-XXXX or (XX) XXXX-XXX
+    if (limited.length === 0) return '';
+    if (limited.length <= 2) return `(${limited}`;
+    if (limited.length <= 7) return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+    return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    // Apply phone formatting if it's the whatsapp field
+    if (name === 'whatsapp') {
+      value = formatPhoneNumber(value);
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
