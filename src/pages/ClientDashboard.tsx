@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 interface ClientUser {
   id: string;
