@@ -97,7 +97,15 @@ export const usersService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('[usersService] Supabase error:', error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        console.error('[usersService] Supabase error:', {
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+        });
         throw error;
       }
 
@@ -117,16 +125,24 @@ export const usersService = {
 
       return { data: transformedData || [], error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
       console.error('[usersService] Error fetching users:', {
         message: errorMessage,
         type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
-        error,
+        errorObj: error,
       });
 
       // Check if it's a network error
       if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-        console.error('[usersService] Network error detected - Supabase may be unreachable from this environment');
+        console.error('[usersService] ❌ NETWORK ERROR: Cannot reach Supabase at', import.meta.env.VITE_SUPABASE_URL);
+        console.error('[usersService] This is a connectivity issue - the browser cannot access the Supabase API');
+        console.error('[usersService] Possible causes:');
+        console.error('[usersService]   1. Network connectivity issue');
+        console.error('[usersService]   2. CORS (Cross-Origin Resource Sharing) blocked');
+        console.error('[usersService]   3. Firewall or proxy blocking the request');
+        console.error('[usersService]   4. Supabase URL is incorrect or service is down');
       }
 
       return { data: null, error };
