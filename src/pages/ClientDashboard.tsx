@@ -333,7 +333,7 @@ export default function ClientDashboard() {
                         ) : (
                           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-0">
                             <span className="text-5xl font-bold text-secondary-foreground">
-                              {clientUser?.name.charAt(0) || 'U'}
+                              {clientUser?.name?.[0] || 'U'}
                             </span>
                           </div>
                         )}
