@@ -627,14 +627,14 @@ export const usersService = {
         profileImage: userData.profile_image_url,
       };
 
-      console.log('[usersService] User updated successfully');
+      console.log('[usersService] User updated successfully via Edge Function');
       return { data: transformedData, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
       console.error('[usersService] Error updating user:', errorMessage);
-      return { data: null, error };
+      return { data: null, error: errorMessage };
     }
   },
 
