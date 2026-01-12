@@ -20,6 +20,40 @@ export default function EventUserSelection() {
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  // Load current user and participants from database
+  useEffect(() => {
+    if (!authUser) {
+      console.log('[EventUserSelection] No auth user yet');
+      return;
+    }
+
+    console.log('[EventUserSelection] Loading data...', {
+      authUserId: authUser.id,
+      usersCount: users.length,
+      isLoading,
+    });
+
+    // Get current user from users array
+    const user = users.find(u => u.id === authUser.id);
+    if (user) {
+      console.log('[EventUserSelection] Current user loaded:', user.name);
+      setCurrentUser(user);
+    } else {
+      console.log('[EventUserSelection] Current user not found in users array');
+      // Don't block - show what we have
+    }
+
+    // Get other participants (excluding current user and admin users)
+    const otherUsers = users.filter(u => u.id !== authUser.id && u.role === 'client');
+    console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
+    setParticipants(otherUsers);
+
+    if (otherUsers.length === 0 && users.length > 0) {
+      console.warn('[EventUserSelection] No participants found but users exist');
+      toast.warning('Nenhum outro participante disponível');
+    }
+  }, [authUser, users]);
+
   // Show error if not authenticated
   if (!authUser) {
     return (
@@ -57,40 +91,6 @@ export default function EventUserSelection() {
       </div>
     );
   }
-
-  // Load current user and participants from database
-  useEffect(() => {
-    if (!authUser) {
-      console.log('[EventUserSelection] No auth user yet');
-      return;
-    }
-
-    console.log('[EventUserSelection] Loading data...', {
-      authUserId: authUser.id,
-      usersCount: users.length,
-      isLoading,
-    });
-
-    // Get current user from users array
-    const user = users.find(u => u.id === authUser.id);
-    if (user) {
-      console.log('[EventUserSelection] Current user loaded:', user.name);
-      setCurrentUser(user);
-    } else {
-      console.log('[EventUserSelection] Current user not found in users array');
-      // Don't block - show what we have
-    }
-
-    // Get other participants (excluding current user and admin users)
-    const otherUsers = users.filter(u => u.id !== authUser.id && u.role === 'client');
-    console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
-    setParticipants(otherUsers);
-
-    if (otherUsers.length === 0 && users.length > 0) {
-      console.warn('[EventUserSelection] No participants found but users exist');
-      toast.warning('Nenhum outro participante disponível');
-    }
-  }, [authUser, users]);
 
   const handleSelection = (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
     const existingSelection = selections.find(s => s.userId === participantId);
