@@ -1,39 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useUsers } from '@/context/UsersContext';
 import { toast } from 'sonner';
-
-interface ClientUser {
-  id: string;
-  name: string;
-  username: string;
-  age: number;
-  email: string;
-  whatsapp: string;
-  profession: string;
-  profileImage?: string;
-}
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
+  const { getUserById, updateUser } = useUsers();
 
-  // Mock user data - in real app this would come from auth context
-  const [clientUser, setClientUser] = useState<ClientUser>({
-    id: '1',
-    name: 'Maria Silva',
-    username: 'maria.silva',
-    age: 32,
-    email: 'maria@example.com',
-    whatsapp: '(11) 98765-4321',
-    profession: 'Advogada',
-    profileImage: undefined,
-  });
+  // Load real user data from context
+  const realUser = authUser ? getUserById(authUser.id) : null;
+  const [clientUser, setClientUser] = useState(realUser);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // Update clientUser when realUser changes
+  useEffect(() => {
+    if (realUser) {
+      setClientUser(realUser);
+    }
+  }, [realUser]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
