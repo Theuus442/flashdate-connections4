@@ -48,15 +48,25 @@ export default function EventUserSelection() {
 
   // Load current user and participants from database
   useEffect(() => {
-    if (!authUser || !users.length) return;
+    if (!authUser) {
+      console.log('[EventUserSelection] No auth user yet');
+      return;
+    }
 
-    console.log('[EventUserSelection] Loading data...');
+    console.log('[EventUserSelection] Loading data...', {
+      authUserId: authUser.id,
+      usersCount: users.length,
+      isLoading,
+    });
 
     // Get current user from users array
     const user = users.find(u => u.id === authUser.id);
     if (user) {
       console.log('[EventUserSelection] Current user loaded:', user.name);
       setCurrentUser(user);
+    } else {
+      console.log('[EventUserSelection] Current user not found in users array');
+      // Don't block - show what we have
     }
 
     // Get other participants (excluding current user and admin users)
@@ -64,7 +74,8 @@ export default function EventUserSelection() {
     console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
     setParticipants(otherUsers);
 
-    if (otherUsers.length === 0) {
+    if (otherUsers.length === 0 && users.length > 0) {
+      console.warn('[EventUserSelection] No participants found but users exist');
       toast.warning('Nenhum outro participante disponível');
     }
   }, [authUser, users]);
