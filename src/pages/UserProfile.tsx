@@ -328,12 +328,15 @@ export default function UserProfile() {
                         <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
                             onClick={() => handleSelection(user.id, 'SIM')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'SIM'
                                 ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="SIM"
+                            title={currentEventId ? "SIM" : "Nenhum evento disponível"}
                           >
                             <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
