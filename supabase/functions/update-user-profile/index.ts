@@ -147,17 +147,37 @@ serve(async (req) => {
       })
     }
 
-    // Build update object
+    // Validate that we have at least one field to update
+    if (!id) {
+      console.error('[update-user-profile] ❌ Missing required field: id')
+      return new Response(JSON.stringify({
+        error: "ID do usuário não fornecido"
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    // Build update object - only include fields that are provided
     const updateData: any = {}
-    if (name !== undefined) updateData.name = name
-    if (username !== undefined) updateData.username = username
-    if (email !== undefined) updateData.email = email
-    if (whatsapp !== undefined) updateData.whatsapp = whatsapp
-    if (gender !== undefined) updateData.gender = gender
-    if (profile_image_url !== undefined) updateData.profile_image_url = profile_image_url
+    if (name !== undefined && name !== null && name !== '') updateData.name = name
+    if (username !== undefined && username !== null && username !== '') updateData.username = username
+    if (email !== undefined && email !== null && email !== '') updateData.email = email
+    if (whatsapp !== undefined && whatsapp !== null) updateData.whatsapp = whatsapp
+    if (gender !== undefined && gender !== null && gender !== '') updateData.gender = gender
+    if (profile_image_url !== undefined && profile_image_url !== null && profile_image_url !== '') updateData.profile_image_url = profile_image_url
     updateData.updated_at = new Date().toISOString()
 
-    console.log('[update-user-profile] Updating with data:', Object.keys(updateData))
+    console.log('[update-user-profile] Building update with fields:', {
+      fieldNames: Object.keys(updateData),
+      fieldCount: Object.keys(updateData).length,
+      hasName: !!updateData.name,
+      hasUsername: !!updateData.username,
+      hasEmail: !!updateData.email,
+      hasGender: !!updateData.gender,
+      hasWhatsapp: !!updateData.whatsapp,
+      hasImage: !!updateData.profile_image_url,
+    })
 
     // Try to update by ID first (most common case)
     let response = await supabase
