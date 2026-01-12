@@ -124,6 +124,7 @@ export default function ClientDashboard() {
 
   const handleRemoveImage = () => {
     if (clientUser) {
+      setSelectedImageFile(undefined);
       setClientUser(prev => prev ? {
         ...prev,
         profileImage: undefined,
