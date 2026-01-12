@@ -332,11 +332,13 @@ export const usersService = {
         const existsErrorMsg = existsError instanceof Error
           ? existsError.message
           : (existsError?.message || 'User not found');
-        console.error('[usersService] User does not exist:', {
+        const errorDetails = {
           userId: id,
           message: existsErrorMsg,
           code: existsError?.code,
-        });
+          details: existsError?.details,
+        };
+        console.error('[usersService] User does not exist:', errorDetails);
         throw new Error(`User with ID ${id} not found in database`);
       }
 
