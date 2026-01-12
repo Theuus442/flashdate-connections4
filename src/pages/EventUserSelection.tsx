@@ -20,13 +20,27 @@ export default function EventUserSelection() {
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // Show loading state while data is being fetched
-  if (isLoading || !authUser || !currentUser) {
+  // Show loading state only if truly loading and no data yet
+  if (isLoading && participants.length === 0 && !currentUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
           <p className="text-muted-foreground">Carregando participantes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if not authenticated
+  if (!authUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Erro: Você precisa estar autenticado</p>
+          <Button onClick={() => navigate('/login')} variant="gold">
+            Ir para Login
+          </Button>
         </div>
       </div>
     );
