@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function LoginPage() {
   const { signIn, user } = useAuth();
 
   // Redirect authenticated users to appropriate dashboard
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       const destination = user.role === 'admin' ? '/admin' : '/dashboard';
       navigate(destination, { replace: true });
