@@ -1,27 +1,79 @@
-// Importando de um CDN alternativo que costuma ser mais rápido no Brasil
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.90.0"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Max-Age': '86400',
 }
 
 export default async (req: Request) => {
-  // RESPOSTA IMEDIATA: Não carrega nada do Supabase se for apenas o navegador perguntando do CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { 
+      status: 200,
+      headers: corsHeaders 
+    })
+  }
+
+  // Only handle POST requests
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 
   try {
-    const { email, password } = await req.json()
+    // Parse request body
+    let email: string
+    let password: string
+    
+    try {
+      const body = await req.json()
+      email = body.email
+      password = body.password
+    } catch (parseError) {
+      console.error('[create-user-confirmed] Error parsing request body:', parseError)
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
 
-    // Carrega as variáveis apenas no momento do POST
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    // Validate inputs
+    if (!email || !password) {
+      return new Response(
+        JSON.stringify({ error: 'Email and password are required' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
 
+    // Get environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('[create-user-confirmed] Missing environment variables')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Create user with email confirmation
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
@@ -29,17 +81,34 @@ export default async (req: Request) => {
       user_metadata: { role: 'client' }
     })
 
-    if (error) throw error
+    if (error) {
+      console.error('[create-user-confirmed] Supabase error:', error)
+      throw error
+    }
 
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
+    console.log('[create-user-confirmed] User created successfully:', data?.user?.id)
+
+    return new Response(
+      JSON.stringify({ user: data.user }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('[create-user-confirmed] Unhandled error:', errorMessage)
+    
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to create user',
+        details: errorMessage 
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
   }
 }
