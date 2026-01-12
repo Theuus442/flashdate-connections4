@@ -384,50 +384,39 @@ export const usersService = {
         throw error;
       }
 
-      // If update didn't affect any rows, user doesn't exist - try to create it
+      // If update didn't affect any rows, user doesn't exist - need to handle this
       let userData: any;
       if (!data || data.length === 0) {
-        console.warn('[usersService] Update affected 0 rows - user does not exist. Attempting to create...', id);
+        // User doesn't exist - this is a data sync issue
+        console.error('[usersService] Update affected 0 rows - user does not exist in database:', id);
 
-        // Try to create user record
-        const { data: createData, error: createError } = await supabase
+        // Try to fetch the user to see if it actually exists
+        const { data: checkData, error: checkError } = await supabase
           .from('users')
-          .insert([{
-            id: id,
-            name: updates.name || 'Usuário',
-            username: updates.username || `user-${id.slice(0, 8)}`,
-            email: updates.email || '',
-            whatsapp: updates.whatsapp || '',
-            gender: updates.gender || 'Outro',
-            role: updates.role || 'client',
-            profile_image_url: profileImageUrl,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }])
-          .select();
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
 
-        if (createError) {
-          const createErrorMsg = createError instanceof Error
-            ? createError.message
-            : (createError?.message || 'Failed to create user');
-          const errorDetails = {
+        if (checkError) {
+          const checkErrorMsg = checkError instanceof Error
+            ? checkError.message
+            : (checkError?.message || 'Unknown error');
+          console.error('[usersService] Error checking user existence:', {
             userId: id,
-            message: createErrorMsg,
-            code: createError?.code,
-            details: createError?.details,
-            hint: createError?.hint,
-          };
-          console.error('[usersService] Failed to create user record:', errorDetails);
-          throw new Error(`User with ID ${id} not found and could not be created: ${createErrorMsg}`);
+            message: checkErrorMsg,
+            code: checkError?.code,
+          });
+          throw new Error(`Could not verify user: ${checkErrorMsg}`);
         }
 
-        if (!createData || createData.length === 0) {
-          console.error('[usersService] Insert succeeded but returned no data for user:', id);
-          throw new Error(`User with ID ${id} could not be created (no data returned)`);
+        if (!checkData) {
+          console.error('[usersService] User not found in database:', id);
+          throw new Error(`User with ID ${id} does not exist in database. Please logout and login again.`);
         }
 
-        userData = createData[0];
-        console.log('[usersService] User created successfully');
+        // User exists, use the fetched data
+        userData = checkData;
+        console.log('[usersService] User data retrieved after update returned no rows');
       } else {
         userData = data[0];
         console.log('[usersService] User updated successfully');
