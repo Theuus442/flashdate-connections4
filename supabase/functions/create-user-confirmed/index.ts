@@ -50,7 +50,8 @@ serve(async (req) => {
         email,
         password,
         email_confirm: true,
-        user_metadata: { role }
+        user_metadata: { role },
+        app_metadata: { role }
       })
     })
 
