@@ -315,9 +315,41 @@ export const usersService = {
     }
 
     try {
-      console.log('[usersService] Creating user:', user);
+      console.log('[usersService] Creating user:', {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      });
       let profileImageUrl: string | undefined;
       let userId = crypto.randomUUID();
+
+      // Pre-check for duplicate email or username to provide better error message
+      console.log('[usersService] Checking for duplicate email or username...');
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('id, email, username')
+        .or(`email.eq.${user.email},username.eq.${user.username}`)
+        .maybeSingle();
+
+      if (checkError) {
+        const errorStr = serializeError(checkError);
+        console.warn('[usersService] Error checking for duplicates:', errorStr);
+        // Continue anyway - the insert will fail if there are duplicates
+      } else if (existingUser) {
+        // Found a duplicate
+        let duplicateField = 'dados';
+        if (existingUser.email === user.email && existingUser.username === user.username) {
+          duplicateField = 'email e apelido';
+        } else if (existingUser.email === user.email) {
+          duplicateField = 'email';
+        } else if (existingUser.username === user.username) {
+          duplicateField = 'apelido';
+        }
+        const errorMsg = `Este ${duplicateField} já está registrado no sistema. Escolha um ${duplicateField === 'email e apelido' ? 'email e apelido' : duplicateField} único.`;
+        console.warn('[usersService] Duplicate found:', { duplicateField, existingId: existingUser.id });
+        throw new Error(errorMsg);
+      }
 
       // Create auth user if password provided (Edge Function handles both Auth and DB)
       if (user.password && user.password.trim()) {
