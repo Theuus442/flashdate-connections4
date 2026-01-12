@@ -162,20 +162,28 @@ export const usersService = {
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-      const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+      // Check for network error - look for "Failed to fetch" in various formats
+      const isNetworkError =
+        (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+        errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('Network') ||
+        (error instanceof TypeError && errorMessage.includes('fetch'));
+
       const isJSONError = error instanceof SyntaxError;
-      const errorType = error instanceof TypeError
+      const isTimeoutError = errorMessage.includes('timeout');
+      const errorType = isNetworkError
         ? 'Network/Fetch Error'
-        : (isJSONError ? 'JSON Parse Error' : 'Other Error');
+        : (isTimeoutError ? 'Timeout Error' : (isJSONError ? 'JSON Parse Error' : 'Other Error'));
 
       console.error('[usersService] ❌ Error fetching users:');
       console.error('[usersService]   Message:', errorMessage);
       console.error('[usersService]   Type:', errorType);
       console.error('[usersService]   IsNetworkError:', isNetworkError);
+      console.error('[usersService]   IsTimeoutError:', isTimeoutError);
       console.error('[usersService]   Supabase configured:', isSupabaseConfigured());
 
-      // Check if it's a network error and retry if we haven't exhausted retries
-      if (isNetworkError) {
+      // Check if it's a network or timeout error and retry if we haven't exhausted retries
+      if (isNetworkError || isTimeoutError) {
         console.error('[usersService] 🌐 NETWORK ERROR: Cannot reach Supabase');
         console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
         console.error('[usersService] Possible causes:');
