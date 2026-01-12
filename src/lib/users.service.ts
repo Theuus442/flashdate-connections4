@@ -461,11 +461,11 @@ export const usersService = {
 
       console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
-      // First attempt: try normal update
+      // First attempt: try normal update with validated ID
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
-        .eq('id', id)
+        .eq('id', validId)
         .select();
 
       console.log('[usersService] Update response received:', { hasData: !!data, hasError: !!error, dataLength: data?.length });
