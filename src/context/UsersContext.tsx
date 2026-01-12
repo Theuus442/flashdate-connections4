@@ -211,15 +211,26 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data, error } = await usersService.getUsers();
 
       if (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('[UsersContext] Error refreshing users:', errorMessage);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        console.error('[UsersContext] ⚠️ Error refreshing users:', {
+          message: errorMessage,
+          type: typeof error,
+          error,
+        });
       } else if (data) {
-        console.log('[UsersContext] Successfully refreshed users:', data.length);
+        console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
         setUsers(data);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[UsersContext] Unexpected error refreshing users:', errorMessage);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[UsersContext] ❌ Unexpected error refreshing users:', {
+        message: errorMessage,
+        error,
+      });
     }
   };
 
