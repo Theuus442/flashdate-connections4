@@ -48,45 +48,33 @@ export default function ClientDashboard() {
       console.log('[ClientDashboard] User not found in array, fetching directly from database...');
       setIsLoadingUserData(true);
       try {
-        const { data, error } = await usersService.getUserById(authUser.id);
-        if (error) {
-          const errorMessage = error instanceof Error
-            ? error.message
-            : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        // Try fetching by ID first
+        console.log('[ClientDashboard] Attempting to fetch user by ID:', authUser.id);
+        let result = await usersService.getUserById(authUser.id);
+
+        // If not found by ID, try by email (in case IDs are out of sync)
+        if (!result.data && authUser.email) {
+          console.log('[ClientDashboard] User not found by ID, trying by email:', authUser.email);
+          result = await usersService.getUserByEmail(authUser.email);
+        }
+
+        if (result.error) {
+          const errorMessage = result.error instanceof Error
+            ? result.error.message
+            : (typeof result.error === 'object' && result.error !== null ? JSON.stringify(result.error) : String(result.error));
           console.error('[ClientDashboard] Error fetching user:', {
             userId: authUser.id,
+            userEmail: authUser.email,
             message: errorMessage,
-            error,
+            error: result.error,
           });
-
-          // Fallback: Create a minimal user object from auth data so user can still see and edit profile
-          console.log('[ClientDashboard] Creating fallback user from auth data...');
-          const fallbackUser = {
-            id: authUser.id,
-            name: 'Usuário',
-            username: 'usuario',
-            email: authUser.email || '',
-            whatsapp: '',
-            gender: 'Outro' as 'M' | 'F' | 'Outro',
-            role: authUser.role || 'client',
-          };
-          setClientUser(fallbackUser);
-        } else if (data) {
-          console.log('[ClientDashboard] User data loaded successfully:', data);
-          setClientUser(data);
+          setClientUser(null);
+        } else if (result.data) {
+          console.log('[ClientDashboard] User data loaded successfully:', result.data);
+          setClientUser(result.data);
         } else {
-          console.warn('[ClientDashboard] No user data returned, using fallback');
-          // Fallback: Create a minimal user object from auth data
-          const fallbackUser = {
-            id: authUser.id,
-            name: 'Usuário',
-            username: 'usuario',
-            email: authUser.email || '',
-            whatsapp: '',
-            gender: 'Outro' as 'M' | 'F' | 'Outro',
-            role: authUser.role || 'client',
-          };
-          setClientUser(fallbackUser);
+          console.error('[ClientDashboard] User not found in database');
+          setClientUser(null);
         }
       } catch (error) {
         const errorMessage = error instanceof Error
@@ -97,18 +85,7 @@ export default function ClientDashboard() {
           message: errorMessage,
           error,
         });
-
-        // Fallback: Create a minimal user object from auth data
-        const fallbackUser = {
-          id: authUser.id,
-          name: 'Usuário',
-          username: 'usuario',
-          email: authUser.email || '',
-          whatsapp: '',
-          gender: 'Outro' as 'M' | 'F' | 'Outro',
-          role: authUser.role || 'client',
-        };
-        setClientUser(fallbackUser);
+        setClientUser(null);
       } finally {
         setIsLoadingUserData(false);
       }
