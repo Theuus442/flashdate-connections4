@@ -103,9 +103,9 @@ export const usersService = {
         return { data: transformedData, error: null };
       }
 
-      // If user not found by ID, this is an error - don't fallback
-      console.error('[usersService] User not found by ID:', id);
-      return { data: null, error: 'User not found in database' };
+      // If user not found by ID, return null (caller will try fallback by email)
+      console.log('[usersService] User not found by ID, will try email fallback:', id);
+      return { data: null, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
