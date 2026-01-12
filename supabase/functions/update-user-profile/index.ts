@@ -17,29 +17,48 @@ serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     const authHeader = req.headers.get('Authorization')
 
+    // Extract token from Authorization header (format: "Bearer TOKEN")
+    const token = authHeader?.replace('Bearer ', '') || ''
+
+    if (!token) {
+      console.error('[update-user-profile] No auth token provided')
+      return new Response(JSON.stringify({
+        error: "Token de autenticação não fornecido",
+        details: "Header Authorization não contém um token válido"
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
     // Create service role client (can bypass RLS)
     const supabase = createClient(supabaseUrl, serviceKey)
 
-    // Create auth client to verify user is logged in
+    // Create auth client to verify user is logged in - pass token in Authorization header
     const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: {
         headers: {
-          Authorization: authHeader || ''
+          Authorization: `Bearer ${token}`
         }
       }
     })
 
     // Verify user is authenticated
     const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser()
-    
+
     if (authError || !authUser) {
-      console.error('[update-user-profile] Auth error:', authError?.message)
-      return new Response(JSON.stringify({ 
+      console.error('[update-user-profile] Auth error:', {
+        message: authError?.message,
+        status: authError?.status,
+        hasToken: !!token,
+        tokenLength: token.length
+      })
+      return new Response(JSON.stringify({
         error: "Usuário não autenticado",
-        details: authError?.message
-      }), { 
-        status: 401, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        details: authError?.message || "Token inválido ou expirado"
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       })
     }
 
