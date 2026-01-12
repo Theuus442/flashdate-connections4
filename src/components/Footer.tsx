@@ -12,8 +12,8 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <a href="#home" className="inline-block mb-6 flex items-center gap-3">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F17ade0ffd5be4acbaea6079377d9739d?format=webp&width=800"
-                alt="Flashdate Logo - Cupido"
+                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F2df169346ab544fb91e72465f352b070?format=webp&width=800"
+                alt="Flashdate Logo"
                 className="h-20 w-auto"
               />
               <span className="font-bold text-2xl text-foreground">
