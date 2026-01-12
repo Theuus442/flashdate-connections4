@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
-  const { getUserById, updateUser } = useUsers();
+  const { getUserById, updateUser, isLoading } = useUsers();
 
   // Load real user data from context
   const realUser = authUser ? getUserById(authUser.id) : null;
