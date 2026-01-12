@@ -16,6 +16,7 @@ export default function ClientDashboard() {
   const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
   const [clientUser, setClientUser] = useState<any>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
