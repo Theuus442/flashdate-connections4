@@ -1,58 +1,49 @@
--- 🔐 RLS POLICIES PARA TABELA USERS
--- Estas políticas permitem que:
--- 1. Todos vejam perfis de outros usuários (SELECT)
--- 2. Cada usuário atualize seu próprio perfil (UPDATE)
--- 3. Admins gerenciem qualquer coisa
+-- 🔐 RLS POLICIES FOR USERS TABLE
+-- This fixes the issue where clients cannot update their own profiles
+-- Copy this entire file and run it in Supabase SQL Editor
 
--- ⚠️ IMPORTANTE: Execute estes comandos no Supabase SQL Editor
--- Dashboard → SQL Editor → New Query → Cole este código → RUN
+-- 1️⃣ DROP EXISTING POLICIES (if any)
+DROP POLICY IF EXISTS "Anyone can view profiles" ON public.users;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
+DROP POLICY IF EXISTS "Admins can update any profile" ON public.users;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.users;
+DROP POLICY IF EXISTS "Admins can insert any profile" ON public.users;
+DROP POLICY IF EXISTS "Admins can delete users" ON public.users;
 
--- ═══════════════════════════════════════════════════════════════════
--- 1️⃣ REMOVER POLÍTICAS ANTIGAS (se existirem)
--- ═══════════════════════════════════════════════════════════════════
+-- 2️⃣ ENABLE ROW LEVEL SECURITY
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Usuarios podem ler próprio perfil" ON public.users;
-DROP POLICY IF EXISTS "Usuarios podem atualizar próprio perfil" ON public.users;
-DROP POLICY IF EXISTS "Admins gerenciam usuários" ON public.users;
-DROP POLICY IF EXISTS "Anyone can read user profiles" ON public.users;
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
-DROP POLICY IF EXISTS "Admins can manage all users" ON public.users;
+-- 3️⃣ CREATE NEW POLICIES
 
--- ═══════════════════════════════════════════════════════════════════
--- 2️⃣ CRIAR NOVAS POLÍTICAS
--- ═══════════════════════════════════════════════════════════════════
---
--- IMPORTANTE: Diferença entre INSERT, UPDATE, DELETE:
---
--- INSERT: Só usa WITH CHECK (não pode usar USING)
---   - WITH CHECK: valida se o novo registro pode ser inserido
---
--- UPDATE/DELETE: Pode usar USING e WITH CHECK
---   - USING: valida o registro ANTES de atualizar (qual linha selecionar)
---   - WITH CHECK: valida o resultado APÓS atualizar (dados podem ficar assim?)
---
--- ═══════════════════════════════════════════════════════════════════
-
--- POLÍTICA 1: Qualquer um pode ver (SELECT) qualquer perfil público
-CREATE POLICY "Qualquer um pode ler perfis públicos"
-ON public.users
-FOR SELECT
+-- POLICY 1: Anyone (authenticated) can view all profiles
+CREATE POLICY "Anyone can view profiles" 
+ON public.users FOR SELECT 
 USING (true);
 
--- POLÍTICA 2: Cada usuário pode atualizar seu próprio perfil
--- auth.uid() retorna o ID do usuário autenticado
--- Isso garante que só possa atualizar se o ID for dele
-CREATE POLICY "Usuários atualizam próprio perfil"
-ON public.users
-FOR UPDATE
+-- POLICY 2: Authenticated users can update their own profile
+CREATE POLICY "Users can update own profile" 
+ON public.users FOR UPDATE 
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- POLÍTICA 3: Admins podem atualizar qualquer perfil
--- Verifica se o role do usuário logado é 'admin'
-CREATE POLICY "Admins atualizam qualquer perfil"
-ON public.users
-FOR UPDATE
+-- POLICY 3: Admins can update any profile
+CREATE POLICY "Admins can update any profile" 
+ON public.users FOR UPDATE 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid() AND role = 'admin'
+  )
+);
+
+-- POLICY 4: Authenticated users can insert their own profile (for syncing from Auth)
+CREATE POLICY "Users can insert own profile" 
+ON public.users FOR INSERT 
+WITH CHECK (auth.uid() = id OR role = 'client');
+
+-- POLICY 5: Admins can insert any profile
+CREATE POLICY "Admins can insert any profile" 
+ON public.users FOR INSERT 
 USING (
   EXISTS (
     SELECT 1 FROM public.users
@@ -66,27 +57,9 @@ WITH CHECK (
   )
 );
 
--- POLÍTICA 4: Usuários podem criar seu próprio registro (para sincronização)
-CREATE POLICY "Usuários criam próprio perfil"
-ON public.users
-FOR INSERT
-WITH CHECK (auth.uid() = id);
-
--- POLÍTICA 5: Admins podem inserir qualquer usuário
-CREATE POLICY "Admins criam qualquer perfil"
-ON public.users
-FOR INSERT
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.users
-    WHERE id = auth.uid() AND role = 'admin'
-  )
-);
-
--- POLÍTICA 6: Admins podem deletar (para limpeza)
-CREATE POLICY "Admins deletam usuários"
-ON public.users
-FOR DELETE
+-- POLICY 6: Admins can delete users
+CREATE POLICY "Admins can delete users" 
+ON public.users FOR DELETE 
 USING (
   EXISTS (
     SELECT 1 FROM public.users
@@ -94,11 +67,13 @@ USING (
   )
 );
 
--- ═══════════════════════════════════════════════════════════════════
--- 3️⃣ VERIFICAÇÃO
--- ═══════════════════════════════════════════════════════════════════
-
--- Execute isto para confirmar que as políticas foram criadas:
--- SELECT * FROM pg_policies WHERE tablename = 'users';
-
--- Você deve ver 6 novas políticas listadas.
+-- ✅ VERIFY POLICIES WERE CREATED
+SELECT 
+  policyname,
+  tablename,
+  permissive,
+  qual,
+  with_check
+FROM pg_policies 
+WHERE tablename = 'users'
+ORDER BY policyname;

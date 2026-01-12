@@ -399,32 +399,11 @@ export const usersService = {
       console.log('[usersService] Updating user:', { id, email: updates.email });
       let profileImageUrl: string | undefined;
 
-      // Validate that the ID exists in database before proceeding
-      let validId = id;
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (!existingUser && updates.email) {
-        console.warn('[usersService] ID not found in database, checking by email:', updates.email);
-        const { data: userByEmail } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', updates.email)
-          .maybeSingle();
-
-        if (userByEmail) {
-          console.log('[usersService] Found user by email, using database ID:', userByEmail.id);
-          validId = userByEmail.id;
-        }
-      }
 
       // Upload profile image if provided
       if (profileImage) {
-        console.log('[usersService] Uploading profile image for user:', validId);
-        const result = await storageService.uploadUserProfileImage(validId, profileImage);
+        console.log('[usersService] Uploading profile image for user:', id);
+        const result = await storageService.uploadUserProfileImage(id, profileImage);
         if (result.error) {
           console.error('[usersService] Error uploading profile image:', result.error);
           throw result.error;
@@ -457,51 +436,60 @@ export const usersService = {
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
-      updateData.updated_at = new Date().toISOString();
 
-      console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
+      console.log('[usersService] Calling Edge Function to update user:', {
+        userId: id,
+        fields: Object.keys(updateData).length
+      });
 
-      // First attempt: try normal update with validated ID
-      const { data, error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', validId)
-        .select();
+      // Call Edge Function with SERVICE_ROLE permissions (bypasses RLS)
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      const functionUrl = `${supabaseUrl}/functions/v1/update-user-profile`;
 
-      console.log('[usersService] Update response received:', { hasData: !!data, hasError: !!error, dataLength: data?.length });
+      // Get auth token from Supabase client
+      const { data: { session } } = await supabase.auth.getSession();
+      const authToken = session?.access_token;
 
-      if (error) {
-        const errorMessage = error instanceof Error
-          ? error.message
-          : (error?.message || JSON.stringify(error));
-
-        // Detect RLS policy violations
-        const isRLSError = errorMessage.includes('new row violates row-level security policy') ||
-                          errorMessage.includes('row-level security policy') ||
-                          errorMessage.includes('permission denied') ||
-                          error?.code === 'PGRST301';
-
-        console.error('[usersService] Update error:', {
-          message: errorMessage,
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          isRLSError,
-        });
-
-        if (isRLSError) {
-          console.error('[usersService] 🔐 RLS POLICY ERROR DETECTED!');
-          console.error('[usersService] User role may not have permission to update');
-          throw new Error(`Erro de permissão (RLS): Você não tem permissão para atualizar este perfil. Se é admin, verifique as RLS policies.`);
-        }
-
-        throw error;
+      if (!authToken) {
+        console.error('[usersService] No auth token available');
+        throw new Error('Sessao expirada. Faca login novamente.');
       }
 
-      // If update didn't affect any rows, user doesn't exist with that ID
-      let userData: any;
-      if (!data || data.length === 0) {
-        // Update affected 0 rows - try to find user by email instead
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+          'apikey': anonKey,
+        },
+        body: JSON.stringify({
+          id,
+          ...updateData
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = result.error || `HTTP ${response.status}`;
+        console.error('[usersService] Edge Function error:', {
+          status: response.status,
+          message: errorMessage,
+          details: result.details
+        });
+        throw new Error(result.details || errorMessage || 'Falha ao atualizar perfil');
+      }
+
+      if (!result.user) {
+        console.error('[usersService] Edge Function returned no user data');
+        throw new Error('Falha ao atualizar perfil - nenhum dado retornado');
+      }
+
+      const userData: any = result.user;
+      if (!userData) {
+        console.error('[usersService] No user data in Edge Function response');
+        throw new Error('Nenhum dado de usuario retornado');
         console.warn('[usersService] Update affected 0 rows for ID:', id);
         console.warn('[usersService] User ID:', id, 'Email:', updates.email);
 
@@ -627,14 +615,14 @@ export const usersService = {
         profileImage: userData.profile_image_url,
       };
 
-      console.log('[usersService] User updated successfully');
+      console.log('[usersService] User updated successfully via Edge Function');
       return { data: transformedData, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
       console.error('[usersService] Error updating user:', errorMessage);
-      return { data: null, error };
+      return { data: null, error: errorMessage };
     }
   },
 
