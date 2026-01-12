@@ -267,13 +267,10 @@ export default function EventUserSelection() {
                     {/* User Info */}
                     <div className="mb-4">
                       <h3 className="font-serif text-xl font-bold text-foreground">
-                        {participant.name || 'Usuário'}
+                        {participant.username || 'Usuário'}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {participant.age || '-'} anos • {getGenderLabel(participant.gender)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {participant.profession || '-'}
+                        {getGenderLabel(participant.gender)}
                       </p>
                     </div>
 
