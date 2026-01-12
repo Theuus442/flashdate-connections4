@@ -411,12 +411,10 @@ export const usersService = {
 
         // Provide better error messages for common issues
         if (error?.code === '23505') {
-          if (errorMsg.includes('username')) {
-            errorMsg = 'Este apelido (username) já existe. Escolha outro apelido único.';
-          } else if (errorMsg.includes('email')) {
+          if (errorMsg.includes('email')) {
             errorMsg = 'Este email já está cadastrado.';
           } else {
-            errorMsg = 'Dados duplicados. Verifique se apelido ou email já existem.';
+            errorMsg = 'Erro de dados duplicados. Verifique as informações.';
           }
         }
 
