@@ -105,6 +105,10 @@ export default function ClientDashboard() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && clientUser) {
+      // Store the file for upload when saving
+      setSelectedImageFile(file);
+
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
