@@ -21,6 +21,7 @@ interface UsersContextType {
   deleteUser: (id: string) => Promise<boolean>;
   deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
   getUserById: (id: string) => User | undefined;
+  refreshUsers: () => Promise<void>;
   isLoading: boolean;
 }
 
