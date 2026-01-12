@@ -43,10 +43,45 @@ export default function ClientDashboard() {
   };
 
   const handleRemoveImage = () => {
-    setClientUser(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
+    if (clientUser) {
+      setClientUser(prev => prev ? {
+        ...prev,
+        profile_image_url: undefined,
+      } : prev);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!clientUser || !authUser) {
+      toast.error('Erro: dados do usuário não encontrados');
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const updatedData = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        whatsapp: formData.get('whatsapp') as string,
+      };
+
+      const result = await updateUser(authUser.id, updatedData);
+
+      if (result) {
+        toast.success('Perfil atualizado com sucesso!');
+        setClientUser(result);
+      } else {
+        toast.error('Erro ao atualizar perfil');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erro ao atualizar perfil');
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
   const handleLogout = async () => {
