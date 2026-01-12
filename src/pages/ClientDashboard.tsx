@@ -286,51 +286,55 @@ export default function ClientDashboard() {
                   {/* Edit Profile Card */}
                   <div className="bg-card border border-border rounded-2xl p-8">
                     <h3 className="font-serif text-xl font-bold text-foreground mb-6">Editar Perfil</h3>
-                    <form className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Nome Completo
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={clientUser.name}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
+                    {clientUser ? (
+                      <form onSubmit={handleSaveProfile} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            Nome Completo
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            defaultValue={clientUser.name}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            defaultValue={clientUser.email}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            WhatsApp
+                          </label>
+                          <input
+                            type="tel"
+                            name="whatsapp"
+                            defaultValue={clientUser.whatsapp || ''}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <Button
+                          type="submit"
+                          variant="gold"
+                          className="w-full mt-6"
+                          disabled={isUpdatingProfile}
+                        >
+                          {isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações'}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Carregando dados do perfil...</p>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          defaultValue={clientUser.email}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          WhatsApp
-                        </label>
-                        <input
-                          type="tel"
-                          defaultValue={clientUser.whatsapp}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Profissão
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={clientUser.profession}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <Button variant="gold" className="w-full mt-6">
-                        Salvar Alterações
-                      </Button>
-                    </form>
+                    )}
                   </div>
                 </div>
               </div>
