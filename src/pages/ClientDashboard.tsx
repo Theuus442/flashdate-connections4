@@ -4,28 +4,79 @@ import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
+import { usersService } from '@/lib/users.service';
 import { toast } from 'sonner';
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
-  const { users, updateUser, isLoading } = useUsers();
+  const { users, updateUser, isLoading, refreshUsers } = useUsers();
 
   // Load real user data from users array
   const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
   const [clientUser, setClientUser] = useState<any>(null);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
-  // Update clientUser when realUser or users changes
+  // Refresh users list on mount and when auth user changes
   useEffect(() => {
-    if (realUser) {
-      console.log('[ClientDashboard] Loading user data:', realUser);
+    if (authUser && !clientUser) {
+      console.log('[ClientDashboard] Auth user detected, refreshing users list...');
+      refreshUsers();
+    }
+  }, [authUser, refreshUsers]);
+
+  // Fetch user data directly if not found in users array
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!authUser || clientUser) {
+        return; // Already have data or no auth user
+      }
+
+      // Check if user is in the users array
+      const userInArray = users.find(u => u.id === authUser.id);
+      if (userInArray) {
+        console.log('[ClientDashboard] User found in array:', userInArray);
+        setClientUser(userInArray);
+        return;
+      }
+
+      // User not found in array - fetch directly from database
+      console.log('[ClientDashboard] User not found in array, fetching directly from database...');
+      setIsLoadingUserData(true);
+      try {
+        const { data, error } = await usersService.getUserById(authUser.id);
+        if (error) {
+          console.error('[ClientDashboard] Error fetching user:', error);
+          setClientUser(null);
+        } else if (data) {
+          console.log('[ClientDashboard] User data loaded successfully:', data);
+          setClientUser(data);
+        } else {
+          console.warn('[ClientDashboard] No user data returned');
+          setClientUser(null);
+        }
+      } catch (error) {
+        console.error('[ClientDashboard] Unexpected error loading user:', error);
+        setClientUser(null);
+      } finally {
+        setIsLoadingUserData(false);
+      }
+    };
+
+    loadUserData();
+  }, [authUser, users, clientUser]);
+
+  // Update clientUser when realUser changes
+  useEffect(() => {
+    if (realUser && !clientUser) {
+      console.log('[ClientDashboard] Loading user data from array:', realUser);
       setClientUser(realUser);
     }
-  }, [realUser, users]);
+  }, [realUser]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
