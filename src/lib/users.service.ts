@@ -324,30 +324,22 @@ export const usersService = {
       let profileImageUrl: string | undefined;
       let userId = crypto.randomUUID();
 
-      // Pre-check for duplicate email or username to provide better error message
-      console.log('[usersService] Checking for duplicate email or username...');
+      // Pre-check for duplicate email only (username and name can be duplicated now)
+      console.log('[usersService] Checking for duplicate email...');
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
-        .select('id, email, username')
-        .or(`email.eq.${user.email},username.eq.${user.username}`)
+        .select('id, email')
+        .eq('email', user.email)
         .maybeSingle();
 
       if (checkError) {
         const errorStr = serializeError(checkError);
-        console.warn('[usersService] Error checking for duplicates:', errorStr);
-        // Continue anyway - the insert will fail if there are duplicates
+        console.warn('[usersService] Error checking for duplicate email:', errorStr);
+        // Continue anyway - the insert will fail if there's a duplicate
       } else if (existingUser) {
-        // Found a duplicate
-        let duplicateField = 'dados';
-        if (existingUser.email === user.email && existingUser.username === user.username) {
-          duplicateField = 'email e apelido';
-        } else if (existingUser.email === user.email) {
-          duplicateField = 'email';
-        } else if (existingUser.username === user.username) {
-          duplicateField = 'apelido';
-        }
-        const errorMsg = `Este ${duplicateField} já está registrado no sistema. Escolha um ${duplicateField === 'email e apelido' ? 'email e apelido' : duplicateField} único.`;
-        console.warn('[usersService] Duplicate found:', { duplicateField, existingId: existingUser.id });
+        // Found a duplicate email
+        const errorMsg = 'Este email já está registrado no sistema. Escolha um email único.';
+        console.warn('[usersService] Duplicate email found:', { existingId: existingUser.id });
         throw new Error(errorMsg);
       }
 
