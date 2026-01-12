@@ -206,10 +206,10 @@ export default function ClientDashboard() {
                     <div className="flex flex-col items-center text-center mb-6">
                       {/* Profile Image Section */}
                       <div className="relative mb-4">
-                        {clientUser.profileImage ? (
+                        {clientUser && clientUser.profile_image_url ? (
                           <>
                             <img
-                              src={clientUser.profileImage}
+                              src={clientUser.profile_image_url}
                               alt={clientUser.name}
                               className="w-32 h-32 rounded-full object-cover border-4 border-gold shadow-lg"
                             />
@@ -233,7 +233,7 @@ export default function ClientDashboard() {
                         ) : (
                           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-0">
                             <span className="text-5xl font-bold text-secondary-foreground">
-                              {clientUser.name.charAt(0)}
+                              {clientUser?.name.charAt(0) || 'U'}
                             </span>
                           </div>
                         )}
@@ -256,7 +256,7 @@ export default function ClientDashboard() {
                         className="hidden"
                       />
 
-                      {isEditingImage && !clientUser.profileImage && (
+                      {isEditingImage && !clientUser?.profile_image_url && (
                         <button
                           onClick={() => document.getElementById('profileImageInput')?.click()}
                           className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
@@ -272,15 +272,14 @@ export default function ClientDashboard() {
                         {isEditingImage ? 'Cancelar' : 'Editar Foto'}
                       </button>
 
-                      <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser.name}</h2>
-                      <p className="text-muted-foreground text-sm">@{clientUser.username}</p>
+                      <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser?.name || 'Usuário'}</h2>
+                      <p className="text-muted-foreground text-sm">@{clientUser?.username || 'username'}</p>
                     </div>
 
                     <div className="space-y-4 border-t border-border pt-6">
-                      <InfoItem label="Profissão" value={clientUser.profession} />
-                      <InfoItem label="Idade" value={`${clientUser.age} anos`} />
-                      <InfoItem label="Email" value={clientUser.email} />
-                      <InfoItem label="WhatsApp" value={clientUser.whatsapp} />
+                      <InfoItem label="Email" value={clientUser?.email || '-'} />
+                      <InfoItem label="WhatsApp" value={clientUser?.whatsapp || '-'} />
+                      <InfoItem label="Gênero" value={clientUser?.gender || '-'} />
                     </div>
                   </div>
 
