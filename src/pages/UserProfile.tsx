@@ -343,12 +343,15 @@ export default function UserProfile() {
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'TALVEZ')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'TALVEZ'
                                 ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="TALVEZ"
+                            title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
                           >
                             <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
