@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { usersService } from '@/lib/users.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
