@@ -274,7 +274,11 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             ? error.message
             : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-          const isNetworkError = errorMessage.includes('Failed to fetch');
+          const isNetworkError =
+            (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+            errorMessage.includes('Failed to fetch') ||
+            errorMessage.includes('Network') ||
+            (error instanceof TypeError && errorMessage.includes('fetch'));
 
           console.error('[UsersContext] ⚠️ Error refreshing users:');
           console.error('[UsersContext]   Message:', errorMessage);
