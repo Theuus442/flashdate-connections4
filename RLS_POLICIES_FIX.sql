@@ -65,12 +65,6 @@ WITH CHECK (auth.uid() = id);
 CREATE POLICY "Admins criam qualquer perfil"
 ON public.users
 FOR INSERT
-USING (
-  EXISTS (
-    SELECT 1 FROM public.users
-    WHERE id = auth.uid() AND role = 'admin'
-  )
-)
 WITH CHECK (
   EXISTS (
     SELECT 1 FROM public.users
