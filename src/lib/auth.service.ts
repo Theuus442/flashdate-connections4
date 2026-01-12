@@ -145,7 +145,7 @@ export const authService = {
 
   /**
    * Create user as admin with email and password (for admin panel)
-   * Uses Edge Function to create confirmed user without sending email
+   * Attempts to use Edge Function first, then falls back to regular signUp
    */
   async createUserAsAdmin(email: string, password: string) {
     if (!isSupabaseConfigured()) {
@@ -153,48 +153,78 @@ export const authService = {
     }
 
     try {
-      console.log('[authService] Creating user as admin via Supabase Edge Function:', email);
+      console.log('[authService] Creating user as admin:', email);
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
       const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
-      console.log('[authService] Calling Edge Function at:', functionUrl);
+      // Attempt 1: Try Edge Function (primary method)
+      console.log('[authService] Attempting Edge Function method...');
+      try {
+        const response = await Promise.race([
+          fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${anonKey}`,
+              'apikey': anonKey,
+            },
+            body: JSON.stringify({ email, password }),
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Edge function timeout')), 10000)
+          ),
+        ]);
 
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`,
-          'apikey': anonKey,
+        console.log('[authService] Edge Function response - status:', (response as Response).status);
+
+        if ((response as Response).ok) {
+          const responseData = await (response as Response).json();
+          const user = responseData.user || responseData.data?.user;
+
+          if (user) {
+            console.log('[authService] ✅ User created via Edge Function:', user.id);
+            return { data: user, error: null };
+          }
+        } else {
+          const status = (response as Response).status;
+          console.warn(`[authService] Edge Function returned ${status}, will try fallback method`);
+        }
+      } catch (edgeFunctionError) {
+        const errorMsg = edgeFunctionError instanceof Error
+          ? edgeFunctionError.message
+          : String(edgeFunctionError);
+        console.warn('[authService] Edge Function failed:', errorMsg);
+        // Continue to fallback
+      }
+
+      // Attempt 2: Fallback to regular signUp with email_confirm flag (requires email confirmation)
+      console.log('[authService] Falling back to regular signUp method...');
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: 'client',
+            created_via: 'admin_panel',
+          },
+          emailRedirectTo: `${window.location.origin}/login`,
         },
-        body: JSON.stringify({ email, password }),
       });
 
-      console.log('[authService] Response received - status:', response.status);
-
-      if (!response.ok) {
-        let errorData: { error?: string; details?: string } | null = null;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = null;
-        }
-
-        const errorMsg = errorData?.error || errorData?.details || `HTTP ${response.status}`;
-        console.error('[authService] Edge Function error:', errorMsg);
-        throw new Error(errorMsg);
+      if (error) {
+        console.error('[authService] SignUp error:', error.message);
+        throw error;
       }
 
-      const responseData = await response.json();
-      const user = responseData.user || responseData.data?.user;
-
-      if (!user) {
-        throw new Error('No user data returned from edge function');
+      if (data.user) {
+        console.log('[authService] ✅ User created via fallback signUp:', data.user.id);
+        // Note: User will need to confirm email with this method
+        return { data: data.user, error: null };
       }
 
-      console.log('[authService] Auth user created:', user.id);
-      return { data: user, error: null };
+      throw new Error('No user data returned');
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
