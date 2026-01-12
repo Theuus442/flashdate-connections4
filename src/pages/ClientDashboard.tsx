@@ -145,14 +145,17 @@ export default function ClientDashboard() {
 
       const result = await updateUser(authUser.id, updatedData);
 
-      if (result) {
+      if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
-        setClientUser(result);
+        setClientUser(result.data);
       } else {
-        toast.error('Erro ao atualizar perfil');
+        const errorMsg = result.error || 'Erro desconhecido';
+        console.error('Error updating profile:', errorMsg);
+        toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Error updating profile:', errorMessage);
       toast.error('Erro ao atualizar perfil');
     } finally {
       setIsUpdatingProfile(false);
