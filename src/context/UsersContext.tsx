@@ -17,7 +17,7 @@ export interface User {
 interface UsersContextType {
   users: User[];
   addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
-  updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
+  updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
   deleteUser: (id: string) => Promise<boolean>;
   deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
   getUserById: (id: string) => User | undefined;
