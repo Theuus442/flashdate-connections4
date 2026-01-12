@@ -21,6 +21,17 @@ DROP POLICY IF EXISTS "Admins can manage all users" ON public.users;
 -- ═══════════════════════════════════════════════════════════════════
 -- 2️⃣ CRIAR NOVAS POLÍTICAS
 -- ═══════════════════════════════════════════════════════════════════
+--
+-- IMPORTANTE: Diferença entre INSERT, UPDATE, DELETE:
+--
+-- INSERT: Só usa WITH CHECK (não pode usar USING)
+--   - WITH CHECK: valida se o novo registro pode ser inserido
+--
+-- UPDATE/DELETE: Pode usar USING e WITH CHECK
+--   - USING: valida o registro ANTES de atualizar (qual linha selecionar)
+--   - WITH CHECK: valida o resultado APÓS atualizar (dados podem ficar assim?)
+--
+-- ═══════════════════════════════════════════════════════════════════
 
 -- POLÍTICA 1: Qualquer um pode ver (SELECT) qualquer perfil público
 CREATE POLICY "Qualquer um pode ler perfis públicos"
