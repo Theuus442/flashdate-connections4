@@ -20,6 +20,18 @@ export default function EventUserSelection() {
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  // Show loading state while data is being fetched
+  if (isLoading || !authUser || !currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando participantes...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Load current user and participants from database
   useEffect(() => {
     if (!authUser || !users.length) return;
@@ -102,7 +114,7 @@ export default function EventUserSelection() {
             </a>
             <div className="flex items-center gap-4">
               <span className="hidden sm:inline text-sm text-muted-foreground">
-                Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
+                Bem-vindo, <span className="text-foreground font-medium">{currentUser?.name || 'Usuário'}</span>
               </span>
               <Button
                 variant="ghost"
@@ -156,7 +168,7 @@ export default function EventUserSelection() {
                       />
                     ) : (
                       <span className="text-6xl font-bold text-amber-300/80">
-                        {participant.name.charAt(0)}
+                        {participant.name?.charAt(0) || 'U'}
                       </span>
                     )}
                   </div>
@@ -166,13 +178,13 @@ export default function EventUserSelection() {
                     {/* User Info */}
                     <div className="mb-4">
                       <h3 className="font-serif text-xl font-bold text-foreground">
-                        {participant.name}
+                        {participant.name || 'Usuário'}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {participant.age} anos • {getGenderLabel(participant.gender)}
+                        {participant.age || '-'} anos • {getGenderLabel(participant.gender)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {participant.profession}
+                        {participant.profession || '-'}
                       </p>
                     </div>
 
