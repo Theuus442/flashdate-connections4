@@ -482,8 +482,47 @@ export const usersService = {
 
         if (!existingUser) {
           console.error('[usersService] User not found with email:', updates.email);
-          console.error('[usersService] Database lookup failed - user data mismatch detected');
-          throw new Error(`Usuário com email ${updates.email} não foi encontrado no banco de dados. Verifique se sua conta está sincronizada corretamente.`);
+          console.warn('[usersService] Attempting to sync user from Auth to Database...');
+
+          // Try to sync the user from Auth system
+          const syncResult = await this.syncAuthUserToDatabase({
+            id,
+            email: updates.email,
+            user_metadata: {
+              name: updates.name,
+              username: updates.username,
+            }
+          });
+
+          if (syncResult.error) {
+            const syncErrorMsg = syncResult.error instanceof Error
+              ? syncResult.error.message
+              : (typeof syncResult.error === 'object' ? JSON.stringify(syncResult.error) : String(syncResult.error));
+            console.error('[usersService] Sync failed:', syncErrorMsg);
+            throw new Error(`Usuário não encontrado. Erro ao sincronizar: ${syncErrorMsg}`);
+          }
+
+          if (!syncResult.data) {
+            throw new Error(`Falha ao sincronizar usuário ${updates.email} com o banco de dados.`);
+          }
+
+          console.log('[usersService] User synced successfully, retrying update...');
+          // Retry the update with synced user
+          const { data: retryData, error: retryError } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('id', id)
+            .select();
+
+          if (retryError || !retryData || retryData.length === 0) {
+            throw new Error(`Falha ao salvar dados após sincronização.`);
+          }
+
+          userData = retryData[0];
+          console.log('[usersService] User updated successfully after sync');
+        } else {
+          // User exists with email, update by email
+          userData = existingUser;
         }
 
         // Try to update by email instead
