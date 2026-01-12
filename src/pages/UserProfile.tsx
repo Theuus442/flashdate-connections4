@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function UserProfile() {
   const navigate = useNavigate();
