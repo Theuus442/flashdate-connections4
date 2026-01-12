@@ -70,7 +70,7 @@ export const usersService = {
         .from('users')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         const errorMessage = error instanceof Error
@@ -85,20 +85,92 @@ export const usersService = {
         throw error;
       }
 
-      const transformedData = data ? {
-        id: data.id,
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        gender: data.gender,
-        role: data.role || 'client',
-        profileImage: data.profile_image_url,
-        password: data.password,
-      } : null;
+      // If user found in database, return it
+      if (data) {
+        const transformedData: User = {
+          id: data.id,
+          name: data.name,
+          username: data.username,
+          email: data.email,
+          whatsapp: data.whatsapp,
+          gender: data.gender,
+          role: data.role || 'client',
+          profileImage: data.profile_image_url,
+          password: data.password,
+        };
+        console.log('[usersService] Successfully fetched user from database:', id);
+        return { data: transformedData, error: null };
+      }
 
-      console.log('[usersService] Successfully fetched user:', id);
-      return { data: transformedData, error: null };
+      // If user not found in database, try to create one from Auth metadata
+      console.log('[usersService] User not found in database, attempting to create from Auth...');
+      try {
+        const { data: { user: authUser }, error: authError } = await supabase.auth.admin.getUserById(id);
+
+        if (authError || !authUser) {
+          console.warn('[usersService] Could not fetch auth user:', authError);
+          return { data: null, error: 'User not found in database or authentication' };
+        }
+
+        console.log('[usersService] Found auth user, creating database record...');
+
+        // Create user record with auth data
+        const { data: insertedUser, error: insertError } = await supabase
+          .from('users')
+          .insert([{
+            id: authUser.id,
+            name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+            username: authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user',
+            email: authUser.email || '',
+            whatsapp: authUser.user_metadata?.whatsapp || '',
+            gender: authUser.user_metadata?.gender || 'Outro',
+            role: authUser.user_metadata?.role || 'client',
+            profile_image_url: null,
+            created_at: new Date().toISOString(),
+          }])
+          .select();
+
+        if (insertError) {
+          console.warn('[usersService] Could not create user in database:', insertError);
+          // Even if insert fails, return basic user data
+          return {
+            data: {
+              id: authUser.id,
+              name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+              username: authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user',
+              email: authUser.email || '',
+              whatsapp: authUser.user_metadata?.whatsapp || '',
+              gender: authUser.user_metadata?.gender || 'Outro',
+              role: authUser.user_metadata?.role || 'client',
+            },
+            error: null,
+          };
+        }
+
+        if (insertedUser && insertedUser.length > 0) {
+          const userData = insertedUser[0];
+          const transformedData: User = {
+            id: userData.id,
+            name: userData.name,
+            username: userData.username,
+            email: userData.email,
+            whatsapp: userData.whatsapp,
+            gender: userData.gender,
+            role: userData.role || 'client',
+            profileImage: userData.profile_image_url,
+          };
+          console.log('[usersService] Successfully created user in database:', id);
+          return { data: transformedData, error: null };
+        }
+
+        return { data: null, error: 'Failed to create user in database' };
+      } catch (authFetchError) {
+        const authErrorMsg = authFetchError instanceof Error
+          ? authFetchError.message
+          : String(authFetchError);
+        console.warn('[usersService] Error fetching from auth:', authErrorMsg);
+        return { data: null, error: 'User not found' };
+      }
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
