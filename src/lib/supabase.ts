@@ -41,12 +41,51 @@ if (!isConfigured) {
         autoRefreshToken: true,
         persistSession: true,
       },
+      // Add request configuration to handle network issues
+      global: {
+        headers: {
+          'x-request-id': crypto.randomUUID(),
+        },
+      },
     });
     console.log('[Supabase] ✅ Client initialized successfully');
+
+    // Test connectivity to Supabase
+    testSupabaseConnectivity(supabaseUrl);
   } catch (error) {
     supbaseInitError = `Failed to initialize Supabase client: ${error instanceof Error ? error.message : String(error)}`;
     console.error('[Supabase] ❌ Initialization error:', error);
     supabaseClient = null;
+  }
+}
+
+/**
+ * Test connectivity to Supabase
+ */
+async function testSupabaseConnectivity(url: string) {
+  try {
+    console.log('[Supabase] Testing connectivity to:', url);
+    const testUrl = `${url}/rest/v1/`;
+    const response = await fetch(testUrl, {
+      method: 'OPTIONS',
+      headers: {
+        'apikey': supabaseAnonKey,
+      },
+    });
+
+    if (response.ok) {
+      console.log('[Supabase] ✅ Connectivity test passed');
+    } else {
+      console.warn('[Supabase] ⚠️  Connectivity test returned status:', response.status);
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('[Supabase] ❌ Connectivity test failed:', errorMsg);
+    console.error('[Supabase] This indicates a network issue. Possible causes:');
+    console.error('[Supabase]   1. Network is offline or blocked');
+    console.error('[Supabase]   2. CORS policy is blocking requests');
+    console.error('[Supabase]   3. Firewall is blocking access to Supabase');
+    console.error('[Supabase]   4. Supabase URL is incorrect');
   }
 }
 
