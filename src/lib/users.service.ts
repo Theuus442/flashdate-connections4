@@ -446,19 +446,22 @@ export const usersService = {
       }
 
       // If password is being updated, update it in auth system first
+      // NOTE: Password is only updated if explicitly provided and not empty
       if (updates.password && updates.password.trim()) {
-        console.log('[usersService] Updating password in auth system...');
-        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password);
+        console.log('[usersService] ✏️ Password change requested - updating auth system...');
+        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password.trim());
         if (authResult.error) {
           const errorMsg = authResult.error instanceof Error
             ? authResult.error.message
             : JSON.stringify(authResult.error);
-          console.warn('[usersService] Could not update password via auth API:', errorMsg);
+          console.warn('[usersService] ⚠️ Could not update password via auth API:', errorMsg);
           // Don't throw error - password update is secondary, continue with other updates
+        } else {
+          console.log('[usersService] ✅ Password updated successfully');
         }
-      } else if (updates.password === '') {
-        // Empty password means don't update password - remove from updates
-        console.log('[usersService] Password field is empty, skipping password update');
+      } else {
+        // No password update requested - this is normal for profile updates
+        console.log('[usersService] ℹ️ No password change - updating profile only');
       }
 
       // Build update data for Edge Function (NEVER include password here - it's handled separately)
