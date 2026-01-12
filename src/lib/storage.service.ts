@@ -68,10 +68,10 @@ export const storageService = {
       const fileName = `${eventId}-${Date.now()}-${sanitizedFileName}`;
       const filePath = fileName;
 
-      console.log('[storageService] Uploading event image to bucket: events');
+      console.log('[storageService] Uploading event image');
       console.log('[storageService] Original filename:', file.name);
       console.log('[storageService] Sanitized filename:', sanitizedFileName);
-      console.log('[storageService] Full file path:', filePath);
+      console.log('[storageService] File path (within bucket):', filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('events')
