@@ -544,6 +544,13 @@ export const usersService = {
           console.log('[usersService] User updated successfully after sync');
         } else {
           // User exists with email, update by email
+          console.log('[usersService] User found by email, preparing to update:', {
+            email: updates.email,
+            existingUserId: existingUser?.id,
+            updateDataFields: Object.keys(updateData),
+            updateDataValues: updateData,
+          });
+
           const { data: emailUpdateData, error: emailUpdateError } = await supabase
             .from('users')
             .update(updateData)
@@ -552,19 +559,39 @@ export const usersService = {
 
           if (emailUpdateError) {
             const emailErrorMsg = emailUpdateError instanceof Error
-              ? emailUpdateError.message
+              ? emailErrorError.message
               : (emailUpdateError?.message || 'Erro desconhecido');
-            console.error('[usersService] Email-based update failed:', {
+            console.error('[usersService] Email-based update error response:', {
               message: emailErrorMsg,
               code: emailUpdateError?.code,
               details: emailUpdateError?.details,
+              hint: emailUpdateError?.hint,
             });
             throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
           }
 
+          console.log('[usersService] Email-based update response:', {
+            hasData: !!emailUpdateData,
+            dataLength: emailUpdateData?.length || 0,
+            data: emailUpdateData,
+          });
+
           if (!emailUpdateData || emailUpdateData.length === 0) {
-            console.error('[usersService] Email-based update affected 0 rows:', updates.email);
-            throw new Error(`Falha ao salvar alterações. Tente fazer login novamente.`);
+            console.error('[usersService] Email-based update affected 0 rows:', {
+              email: updates.email,
+              updateDataKeys: Object.keys(updateData),
+            });
+
+            // Try to debug: check if user still exists
+            const { data: debugUser } = await supabase
+              .from('users')
+              .select('id, email, updated_at')
+              .eq('email', updates.email)
+              .maybeSingle();
+
+            console.error('[usersService] Debug: User exists after failed update?', debugUser);
+
+            throw new Error(`Falha ao salvar alterações no usuário ${updates.email}. Verifique sua conexão e tente novamente.`);
           }
 
           userData = emailUpdateData[0];
