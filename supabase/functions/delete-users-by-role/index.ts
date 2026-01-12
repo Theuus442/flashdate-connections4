@@ -1,182 +1,74 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.90.0";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Max-Age": "86400",
-};
-
-export default async (req: Request) => {
-  console.log(`[delete-users-by-role] ${req.method} request received`);
-
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      status: 200,
-      headers: corsHeaders,
-    });
+serve(async (req) => {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
   }
 
-  // Only accept POST
-  if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed. Use POST." }),
-      {
-        status: 405,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders })
   }
 
   try {
-    // Parse request
-    let body: any;
-    try {
-      body = await req.json();
-    } catch (parseErr) {
-      console.error("[delete-users-by-role] JSON parse error:", parseErr);
-      return new Response(
-        JSON.stringify({ error: "Invalid JSON in request body" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const supabase = createClient(supabaseUrl, serviceKey)
 
-    const { role } = body;
+    const { role } = await req.json()
 
-    // Validate role
     if (!role || (role !== "admin" && role !== "client")) {
-      console.error("[delete-users-by-role] Invalid role:", role);
-      return new Response(
-        JSON.stringify({
-          error: "Invalid role. Must be 'admin' or 'client'",
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Role invalida" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
     }
 
-    console.log("[delete-users-by-role] Deleting all users with role:", role);
+    console.log(`Iniciando exclusao de usuarios com role: ${role}`)
 
-    // Get environment variables
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error("[delete-users-by-role] Missing environment variables");
-      return new Response(
-        JSON.stringify({
-          error: "Server configuration error",
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Create Supabase client with SERVICE ROLE (has full permissions)
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Step 1: Count users to delete
-    console.log("[delete-users-by-role] Fetching users to count...");
-    const { data: usersToDelete, error: fetchError } = await supabase
+    // 1. Buscar os IDs na tabela pública
+    const { data: users, error: fetchError } = await supabase
       .from("users")
       .select("id")
-      .eq("role", role);
+      .eq("role", role)
 
-    if (fetchError) {
-      console.error("[delete-users-by-role] Error fetching users:", fetchError);
-      throw fetchError;
-    }
-
-    const count = usersToDelete?.length || 0;
-    console.log("[delete-users-by-role] Found", count, "users to delete");
-
-    if (count === 0) {
-      console.log("[delete-users-by-role] No users to delete");
-      return new Response(
-        JSON.stringify({
-          count: 0,
-          message: "No users found with that role",
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Step 2: Delete users (using SERVICE ROLE)
-    console.log("[delete-users-by-role] Deleting", count, "users...");
-    const { error: deleteError, count: deletedCount } = await supabase
-      .from("users")
-      .delete()
-      .eq("role", role);
-
-    if (deleteError) {
-      console.error("[delete-users-by-role] Delete error:", deleteError);
-      throw deleteError;
-    }
-
-    // Step 3: Verify deletion
-    console.log("[delete-users-by-role] Verifying deletion...");
-    const { data: remainingUsers, error: verifyError } = await supabase
-      .from("users")
-      .select("id")
-      .eq("role", role);
-
-    if (verifyError) {
-      console.error("[delete-users-by-role] Verify error:", verifyError);
-      throw verifyError;
-    }
-
-    const remaining = remainingUsers?.length || 0;
-    console.log(
-      "[delete-users-by-role] Deletion verified. Remaining users with role '",
-      role,
-      "':",
-      remaining
-    );
-
-    if (remaining > 0) {
-      console.warn(
-        "[delete-users-by-role] WARNING: Deletion may have failed. Still",
-        remaining,
-        "users remaining"
-      );
-    }
-
-    return new Response(
-      JSON.stringify({
-        count: count - remaining, // Actual deleted count
-        message: `Deleted ${count - remaining} users with role '${role}'`,
-      }),
-      {
+    if (fetchError) throw fetchError
+    if (!users || users.length === 0) {
+      return new Response(JSON.stringify({ message: "Nenhum usuario encontrado" }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
-  } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : JSON.stringify(error);
-    console.error("[delete-users-by-role] Unhandled error:", msg);
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
 
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-        details: msg,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    const userIds = users.map(u => u.id)
+    let deletedCount = 0
+
+    // 2. Loop para deletar do Auth (Obrigatário para limpeza real)
+    // O deleteUser remove o usuario do sistema de login permanentemente
+    for (const id of userIds) {
+      const { error: authErr } = await supabase.auth.admin.deleteUser(id)
+      if (!authErr) deletedCount++
+      
+      // O Supabase deleta automaticamente da public.users se houver CASCADE, 
+      // caso contrario, deletamos manualmente abaixo:
+      await supabase.from("users").delete().eq("id", id)
+    }
+
+    return new Response(JSON.stringify({ 
+      message: `Sucesso! ${deletedCount} usuarios removidos.`,
+      role_afetada: role
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    })
+
+  } catch (error) {
+    console.error("Erro na funcao:", error.message)
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    })
   }
-};
+})
