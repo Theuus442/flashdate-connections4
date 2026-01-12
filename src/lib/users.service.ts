@@ -488,7 +488,8 @@ export const usersService = {
 
       const userData: any = result.user;
       if (!userData) {
-        // Update affected 0 rows - try to find user by email instead
+        console.error('[usersService] No user data in Edge Function response');
+        throw new Error('Nenhum dado de usuario retornado');
         console.warn('[usersService] Update affected 0 rows for ID:', id);
         console.warn('[usersService] User ID:', id, 'Email:', updates.email);
 
