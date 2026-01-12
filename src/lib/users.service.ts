@@ -522,35 +522,32 @@ export const usersService = {
           console.log('[usersService] User updated successfully after sync');
         } else {
           // User exists with email, update by email
-          userData = existingUser;
+          const { data: emailUpdateData, error: emailUpdateError } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('email', updates.email)
+            .select();
+
+          if (emailUpdateError) {
+            const emailErrorMsg = emailUpdateError instanceof Error
+              ? emailUpdateError.message
+              : (emailUpdateError?.message || 'Erro desconhecido');
+            console.error('[usersService] Email-based update failed:', {
+              message: emailErrorMsg,
+              code: emailUpdateError?.code,
+              details: emailUpdateError?.details,
+            });
+            throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
+          }
+
+          if (!emailUpdateData || emailUpdateData.length === 0) {
+            console.error('[usersService] Email-based update affected 0 rows:', updates.email);
+            throw new Error(`Falha ao salvar alterações. Tente fazer login novamente.`);
+          }
+
+          userData = emailUpdateData[0];
+          console.log('[usersService] User updated successfully via email');
         }
-
-        // Try to update by email instead
-        const { data: emailUpdateData, error: emailUpdateError } = await supabase
-          .from('users')
-          .update(updateData)
-          .eq('email', updates.email)
-          .select();
-
-        if (emailUpdateError) {
-          const emailErrorMsg = emailUpdateError instanceof Error
-            ? emailUpdateError.message
-            : (emailUpdateError?.message || 'Erro desconhecido');
-          console.error('[usersService] Email-based update failed:', {
-            message: emailErrorMsg,
-            code: emailUpdateError?.code,
-            details: emailUpdateError?.details,
-          });
-          throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
-        }
-
-        if (!emailUpdateData || emailUpdateData.length === 0) {
-          console.error('[usersService] Email-based update affected 0 rows:', updates.email);
-          throw new Error(`Falha ao salvar alterações. Tente fazer login novamente.`);
-        }
-
-        userData = emailUpdateData[0];
-        console.log('[usersService] User updated successfully via email fallback');
       } else {
         userData = data[0];
         console.log('[usersService] User updated successfully via ID');
