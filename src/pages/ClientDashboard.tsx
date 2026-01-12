@@ -266,6 +266,70 @@ export default function ClientDashboard() {
     );
   }
 
+  // Show error state if user could not be loaded
+  if (!clientUser && !isLoading && !isLoadingUserData && authUser) {
+    const handleRetry = () => {
+      setRetryCount(prev => prev + 1);
+      setClientUser(null);
+    };
+
+    const handleLogout = async () => {
+      try {
+        await signOut();
+        navigate('/login');
+      } catch (error) {
+        console.error('Error logging out:', error);
+        navigate('/login');
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+              <X size={32} className="text-destructive" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+              Perfil não carregado
+            </h2>
+            <p className="text-muted-foreground mb-2">
+              Ocorreu um problema ao carregar seus dados do servidor.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              ID de autenticação: <code className="text-xs bg-muted px-2 py-1 rounded">{authUser.id}</code>
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {retryCount < maxRetries ? (
+              <>
+                <Button onClick={handleRetry} variant="gold" className="w-full">
+                  Tentar Novamente ({retryCount}/{maxRetries})
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Se o problema persistir, tente fazer logout e login novamente.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-destructive font-medium mb-4">
+                  Não conseguimos carregar seu perfil após várias tentativas.
+                </p>
+                <Button onClick={handleLogout} variant="outline" className="w-full mb-3">
+                  Fazer Logout
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Faça login novamente para sincronizar seus dados.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
