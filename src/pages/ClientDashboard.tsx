@@ -18,6 +18,7 @@ interface ClientUser {
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   // Mock user data - in real app this would come from auth context
   const [clientUser, setClientUser] = useState<ClientUser>({
@@ -57,8 +58,16 @@ export default function ClientDashboard() {
     }));
   };
 
-  const handleLogout = () => {
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Desconectado com sucesso');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Erro ao desconectar');
+      navigate('/login');
+    }
   };
 
   return (
