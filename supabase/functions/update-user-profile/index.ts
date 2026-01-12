@@ -106,14 +106,29 @@ serve(async (req) => {
       updateEmail: email
     })
 
-    // Verify user can only update their own profile (unless they're updating by email that matches their auth email)
-    if (id !== authUser.id && email !== authUser.email) {
-      console.error('[update-user-profile] Unauthorized update attempt')
-      return new Response(JSON.stringify({ 
+    // Check if user is an admin by querying the users table
+    let isAdmin = false
+    const { data: currentUserData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', authUser.id)
+      .maybeSingle()
+
+    if (currentUserData?.role === 'admin') {
+      isAdmin = true
+      console.log('[update-user-profile] ✅ User is admin, allowing update of other profiles')
+    } else {
+      console.log('[update-user-profile] User is not admin, checking ownership')
+    }
+
+    // Verify user can only update their own profile (unless they're an admin)
+    if (!isAdmin && id !== authUser.id && email !== authUser.email) {
+      console.error('[update-user-profile] ❌ Unauthorized update attempt - user is not admin and trying to update different profile')
+      return new Response(JSON.stringify({
         error: "Você não tem permissão para atualizar este perfil"
-      }), { 
-        status: 403, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       })
     }
 
