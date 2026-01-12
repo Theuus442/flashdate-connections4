@@ -135,19 +135,19 @@ export const usersService = {
 
       const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
       const isJSONError = error instanceof SyntaxError;
+      const errorType = error instanceof TypeError
+        ? 'Network/Fetch Error'
+        : (isJSONError ? 'JSON Parse Error' : 'Other Error');
 
-      console.error('[usersService] ❌ Error fetching users:', {
-        message: errorMessage,
-        type: error instanceof TypeError ? 'Network/Fetch Error' : (isJSONError ? 'JSON Parse Error' : 'Other Error'),
-        isNetworkError,
-        errorObj: error,
-        supabaseConfigured: isSupabaseConfigured(),
-        supabaseUrl: import.meta.env.VITE_SUPABASE_URL?.substring(0, 50),
-      });
+      console.error('[usersService] ❌ Error fetching users:');
+      console.error('[usersService]   Message:', errorMessage);
+      console.error('[usersService]   Type:', errorType);
+      console.error('[usersService]   IsNetworkError:', isNetworkError);
+      console.error('[usersService]   Supabase configured:', isSupabaseConfigured());
 
       // Check if it's a network error
       if (isNetworkError) {
-        console.error('[usersService] ⚠️ NETWORK ERROR: Cannot reach Supabase');
+        console.error('[usersService] 🌐 NETWORK ERROR: Cannot reach Supabase');
         console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
         console.error('[usersService] Possible causes:');
         console.error('[usersService]   1. Network connectivity issue (offline)');
