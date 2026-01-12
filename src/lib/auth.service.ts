@@ -90,38 +90,83 @@ export const authService = {
   },
 
   /**
-   * Sign out the current user and clear all session data
+   * Sign out the current user and clear ALL session/auth data
    */
   async signOut() {
     try {
-      // Clear Supabase session if configured
+      console.log('[signOut] Starting sign out process...');
+
+      // 1. Clear Supabase session via API
       if (isSupabaseConfigured()) {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
+        console.log('[signOut] Clearing Supabase session...');
+        try {
+          const { error } = await supabase.auth.signOut({ scope: 'global' });
+          if (error) {
+            console.warn('[signOut] Supabase signOut error (continuing anyway):', error.message);
+          } else {
+            console.log('[signOut] ✅ Supabase session cleared');
+          }
+        } catch (supabaseError) {
+          console.warn('[signOut] Supabase signOut exception:', supabaseError);
+        }
       }
 
-      // Clear localStorage items that may contain session data
-      const storageKeys = Object.keys(localStorage);
-      storageKeys.forEach(key => {
-        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+      // 2. Clear ALL localStorage - aggressive approach
+      console.log('[signOut] Clearing localStorage...');
+      const localStorageKeys = Object.keys(localStorage);
+      console.log(`[signOut] Found ${localStorageKeys.length} localStorage items`);
+      localStorageKeys.forEach(key => {
+        try {
           localStorage.removeItem(key);
+          console.log(`[signOut] Removed localStorage: ${key}`);
+        } catch (e) {
+          console.warn(`[signOut] Failed to remove localStorage key "${key}":`, e);
         }
       });
 
-      // Clear sessionStorage
-      sessionStorage.clear();
+      // 3. Clear sessionStorage completely
+      console.log('[signOut] Clearing sessionStorage...');
+      try {
+        sessionStorage.clear();
+        console.log('[signOut] ✅ sessionStorage cleared');
+      } catch (e) {
+        console.warn('[signOut] Failed to clear sessionStorage:', e);
+      }
 
+      // 4. Clear specific auth-related cookies
+      console.log('[signOut] Clearing auth cookies...');
+      clearAuthCookies();
+
+      // 5. Clear IndexedDB if it exists (some session data might be there)
+      console.log('[signOut] Clearing IndexedDB...');
+      try {
+        const dbs = await (window.indexedDB?.databases?.() || Promise.resolve([]));
+        for (const db of dbs) {
+          if (db.name && (db.name.includes('supabase') || db.name.includes('auth'))) {
+            indexedDB.deleteDatabase(db.name);
+            console.log(`[signOut] Deleted IndexedDB: ${db.name}`);
+          }
+        }
+      } catch (e) {
+        console.warn('[signOut] Could not access IndexedDB:', e);
+      }
+
+      console.log('[signOut] ✅ Sign out completed successfully');
       return { error: null };
     } catch (error) {
-      console.error('Error during sign out:', error);
-      // Clear data anyway even if error occurs
-      const storageKeys = Object.keys(localStorage);
-      storageKeys.forEach(key => {
-        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
-          localStorage.removeItem(key);
-        }
-      });
-      sessionStorage.clear();
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[signOut] Unexpected error during sign out:', errorMsg);
+
+      // Force clear everything anyway
+      console.log('[signOut] Force clearing all storage...');
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        clearAuthCookies();
+      } catch (e) {
+        console.error('[signOut] Failed to force clear:', e);
+      }
+
       return { error };
     }
   },
