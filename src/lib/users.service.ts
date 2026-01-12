@@ -461,19 +461,36 @@ export const usersService = {
         console.log('[usersService] Password field is empty, skipping password update');
       }
 
+      // Build update data for Edge Function (NEVER include password here - it's handled separately)
       const updateData: any = {};
-      if (updates.name !== undefined) updateData.name = updates.name;
-      if (updates.username !== undefined) updateData.username = updates.username;
-      if (updates.email !== undefined) updateData.email = updates.email;
-      if (updates.whatsapp !== undefined) updateData.whatsapp = updates.whatsapp;
-      if (updates.gender !== undefined) updateData.gender = updates.gender;
-      if (updates.role !== undefined) updateData.role = updates.role;
+      if (updates.name !== undefined && updates.name !== '') updateData.name = updates.name;
+      if (updates.username !== undefined && updates.username !== '') updateData.username = updates.username;
+      if (updates.email !== undefined && updates.email !== '') updateData.email = updates.email;
+      if (updates.whatsapp !== undefined && updates.whatsapp !== null) updateData.whatsapp = updates.whatsapp;
+      if (updates.gender !== undefined && updates.gender !== '') updateData.gender = updates.gender;
+      if (updates.role !== undefined && updates.role !== '') updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
 
-      console.log('[usersService] Building update request:', {
+      // Explicitly ensure password is NEVER sent to Edge Function
+      if (updateData.password) {
+        console.warn('[usersService] WARNING: Removing password from updateData before sending to Edge Function');
+        delete updateData.password;
+      }
+
+      console.log('[usersService] Building update request for Edge Function:', {
         userId: id,
         updateFields: Object.keys(updateData),
-        updateData: updateData,
+        fieldCount: Object.keys(updateData).length,
+        includedFields: {
+          name: !!updateData.name,
+          username: !!updateData.username,
+          email: !!updateData.email,
+          whatsapp: !!updateData.whatsapp,
+          gender: !!updateData.gender,
+          role: !!updateData.role,
+          profileImage: !!updateData.profile_image_url,
+          password: !!updateData.password, // Should always be false
+        }
       });
 
       console.log('[usersService] Calling Edge Function to update user:', {
