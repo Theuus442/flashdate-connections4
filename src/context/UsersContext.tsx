@@ -242,6 +242,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     deleteUser,
     deleteAllByRole,
     getUserById,
+    refreshUsers,
     isLoading,
   };
 
