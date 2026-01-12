@@ -128,21 +128,33 @@ export const usersService = {
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-      console.error('[usersService] Error fetching users:', {
+
+      const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+      const isJSONError = error instanceof SyntaxError;
+
+      console.error('[usersService] ❌ Error fetching users:', {
         message: errorMessage,
-        type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
+        type: error instanceof TypeError ? 'Network/Fetch Error' : (isJSONError ? 'JSON Parse Error' : 'Other Error'),
+        isNetworkError,
         errorObj: error,
+        supabaseConfigured: isSupabaseConfigured(),
+        supabaseUrl: import.meta.env.VITE_SUPABASE_URL?.substring(0, 50),
       });
 
       // Check if it's a network error
-      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-        console.error('[usersService] ❌ NETWORK ERROR: Cannot reach Supabase at', import.meta.env.VITE_SUPABASE_URL);
-        console.error('[usersService] This is a connectivity issue - the browser cannot access the Supabase API');
+      if (isNetworkError) {
+        console.error('[usersService] ⚠️ NETWORK ERROR: Cannot reach Supabase');
+        console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
         console.error('[usersService] Possible causes:');
-        console.error('[usersService]   1. Network connectivity issue');
-        console.error('[usersService]   2. CORS (Cross-Origin Resource Sharing) blocked');
-        console.error('[usersService]   3. Firewall or proxy blocking the request');
-        console.error('[usersService]   4. Supabase URL is incorrect or service is down');
+        console.error('[usersService]   1. Network connectivity issue (offline)');
+        console.error('[usersService]   2. CORS policy blocking requests to Supabase');
+        console.error('[usersService]   3. Environment isolation (preview environment restrictions)');
+        console.error('[usersService]   4. Firewall or corporate proxy blocking');
+        console.error('[usersService]   5. Supabase service is temporarily unavailable');
+
+        // Return empty array instead of error for better UX
+        console.log('[usersService] Returning empty users array due to network error');
+        return { data: [], error: null };
       }
 
       return { data: null, error };
