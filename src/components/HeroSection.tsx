@@ -25,15 +25,6 @@ export const HeroSection = () => {
       <div className="relative z-10 flex-1 flex items-center justify-center pt-20">
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
-            {/* Logo/Icon - Heart with Wings */}
-            <div className="mb-8 flex justify-center animate-fade-up delay-50">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F5aa4608ed40f498f8ed6274d843452de?format=webp&width=800"
-                alt="Flashdate Heart Logo"
-                className="h-40 w-auto drop-shadow-lg"
-              />
-            </div>
-
             {/* Main Title */}
             <h1 className="font-serif text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(80px)' }}>
               <span className="text-white block mb-2">FlashDate.</span>
