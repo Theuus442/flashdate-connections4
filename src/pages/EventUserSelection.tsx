@@ -102,6 +102,15 @@ export default function EventUserSelection() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-20">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft size={20} />
+              <span>Voltar</span>
+            </Button>
             <a href="/" className="flex items-center gap-2">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
@@ -116,15 +125,6 @@ export default function EventUserSelection() {
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{currentUser?.name || 'Usuário'}</span>
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <LogOut size={18} />
-                <span className="hidden sm:inline">Voltar</span>
-              </Button>
             </div>
           </div>
         </div>
