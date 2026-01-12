@@ -66,7 +66,7 @@ export const storageService = {
       // Sanitize filename to remove accents and special characters
       const sanitizedFileName = sanitizeFilename(file.name);
       const fileName = `${eventId}-${Date.now()}-${sanitizedFileName}`;
-      const filePath = `events/${fileName}`;
+      const filePath = fileName;
 
       console.log('[storageService] Uploading event image to bucket: events');
       console.log('[storageService] Original filename:', file.name);
