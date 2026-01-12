@@ -62,12 +62,37 @@ export default function EventUserSelection() {
     }
 
     // Get other participants (excluding current user and admin users)
-    const otherUsers = users.filter(u => u.id !== authUser.id && u.role === 'client');
-    console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
+    const otherUsers = users.filter(u => {
+      const isCurrentUser = u.id === authUser.id;
+      const isAdmin = u.role === 'admin';
+      const isParticipant = !isCurrentUser && !isAdmin;
+
+      if (!isParticipant && u.id !== authUser.id) {
+        console.log('[EventUserSelection] Filtering out:', {
+          name: u.name,
+          id: u.id,
+          role: u.role,
+          isCurrentUser,
+          isAdmin,
+        });
+      }
+
+      return isParticipant;
+    });
+
+    console.log('[EventUserSelection] Participants loaded:', {
+      count: otherUsers.length,
+      totalUsers: users.length,
+      currentUserId: authUser.id,
+      participantNames: otherUsers.map(u => ({ name: u.name, role: u.role })),
+    });
     setParticipants(otherUsers);
 
     if (otherUsers.length === 0 && users.length > 0) {
-      console.warn('[EventUserSelection] No participants found but users exist');
+      console.warn('[EventUserSelection] No participants found but users exist', {
+        totalUsers: users.length,
+        userRoles: users.map(u => ({ name: u.name, role: u.role, id: u.id })),
+      });
       toast.warning('Nenhum outro participante disponível');
     }
   }, [authUser, users]);
