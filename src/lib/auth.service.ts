@@ -156,6 +156,7 @@ export const authService = {
       console.log('[authService] Creating user as admin via Supabase Edge Function:', email);
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
       const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
       console.log('[authService] Calling Edge Function at:', functionUrl);
@@ -164,6 +165,8 @@ export const authService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`,
+          'apikey': anonKey,
         },
         body: JSON.stringify({ email, password }),
       });
@@ -171,15 +174,27 @@ export const authService = {
       console.log('[authService] Response received - status:', response.status);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        let errorData: { error?: string; details?: string } | null = null;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = null;
+        }
+
+        const errorMsg = errorData?.error || errorData?.details || `HTTP ${response.status}`;
         console.error('[authService] Edge Function error:', errorMsg);
         throw new Error(errorMsg);
       }
 
-      const { data } = await response.json();
-      console.log('[authService] Auth user created:', data?.user?.id);
-      return { data: data.user, error: null };
+      const responseData = await response.json();
+      const user = responseData.user || responseData.data?.user;
+
+      if (!user) {
+        throw new Error('No user data returned from edge function');
+      }
+
+      console.log('[authService] Auth user created:', user.id);
+      return { data: user, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
