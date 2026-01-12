@@ -399,27 +399,6 @@ export const usersService = {
       console.log('[usersService] Updating user:', { id, email: updates.email });
       let profileImageUrl: string | undefined;
 
-      // Validate that the ID exists in database before proceeding
-      let validId = id;
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (!existingUser && updates.email) {
-        console.warn('[usersService] ID not found in database, checking by email:', updates.email);
-        const { data: userByEmail } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', updates.email)
-          .maybeSingle();
-
-        if (userByEmail) {
-          console.log('[usersService] Found user by email, using database ID:', userByEmail.id);
-          validId = userByEmail.id;
-        }
-      }
 
       // Upload profile image if provided
       if (profileImage) {
