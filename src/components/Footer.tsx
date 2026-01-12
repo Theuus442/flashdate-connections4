@@ -12,7 +12,7 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <a href="#home" className="inline-block mb-6 flex items-center gap-3">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
                 alt="Flashdate Logo"
                 className="h-20 w-auto"
               />
