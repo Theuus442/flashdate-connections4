@@ -15,33 +15,87 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     const authHeader = req.headers.get('Authorization')
 
-    // Create service role client (can bypass RLS)
-    const supabase = createClient(supabaseUrl, serviceKey)
+    console.log('[update-user-profile] Request started:', {
+      hasAuthHeader: !!authHeader,
+      authHeaderLength: authHeader?.length || 0,
+      supabaseUrl: supabaseUrl.substring(0, 30) + '...',
+      hasServiceKey: !!serviceKey,
+      hasAnonKey: !!anonKey,
+    })
 
-    // Create auth client to verify user is logged in
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    // Extract token from Authorization header (format: "Bearer TOKEN")
+    const token = authHeader?.replace('Bearer ', '') || ''
+
+    if (!token) {
+      console.error('[update-user-profile] ❌ No auth token provided')
+      return new Response(JSON.stringify({
+        error: "Token de autenticação não fornecido",
+        details: "Header Authorization não contém um token válido"
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    console.log('[update-user-profile] Token extracted:', {
+      tokenLength: token.length,
+      tokenStart: token.substring(0, 20) + '...'
+    })
+
+    // Create service role client (can bypass RLS)
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      }
+    })
+
+    // Create auth client to verify user is logged in - pass token in Authorization header
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
       global: {
         headers: {
-          Authorization: authHeader || ''
+          Authorization: `Bearer ${token}`
         }
+      },
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       }
     })
 
     // Verify user is authenticated
+    console.log('[update-user-profile] Calling auth.getUser()...')
     const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser()
-    
+
+    console.log('[update-user-profile] Auth response:', {
+      hasUser: !!authUser,
+      userId: authUser?.id,
+      userEmail: authUser?.email,
+      hasError: !!authError,
+      errorMessage: authError?.message,
+      errorStatus: authError?.status,
+    })
+
     if (authError || !authUser) {
-      console.error('[update-user-profile] Auth error:', authError?.message)
-      return new Response(JSON.stringify({ 
+      console.error('[update-user-profile] ❌ Auth verification failed:', {
+        message: authError?.message,
+        status: authError?.status,
+        hasToken: !!token,
+        tokenLength: token.length
+      })
+      return new Response(JSON.stringify({
         error: "Usuário não autenticado",
-        details: authError?.message
-      }), { 
-        status: 401, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        details: authError?.message || "Token inválido ou expirado"
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       })
     }
+
+    console.log('[update-user-profile] ✅ User authenticated:', authUser.id)
 
     const { id, name, username, email, whatsapp, gender, profile_image_url } = await req.json()
 

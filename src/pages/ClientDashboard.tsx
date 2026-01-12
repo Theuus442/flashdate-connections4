@@ -24,7 +24,7 @@ export default function ClientDashboard() {
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
-    if (authUser && !clientUser) {
+    if (authUser) {
       console.log('[ClientDashboard] Auth user detected, refreshing users list...');
       refreshUsers();
     }
@@ -162,7 +162,14 @@ export default function ClientDashboard() {
 
       if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
-        setClientUser(result.data);
+        // Add cache buster to profile image URL to force browser to reload image
+        const updatedUserData = {
+          ...result.data,
+          profileImage: result.data.profileImage
+            ? `${result.data.profileImage}?t=${Date.now()}`
+            : result.data.profileImage
+        };
+        setClientUser(updatedUserData);
         setSelectedImageFile(undefined); // Clear the selected file after successful upload
       } else {
         const errorMsg = result.error || 'Erro desconhecido';
@@ -271,6 +278,25 @@ export default function ClientDashboard() {
           </div>
         </div>
       </header>
+
+      {/* Connectivity Warning */}
+      {users.length === 0 && !isLoading && (
+        <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 px-4 py-3 text-sm">
+          <div className="container mx-auto flex items-start gap-3">
+            <span className="text-lg">⚠️</span>
+            <div>
+              <p className="font-medium">Problema de conectividade</p>
+              <p className="text-xs mt-1">Não conseguimos conectar ao servidor. Verifique sua conexão e tente recarregar a página.</p>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="ml-auto text-xs font-medium underline hover:no-underline"
+            >
+              Recarregar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col lg:flex-row">

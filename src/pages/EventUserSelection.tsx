@@ -15,10 +15,17 @@ interface Selection {
 export default function EventUserSelection() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
-  const { users, isLoading } = useUsers();
+  const { users, isLoading, refreshUsers } = useUsers();
   const [selections, setSelections] = useState<Selection[]>([]);
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Refresh users on mount to ensure we have latest data
+  useEffect(() => {
+    if (!authUser) return;
+    console.log('[EventUserSelection] Refreshing users list...');
+    refreshUsers();
+  }, [authUser, refreshUsers]);
 
   // Load current user and participants from database
   useEffect(() => {
@@ -36,11 +43,22 @@ export default function EventUserSelection() {
     // Get current user from users array
     const user = users.find(u => u.id === authUser.id);
     if (user) {
-      console.log('[EventUserSelection] Current user loaded:', user.name);
+      console.log('[EventUserSelection] ✅ Current user loaded:', user.name);
       setCurrentUser(user);
     } else {
-      console.log('[EventUserSelection] Current user not found in users array');
-      // Don't block - show what we have
+      console.log('[EventUserSelection] ⚠️ Current user not found in users array');
+      // Fallback: try to create a minimal user object from auth
+      if (authUser.email) {
+        setCurrentUser({
+          id: authUser.id,
+          email: authUser.email,
+          name: authUser.email.split('@')[0], // Use part of email as name
+          username: authUser.email.split('@')[0],
+          whatsapp: '',
+          gender: 'Outro',
+          role: 'client',
+        });
+      }
     }
 
     // Get other participants (excluding current user and admin users)
@@ -78,15 +96,24 @@ export default function EventUserSelection() {
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
-              Nenhum participante disponível
+              {users.length === 0 ? 'Carregando...' : 'Nenhum participante disponível'}
             </h2>
             <p className="text-muted-foreground mb-6">
-              No momento não há outros participantes para você selecionar.
+              {users.length === 0
+                ? 'Não conseguimos carregar os usuários. Tente recarregar a página ou entre em contato com o suporte.'
+                : 'No momento não há outros participantes para você selecionar.'}
             </p>
           </div>
-          <Button onClick={() => navigate('/dashboard')} variant="gold" className="w-full">
-            Voltar ao Dashboard
-          </Button>
+          <div className="flex gap-3">
+            {users.length === 0 && (
+              <Button onClick={() => window.location.reload()} variant="outline" className="flex-1">
+                Recarregar
+              </Button>
+            )}
+            <Button onClick={() => navigate('/dashboard')} variant="gold" className="flex-1">
+              {users.length === 0 ? 'Voltar' : 'Dashboard'}
+            </Button>
+          </div>
         </div>
       </div>
     );

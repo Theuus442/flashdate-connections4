@@ -97,7 +97,19 @@ export const usersService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('[usersService] Supabase error:', error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+
+        // Safely serialize error properties
+        const safeErrorCode = String(error?.code || 'unknown');
+        const safeErrorDetails = String(error?.details || 'no details');
+        const safeErrorHint = String(error?.hint || 'no hint');
+
+        console.error('[usersService] ❌ Supabase error:', errorMessage);
+        console.error('[usersService]   Code:', safeErrorCode);
+        console.error('[usersService]   Details:', safeErrorDetails);
+        console.error('[usersService]   Hint:', safeErrorHint);
         throw error;
       }
 
@@ -117,16 +129,36 @@ export const usersService = {
 
       return { data: transformedData || [], error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[usersService] Error fetching users:', {
-        message: errorMessage,
-        type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
-        error,
-      });
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+
+      const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+      const isJSONError = error instanceof SyntaxError;
+      const errorType = error instanceof TypeError
+        ? 'Network/Fetch Error'
+        : (isJSONError ? 'JSON Parse Error' : 'Other Error');
+
+      console.error('[usersService] ❌ Error fetching users:');
+      console.error('[usersService]   Message:', errorMessage);
+      console.error('[usersService]   Type:', errorType);
+      console.error('[usersService]   IsNetworkError:', isNetworkError);
+      console.error('[usersService]   Supabase configured:', isSupabaseConfigured());
 
       // Check if it's a network error
-      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-        console.error('[usersService] Network error detected - Supabase may be unreachable from this environment');
+      if (isNetworkError) {
+        console.error('[usersService] 🌐 NETWORK ERROR: Cannot reach Supabase');
+        console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+        console.error('[usersService] Possible causes:');
+        console.error('[usersService]   1. Network connectivity issue (offline)');
+        console.error('[usersService]   2. CORS policy blocking requests to Supabase');
+        console.error('[usersService]   3. Environment isolation (preview environment restrictions)');
+        console.error('[usersService]   4. Firewall or corporate proxy blocking');
+        console.error('[usersService]   5. Supabase service is temporarily unavailable');
+
+        // Return empty array instead of error for better UX
+        console.log('[usersService] Returning empty users array due to network error');
+        return { data: [], error: null };
       }
 
       return { data: null, error };
@@ -469,16 +501,25 @@ export const usersService = {
         }),
       });
 
-      const result = await response.json();
+      let result: any = {};
+      try {
+        result = await response.json();
+      } catch (e) {
+        console.error('[usersService] Failed to parse Edge Function response as JSON');
+      }
 
       if (!response.ok) {
         const errorMessage = result.error || `HTTP ${response.status}`;
-        console.error('[usersService] Edge Function error:', {
+        const errorDetails = result.details || '';
+        const fullError = errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage;
+
+        console.error('[usersService] ❌ Edge Function error:', {
           status: response.status,
           message: errorMessage,
-          details: result.details
+          details: errorDetails,
+          fullResponse: result,
         });
-        throw new Error(result.details || errorMessage || 'Falha ao atualizar perfil');
+        throw new Error(fullError || 'Falha ao atualizar perfil');
       }
 
       if (!result.user) {
@@ -486,124 +527,12 @@ export const usersService = {
         throw new Error('Falha ao atualizar perfil - nenhum dado retornado');
       }
 
-      const userData: any = result.user;
+      let userData: any = result.user;
       if (!userData) {
         console.error('[usersService] No user data in Edge Function response');
         throw new Error('Nenhum dado de usuario retornado');
-        console.warn('[usersService] Update affected 0 rows for ID:', id);
-        console.warn('[usersService] User ID:', id, 'Email:', updates.email);
-
-        if (!updates.email) {
-          console.error('[usersService] No email provided for fallback update');
-          throw new Error(`Usuário com ID ${id} não foi encontrado. Verifique sua conexão com o servidor.`);
-        }
-
-        // First, let's check if user exists by email
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('id, email')
-          .eq('email', updates.email)
-          .maybeSingle();
-
-        if (!existingUser) {
-          console.error('[usersService] User not found with email:', updates.email);
-          console.warn('[usersService] Attempting to sync user from Auth to Database...');
-
-          // Try to sync the user from Auth system
-          const syncResult = await this.syncAuthUserToDatabase({
-            id,
-            email: updates.email,
-            user_metadata: {
-              name: updates.name,
-              username: updates.username,
-            }
-          });
-
-          if (syncResult.error) {
-            const syncErrorMsg = syncResult.error instanceof Error
-              ? syncResult.error.message
-              : (typeof syncResult.error === 'object' ? JSON.stringify(syncResult.error) : String(syncResult.error));
-            console.error('[usersService] Sync failed:', syncErrorMsg);
-            throw new Error(`Usuário não encontrado. Erro ao sincronizar: ${syncErrorMsg}`);
-          }
-
-          if (!syncResult.data) {
-            throw new Error(`Falha ao sincronizar usuário ${updates.email} com o banco de dados.`);
-          }
-
-          console.log('[usersService] User synced successfully, retrying update...');
-          // Retry the update with synced user (use validId to ensure we have the right ID)
-          const { data: retryData, error: retryError } = await supabase
-            .from('users')
-            .update(updateData)
-            .eq('id', validId)
-            .select();
-
-          if (retryError || !retryData || retryData.length === 0) {
-            throw new Error(`Falha ao salvar dados após sincronização.`);
-          }
-
-          userData = retryData[0];
-          console.log('[usersService] User updated successfully after sync');
-        } else {
-          // User exists with email, update by email
-          console.log('[usersService] User found by email, preparing to update:', {
-            email: updates.email,
-            existingUserId: existingUser?.id,
-            updateDataFields: Object.keys(updateData),
-            updateDataValues: updateData,
-          });
-
-          const { data: emailUpdateData, error: emailUpdateError } = await supabase
-            .from('users')
-            .update(updateData)
-            .eq('email', updates.email)
-            .select();
-
-          if (emailUpdateError) {
-            const emailErrorMsg = emailUpdateError instanceof Error
-              ? emailErrorError.message
-              : (emailUpdateError?.message || 'Erro desconhecido');
-            console.error('[usersService] Email-based update error response:', {
-              message: emailErrorMsg,
-              code: emailUpdateError?.code,
-              details: emailUpdateError?.details,
-              hint: emailUpdateError?.hint,
-            });
-            throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
-          }
-
-          console.log('[usersService] Email-based update response:', {
-            hasData: !!emailUpdateData,
-            dataLength: emailUpdateData?.length || 0,
-            data: emailUpdateData,
-          });
-
-          if (!emailUpdateData || emailUpdateData.length === 0) {
-            console.error('[usersService] Email-based update affected 0 rows:', {
-              email: updates.email,
-              updateDataKeys: Object.keys(updateData),
-            });
-
-            // Try to debug: check if user still exists
-            const { data: debugUser } = await supabase
-              .from('users')
-              .select('id, email, updated_at')
-              .eq('email', updates.email)
-              .maybeSingle();
-
-            console.error('[usersService] Debug: User exists after failed update?', debugUser);
-
-            throw new Error(`Falha ao salvar alterações no usuário ${updates.email}. Verifique sua conexão e tente novamente.`);
-          }
-
-          userData = emailUpdateData[0];
-          console.log('[usersService] User updated successfully via email');
-        }
-      } else {
-        userData = data[0];
-        console.log('[usersService] User updated successfully via ID');
       }
+
       const transformedData: User = {
         id: userData.id,
         name: userData.name,

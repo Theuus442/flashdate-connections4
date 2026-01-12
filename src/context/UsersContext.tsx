@@ -53,32 +53,55 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           const { data, error } = await usersService.getUsers();
 
           if (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('[UsersContext] Error loading users:', {
+            const errorMessage = error instanceof Error
+              ? error.message
+              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+
+            const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+
+            console.error('[UsersContext] ⚠️ Error loading users:', {
               message: errorMessage,
-              isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
+              isNetworkError,
               error,
             });
 
-            // If it's a network error, show more helpful message
-            if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-              console.error('[UsersContext] Network Error: Cannot reach Supabase. This may be a temporary connectivity issue or a CORS/network isolation problem in your environment.');
+            // If it's a network error, log helpful info but don't fail
+            if (isNetworkError) {
+              console.error('[UsersContext] 🌐 NETWORK ERROR: Cannot reach Supabase');
+              console.error('[UsersContext] This may be a temporary connectivity issue or environment isolation problem.');
+              console.error('[UsersContext] App will continue with empty user list.');
             }
 
+            // In case of network error, return empty array (not an error)
+            // This prevents the app from breaking completely
             setUsers([]);
           } else if (data) {
-            console.log('[UsersContext] Successfully loaded users:', data.length);
+            console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
             setUsers(data);
           }
         })();
 
         await Promise.race([loadPromise, timeoutPromise]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('[UsersContext] Unexpected error loading users:', {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+
+        const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+        const isTimeoutError = errorMessage.includes('timeout');
+
+        console.error('[UsersContext] ❌ Unexpected error loading users:', {
           message: errorMessage,
+          type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
+          isNetworkError,
+          isTimeoutError,
           error,
         });
+
+        if (isNetworkError || isTimeoutError) {
+          console.warn('[UsersContext] App will continue with empty user list');
+        }
+
         setUsers([]);
       } finally {
         setIsLoading(false);
@@ -206,15 +229,24 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data, error } = await usersService.getUsers();
 
       if (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('[UsersContext] Error refreshing users:', errorMessage);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        console.error('[UsersContext] ⚠️ Error refreshing users:');
+        console.error('[UsersContext]   Message:', errorMessage);
+        console.error('[UsersContext]   Type:', typeof error);
       } else if (data) {
-        console.log('[UsersContext] Successfully refreshed users:', data.length);
+        console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
         setUsers(data);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[UsersContext] Unexpected error refreshing users:', errorMessage);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[UsersContext] ❌ Unexpected error refreshing users:', {
+        message: errorMessage,
+        error,
+      });
     }
   };
 

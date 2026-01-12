@@ -41,12 +41,81 @@ if (!isConfigured) {
         autoRefreshToken: true,
         persistSession: true,
       },
+      // Add request configuration to handle network issues
+      global: {
+        headers: {
+          'x-request-id': crypto.randomUUID(),
+        },
+      },
     });
     console.log('[Supabase] ✅ Client initialized successfully');
+
+    // Test connectivity to Supabase
+    testSupabaseConnectivity(supabaseUrl);
   } catch (error) {
     supbaseInitError = `Failed to initialize Supabase client: ${error instanceof Error ? error.message : String(error)}`;
     console.error('[Supabase] ❌ Initialization error:', error);
     supabaseClient = null;
+  }
+}
+
+/**
+ * Test connectivity to Supabase
+ */
+async function testSupabaseConnectivity(url: string) {
+  try {
+    console.log('[Supabase] Testing connectivity to:', url);
+
+    // Test 1: Simple fetch to REST API
+    try {
+      const testUrl = `${url}/rest/v1/`;
+      console.log('[Supabase] Test 1: Fetching', testUrl);
+      const response = await Promise.race([
+        fetch(testUrl, {
+          method: 'OPTIONS',
+          headers: {
+            'apikey': supabaseAnonKey,
+          },
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        )
+      ]);
+
+      if ((response as Response).ok) {
+        console.log('[Supabase] ✅ Test 1 passed: API accessible');
+      } else {
+        console.warn('[Supabase] ⚠️  Test 1: API returned status:', (response as Response).status);
+      }
+    } catch (e1) {
+      const msg1 = e1 instanceof Error ? e1.message : String(e1);
+      console.error('[Supabase] ❌ Test 1 failed:', msg1);
+
+      // Test 2: Try a simple GET request without CORS
+      try {
+        console.log('[Supabase] Test 2: Trying simple fetch without headers...');
+        const response2 = await Promise.race([
+          fetch(url),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+          )
+        ]);
+        console.log('[Supabase] Test 2: Response status:', (response2 as Response).status);
+      } catch (e2) {
+        const msg2 = e2 instanceof Error ? e2.message : String(e2);
+        console.error('[Supabase] ❌ Test 2 failed:', msg2);
+      }
+    }
+
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('[Supabase] ❌ Connectivity test error:', errorMsg);
+    console.error('[Supabase] Network issue detected. Possible causes:');
+    console.error('[Supabase]   1. Network is offline');
+    console.error('[Supabase]   2. CORS policy is blocking requests');
+    console.error('[Supabase]   3. Firewall/proxy is blocking access');
+    console.error('[Supabase]   4. Supabase URL is incorrect:', url);
+    console.error('[Supabase]   5. Supabase service is unavailable');
   }
 }
 
