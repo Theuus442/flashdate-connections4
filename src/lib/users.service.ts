@@ -102,19 +102,27 @@ export const usersService = {
   },
 
   /**
-   * Get all users
+   * Get all users with retry logic
    */
-  async getUsers(): Promise<{ data: User[] | null; error: any }> {
+  async getUsers(retryCount = 0, maxRetries = 2): Promise<{ data: User[] | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
-      console.log('[usersService] Fetching users from Supabase...');
-      const { data, error } = await supabase
+      console.log(`[usersService] Fetching users from Supabase (attempt ${retryCount + 1}/${maxRetries + 1})...`);
+
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000)
+      );
+
+      const fetchPromise = supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
+
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
       if (error) {
         const errorMessage = error instanceof Error
