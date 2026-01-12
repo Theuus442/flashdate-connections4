@@ -216,13 +216,25 @@ export const usersService = {
       console.log('[usersService] User not found by ID, will try email fallback:', id);
       return { data: null, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      let errorMessage = 'Unknown error';
+      let errorCode = 'UNKNOWN';
+      let errorDetails = '';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        errorMessage = (error as any).message || JSON.stringify(error);
+        errorCode = (error as any).code || 'UNKNOWN';
+        errorDetails = (error as any).details || '';
+      } else {
+        errorMessage = String(error);
+      }
+
       console.error('[usersService] Error in getUserById:', {
         userId: id,
         message: errorMessage,
-        error,
+        code: errorCode,
+        details: errorDetails,
       });
       return { data: null, error };
     }
@@ -277,15 +289,27 @@ export const usersService = {
 
       // If user not found by email
       console.warn('[usersService] User not found by email:', email);
-      return { data: null, error: 'User not found in database' };
+      return { data: null, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      let errorMessage = 'Unknown error';
+      let errorCode = 'UNKNOWN';
+      let errorDetails = '';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        errorMessage = (error as any).message || JSON.stringify(error);
+        errorCode = (error as any).code || 'UNKNOWN';
+        errorDetails = (error as any).details || '';
+      } else {
+        errorMessage = String(error);
+      }
+
       console.error('[usersService] Error in getUserByEmail:', {
         email,
         message: errorMessage,
-        error,
+        code: errorCode,
+        details: errorDetails,
       });
       return { data: null, error };
     }
