@@ -314,7 +314,7 @@ export const authService = {
         password,
         options: {
           data: {
-            role: 'client',
+            role: role,
             created_via: 'admin_panel',
           },
           emailRedirectTo: `${window.location.origin}/login`,
