@@ -9,8 +9,20 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function UserProfile() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const { users: allUsers, updateUser } = useUsers();
   const { updateSelection, setCurrentUserId, setCurrentEventId, getSelectionsByVote } = useSelections();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Desconectado com sucesso');
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Erro ao desconectar');
+    }
+  };
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
