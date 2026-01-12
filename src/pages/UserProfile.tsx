@@ -278,6 +278,13 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
+              {!currentEventId && (
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <p className="text-sm text-amber-900 dark:text-amber-100">
+                    ⚠️ Nenhum evento disponível no momento. Participe de um evento para visualizar e selecionar participantes.
+                  </p>
+                </div>
+              )}
               <div className="space-y-3">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
