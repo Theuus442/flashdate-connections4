@@ -96,7 +96,7 @@ export default function UserProfile() {
           <div className="flex items-center justify-between h-20">
             <a href="/" className="flex items-center gap-2">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F0b16f2a8970443a0b7d02d6ff7c28cc7%2F728ec6c60764404790cd1aae17f7869e?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
                 alt="Flashdate Logo"
                 className="h-16 w-auto"
               />
