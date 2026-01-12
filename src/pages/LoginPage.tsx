@@ -144,7 +144,7 @@ export default function LoginPage() {
           {/* Footer Text */}
           <div className="text-center mt-8">
             <p className="text-xs text-muted-foreground">
-              © 2025 Flashdate. Todos os direitos reservados.
+              © 2026 Flashdate. Todos os direitos reservados.
             </p>
           </div>
         </div>
