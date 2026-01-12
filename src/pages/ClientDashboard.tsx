@@ -50,7 +50,14 @@ export default function ClientDashboard() {
       try {
         const { data, error } = await usersService.getUserById(authUser.id);
         if (error) {
-          console.error('[ClientDashboard] Error fetching user:', error);
+          const errorMessage = error instanceof Error
+            ? error.message
+            : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+          console.error('[ClientDashboard] Error fetching user:', {
+            userId: authUser.id,
+            message: errorMessage,
+            error,
+          });
           setClientUser(null);
         } else if (data) {
           console.log('[ClientDashboard] User data loaded successfully:', data);
@@ -60,7 +67,14 @@ export default function ClientDashboard() {
           setClientUser(null);
         }
       } catch (error) {
-        console.error('[ClientDashboard] Unexpected error loading user:', error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        console.error('[ClientDashboard] Unexpected error loading user:', {
+          userId: authUser.id,
+          message: errorMessage,
+          error,
+        });
         setClientUser(null);
       } finally {
         setIsLoadingUserData(false);
