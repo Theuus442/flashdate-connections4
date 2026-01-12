@@ -38,14 +38,16 @@ export default function UserProfile() {
   }, [currentUser, setCurrentUserId, setCurrentEventId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  // Filter and sort users excluding the current user
+  // Filter and sort users excluding the current user and admins
   const otherUsers = useMemo(() => {
-    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers;
+    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id && user.role !== 'admin') : allUsers;
 
     // Apply gender filter
     if (genderFilter !== 'all') {
@@ -61,27 +63,43 @@ export default function UserProfile() {
     return filtered;
   }, [currentUser, allUsers, genderFilter, sortOrder]);
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && currentUser) {
+    if (file) {
+      setSelectedImageFile(file);
       const reader = new FileReader();
-      reader.onloadend = async () => {
+      reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        const result = await updateUser(currentUser.id, { profileImage: imageUrl }, file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveImage = async () => {
+    if (selectedImageFile && currentUser && imagePreview) {
+      setIsUploadingImage(true);
+      try {
+        const result = await updateUser(currentUser.id, { profileImage: imagePreview }, selectedImageFile);
         if (result) {
           toast.success('Foto atualizada com sucesso!');
+          setSelectedImageFile(undefined);
         } else {
           toast.error('Falha ao atualizar foto');
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Erro ao fazer upload da foto');
+      } finally {
+        setIsUploadingImage(false);
+      }
     }
   };
 
   const handleRemoveImage = async () => {
     if (currentUser) {
       setImagePreview(undefined);
+      setSelectedImageFile(undefined);
       const result = await updateUser(currentUser.id, { profileImage: undefined });
       if (result) {
         toast.success('Foto removida');
@@ -385,6 +403,30 @@ export default function UserProfile() {
                       className="hidden"
                     />
                   </label>
+
+                  {selectedImageFile && imagePreview && (
+                    <div className="flex gap-3 justify-center max-w-sm mx-auto mt-4">
+                      <Button
+                        onClick={handleSaveImage}
+                        disabled={isUploadingImage}
+                        variant="gold"
+                        className="flex-1"
+                      >
+                        {isUploadingImage ? 'Salvando...' : 'Salvar Foto'}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedImageFile(undefined);
+                          setImagePreview(currentUser?.profileImage);
+                        }}
+                        disabled={isUploadingImage}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Profile Info */}
