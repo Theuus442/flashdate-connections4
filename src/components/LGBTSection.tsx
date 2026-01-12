@@ -141,8 +141,8 @@ export const LGBTSection = () => {
           {/* Section Header */}
           <div className="text-center mb-16">
             <div className="mb-6 flex justify-center">
-              <img 
-                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F101ed4d62d404da0b1e5ee70eb7980b7?format=webp&width=800"
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2Fcdf15e9fbd634b2b9f32103afe9bf383?format=webp&width=800"
                 alt="LGBT+ Pride"
                 className="h-24 w-auto"
               />
