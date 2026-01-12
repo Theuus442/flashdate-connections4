@@ -6,12 +6,14 @@ import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
 import { useAuth } from '@/context/AuthContext';
+import { eventsService } from '@/lib/events.service';
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
   const { users: allUsers, updateUser } = useUsers();
   const { updateSelection, setCurrentUserId, setCurrentEventId, getSelectionsByVote } = useSelections();
+  const [currentEventId, setEventId] = useState<string | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -24,18 +26,41 @@ export default function UserProfile() {
     }
   };
 
-  // Use the first user as the current user (in a real app, this would be the logged-in user)
-  const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
+  // Get the logged-in user from authenticated context
+  const currentUser = useMemo(() => {
+    if (!authUser) return null;
+    return allUsers.find(u => u.id === authUser.id) || null;
+  }, [authUser, allUsers]);
 
-  // Set current user in selections context
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          setEventId(data[0].id);
+        }
+      } catch (error) {
+        console.error('Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
   useEffect(() => {
     if (currentUser) {
       setCurrentUserId(currentUser.id);
-      // For demo purposes, use a fixed event ID
-      // In a real app, this would come from the current event context
-      setCurrentEventId('default-event-id');
     }
-  }, [currentUser, setCurrentUserId, setCurrentEventId]);
+    if (currentEventId) {
+      setCurrentEventId(currentEventId);
+    }
+  }, [currentUser, currentEventId, setCurrentUserId, setCurrentEventId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
