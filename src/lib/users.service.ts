@@ -436,9 +436,11 @@ export const usersService = {
       if (updates.gender) updateData.gender = updates.gender;
       if (updates.role) updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
-      updateData.updated_at = new Date().toISOString();
 
-      console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
+      console.log('[usersService] Calling Edge Function to update user:', {
+        userId: id,
+        fields: Object.keys(updateData).length
+      });
 
       // First attempt: try normal update with validated ID
       const { data, error } = await supabase
