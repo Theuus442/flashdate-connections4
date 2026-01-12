@@ -164,7 +164,16 @@ export default function ClientDashboard() {
       } else {
         const errorMsg = result.error || 'Erro desconhecido';
         console.error('Error updating profile:', errorMsg);
-        toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
+
+        // Check if it's a user not found error
+        if (errorMsg && errorMsg.includes('does not exist')) {
+          toast.error('Sua sessão expirou. Por favor, faça login novamente.');
+          setTimeout(() => {
+            navigate('/login');
+          }, 2000);
+        } else {
+          toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
+        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
