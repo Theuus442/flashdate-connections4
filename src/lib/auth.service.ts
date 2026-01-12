@@ -236,7 +236,8 @@ export const authService = {
     name?: string,
     username?: string,
     whatsapp?: string,
-    gender?: string
+    gender?: string,
+    role: 'admin' | 'client' = 'client'
   ) {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
@@ -267,7 +268,7 @@ export const authService = {
               username: username || email.split('@')[0],
               whatsapp: whatsapp || '',
               gender: gender || 'Outro',
-              role: 'client'
+              role: role
             }),
           }),
           new Promise((_, reject) =>
@@ -313,7 +314,7 @@ export const authService = {
         password,
         options: {
           data: {
-            role: 'client',
+            role: role,
             created_via: 'admin_panel',
           },
           emailRedirectTo: `${window.location.origin}/login`,
@@ -364,13 +365,20 @@ export const authService = {
         const errorMessage = error instanceof Error
           ? error.message
           : (error?.message || JSON.stringify(error));
+
+        // Handle specific errors
+        if (errorMessage.includes('same_password')) {
+          console.log('[authService] ℹ️ Password is the same as current password - skipping update');
+          return { error: null }; // This is OK - password doesn't need to change
+        }
+
         console.warn('[authService] Could not update password via auth API:', errorMessage);
         // This is expected - we can only update current user's password this way
         // Password updates from admin panel aren't critical if they fail
         return { error: null }; // Return success to continue with other updates
       }
 
-      console.log('[authService] Password updated successfully');
+      console.log('[authService] ✅ Password updated successfully');
       return { error: null };
     } catch (error) {
       const errorMessage = error instanceof Error

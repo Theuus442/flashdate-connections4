@@ -314,7 +314,8 @@ export const usersService = {
           user.name,
           user.username,
           user.whatsapp,
-          user.gender
+          user.gender,
+          user.role
         );
         if (authResult.error) {
           const errorMsg = authResult.error instanceof Error
@@ -445,33 +446,62 @@ export const usersService = {
       }
 
       // If password is being updated, update it in auth system first
+      // NOTE: Password is only updated if explicitly provided and not empty
       if (updates.password && updates.password.trim()) {
-        console.log('[usersService] Updating password in auth system...');
-        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password);
+        console.log('[usersService] ✏️ Password change requested - updating auth system...');
+        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password.trim());
         if (authResult.error) {
           const errorMsg = authResult.error instanceof Error
             ? authResult.error.message
             : JSON.stringify(authResult.error);
-          console.warn('[usersService] Could not update password via auth API:', errorMsg);
+          console.warn('[usersService] ⚠️ Could not update password via auth API:', errorMsg);
           // Don't throw error - password update is secondary, continue with other updates
+        } else {
+          console.log('[usersService] ✅ Password updated successfully');
         }
-      } else if (updates.password === '') {
-        // Empty password means don't update password - remove from updates
-        console.log('[usersService] Password field is empty, skipping password update');
+      } else {
+        // No password update requested - this is normal for profile updates
+        console.log('[usersService] ℹ️ No password change - updating profile only');
       }
 
+      // Build update data for Edge Function (NEVER include password here - it's handled separately)
       const updateData: any = {};
-      if (updates.name) updateData.name = updates.name;
-      if (updates.username) updateData.username = updates.username;
-      if (updates.email) updateData.email = updates.email;
-      if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
-      if (updates.gender) updateData.gender = updates.gender;
-      if (updates.role) updateData.role = updates.role;
+      if (updates.name !== undefined && updates.name !== '') updateData.name = updates.name;
+      if (updates.username !== undefined && updates.username !== '') updateData.username = updates.username;
+      if (updates.email !== undefined && updates.email !== '') updateData.email = updates.email;
+      if (updates.whatsapp !== undefined && updates.whatsapp !== null) updateData.whatsapp = updates.whatsapp;
+      if (updates.gender !== undefined && updates.gender !== '') updateData.gender = updates.gender;
+      if (updates.role !== undefined && updates.role !== '') updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
+
+      // Explicitly ensure password is NEVER sent to Edge Function
+      if (updateData.password) {
+        console.warn('[usersService] WARNING: Removing password from updateData before sending to Edge Function');
+        delete updateData.password;
+      }
+
+      console.log('[usersService] Building update request for Edge Function:', {
+        userId: id,
+        updateFields: Object.keys(updateData),
+        fieldCount: Object.keys(updateData).length,
+        includedFields: {
+          name: !!updateData.name,
+          username: !!updateData.username,
+          email: !!updateData.email,
+          whatsapp: !!updateData.whatsapp,
+          gender: !!updateData.gender,
+          role: !!updateData.role,
+          profileImage: !!updateData.profile_image_url,
+          password: !!updateData.password, // Should always be false
+        }
+      });
 
       console.log('[usersService] Calling Edge Function to update user:', {
         userId: id,
-        fields: Object.keys(updateData).length
+        fields: Object.keys(updateData).length,
+        hasName: !!updateData.name,
+        hasEmail: !!updateData.email,
+        hasRole: !!updateData.role,
       });
 
       // Call Edge Function with SERVICE_ROLE permissions (bypasses RLS)
@@ -488,6 +518,18 @@ export const usersService = {
         throw new Error('Sessao expirada. Faca login novamente.');
       }
 
+      const requestBody = {
+        id,
+        ...updateData
+      };
+
+      console.log('[usersService] Edge Function request details:', {
+        functionUrl: functionUrl,
+        method: 'POST',
+        requestBody: requestBody,
+        hasAuthToken: !!authToken,
+      });
+
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -495,17 +537,27 @@ export const usersService = {
           'Authorization': `Bearer ${authToken}`,
           'apikey': anonKey,
         },
-        body: JSON.stringify({
-          id,
-          ...updateData
-        }),
+        body: JSON.stringify(requestBody),
+      });
+
+      const responseText = await response.text();
+
+      console.log('[usersService] Edge Function response received:', {
+        status: response.status,
+        ok: response.ok,
+        responseTextLength: responseText.length,
+        responseTextPreview: responseText.substring(0, 300),
       });
 
       let result: any = {};
       try {
-        result = await response.json();
+        result = JSON.parse(responseText);
       } catch (e) {
-        console.error('[usersService] Failed to parse Edge Function response as JSON');
+        console.error('[usersService] Failed to parse Edge Function response as JSON:', {
+          responseText: responseText.substring(0, 500),
+          error: e instanceof Error ? e.message : String(e),
+        });
+        result = { error: responseText || 'Unknown error' };
       }
 
       if (!response.ok) {
@@ -517,7 +569,8 @@ export const usersService = {
           status: response.status,
           message: errorMessage,
           details: errorDetails,
-          fullResponse: result,
+          responseText: responseText.substring(0, 500),
+          resultKeys: Object.keys(result),
         });
         throw new Error(fullError || 'Falha ao atualizar perfil');
       }
