@@ -236,25 +236,10 @@ export const usersService = {
       console.log('[usersService] User not found by ID, will try email fallback:', id);
       return { data: null, error: null };
     } catch (error) {
-      let errorMessage = 'Unknown error';
-      let errorCode = 'UNKNOWN';
-      let errorDetails = '';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null) {
-        errorMessage = (error as any).message || JSON.stringify(error);
-        errorCode = (error as any).code || 'UNKNOWN';
-        errorDetails = (error as any).details || '';
-      } else {
-        errorMessage = String(error);
-      }
-
+      const errorStr = serializeError(error);
       console.error('[usersService] Error in getUserById:', {
         userId: id,
-        message: errorMessage,
-        code: errorCode,
-        details: errorDetails,
+        error: errorStr,
       });
       return { data: null, error };
     }
@@ -311,25 +296,10 @@ export const usersService = {
       console.warn('[usersService] User not found by email:', email);
       return { data: null, error: null };
     } catch (error) {
-      let errorMessage = 'Unknown error';
-      let errorCode = 'UNKNOWN';
-      let errorDetails = '';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null) {
-        errorMessage = (error as any).message || JSON.stringify(error);
-        errorCode = (error as any).code || 'UNKNOWN';
-        errorDetails = (error as any).details || '';
-      } else {
-        errorMessage = String(error);
-      }
-
+      const errorStr = serializeError(error);
       console.error('[usersService] Error in getUserByEmail:', {
         email,
-        message: errorMessage,
-        code: errorCode,
-        details: errorDetails,
+        error: errorStr,
       });
       return { data: null, error };
     }
