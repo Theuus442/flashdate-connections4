@@ -11,6 +11,44 @@ export interface AuthUser {
   role: 'admin' | 'client';
 }
 
+/**
+ * Helper function to clear auth-related cookies
+ */
+function clearAuthCookies() {
+  try {
+    // List of cookie names that might contain auth data
+    const authCookiePatterns = [
+      'supabase',
+      'auth',
+      'sb-',
+      'session',
+      'jwt',
+      'token',
+    ];
+
+    // Get all cookies
+    const cookies = document.cookie.split(';');
+
+    cookies.forEach(cookie => {
+      const cookieName = cookie.split('=')[0].trim();
+
+      // Check if cookie matches any auth pattern
+      const isAuthCookie = authCookiePatterns.some(pattern =>
+        cookieName.toLowerCase().includes(pattern.toLowerCase())
+      );
+
+      if (isAuthCookie) {
+        // Clear cookie by setting expiration to past date
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}; SameSite=Lax;`;
+        console.log(`[clearAuthCookies] Cleared cookie: ${cookieName}`);
+      }
+    });
+  } catch (error) {
+    console.warn('[clearAuthCookies] Error clearing cookies:', error);
+  }
+}
+
 export const authService = {
   /**
    * Sign up a new user
