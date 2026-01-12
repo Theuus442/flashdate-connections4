@@ -415,7 +415,7 @@ export const usersService = {
       if (error) {
         let errorMsg = error instanceof Error
           ? error.message
-          : (error?.message || JSON.stringify(error));
+          : (error?.message || 'Unknown database error');
 
         // Provide better error messages for common issues
         if (error?.code === '23505') {
@@ -428,11 +428,12 @@ export const usersService = {
           }
         }
 
+        const errorStr = serializeError(error);
         console.error('[usersService] Database insert error:', {
           message: errorMsg,
           code: error?.code,
           details: error?.details,
-          hint: error?.hint,
+          dbError: errorStr,
         });
         throw new Error(errorMsg);
       }
