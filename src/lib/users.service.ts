@@ -112,9 +112,10 @@ export const usersService = {
     try {
       console.log(`[usersService] Fetching users from Supabase (attempt ${retryCount + 1}/${maxRetries + 1})...`);
 
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (8 seconds per attempt to account for network latency)
+      const timeoutMs = 8000;
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000)
+        setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
       );
 
       const fetchPromise = supabase
