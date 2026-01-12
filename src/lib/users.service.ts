@@ -385,11 +385,10 @@ export const usersService = {
 
       // Delete all users with this role
       console.log('[usersService] Deleting', count, 'users with role:', role);
-      const { error: deleteError, count: deletedCount } = await supabase
+      const { error: deleteError } = await supabase
         .from('users')
         .delete()
-        .eq('role', role)
-        .select();
+        .eq('role', role);
 
       if (deleteError) {
         console.error('[usersService] Error deleting users:', deleteError);
