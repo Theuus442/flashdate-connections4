@@ -147,21 +147,29 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.log('[UsersContext] Calling usersService.createUser...');
       const { data, error } = await usersService.createUser(user, profileImage);
 
-      const errorMessage = error instanceof Error ? error.message : (error?.message || JSON.stringify(error));
-      console.log('[UsersContext] createUser response:', { hasData: !!data, hasError: !!error, errorMessage });
+      const errorMessage = typeof error === 'string' ? error : serializeError(error);
+      console.log('[UsersContext] createUser response:', {
+        hasData: !!data,
+        hasError: !!error,
+        errorMessage
+      });
 
       if (error) {
         console.error('[UsersContext] Error adding user:', errorMessage);
-        console.error('[UsersContext] Full error:', error);
         return { data: null, error: errorMessage };
       }
       if (data) {
-        console.log('[UsersContext] User created successfully:', data);
+        console.log('[UsersContext] User created successfully:', {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          username: data.username,
+        });
         setUsers(prev => [...prev, data]);
         return { data, error: null };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = serializeError(error);
       console.error('[UsersContext] Error adding user:', errorMessage);
       return { data: null, error: errorMessage };
     }
