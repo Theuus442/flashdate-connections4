@@ -518,7 +518,7 @@ export const usersService = {
           status: response.status,
           message: errorMessage,
           details: errorDetails,
-          fullResponse: result,
+          fullResponse: JSON.stringify(result),
         });
         throw new Error(fullError || 'Falha ao atualizar perfil');
       }
