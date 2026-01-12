@@ -321,24 +321,31 @@ export const usersService = {
     try {
       console.log('[usersService] Updating user:', id);
 
-      // Verify user exists before attempting update
+      // Verify user exists before attempting update using maybeSingle to avoid errors
       const { data: existingUser, error: existsError } = await supabase
         .from('users')
         .select('id')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
-      if (existsError || !existingUser) {
+      if (existsError) {
         const existsErrorMsg = existsError instanceof Error
           ? existsError.message
-          : (existsError?.message || 'User not found');
+          : (existsError?.message || 'Database error');
         const errorDetails = {
           userId: id,
           message: existsErrorMsg,
           code: existsError?.code,
           details: existsError?.details,
         };
-        console.error('[usersService] User does not exist:', errorDetails);
+        console.error('[usersService] Error checking if user exists:', errorDetails);
+        throw new Error(`Error verifying user: ${existsErrorMsg}`);
+      }
+
+      if (!existingUser) {
+        console.error('[usersService] User does not exist in database:', {
+          userId: id,
+        });
         throw new Error(`User with ID ${id} not found in database`);
       }
 
