@@ -474,12 +474,27 @@ export const usersService = {
         const errorMessage = error instanceof Error
           ? error.message
           : (error?.message || JSON.stringify(error));
+
+        // Detect RLS policy violations
+        const isRLSError = errorMessage.includes('new row violates row-level security policy') ||
+                          errorMessage.includes('row-level security policy') ||
+                          errorMessage.includes('permission denied') ||
+                          error?.code === 'PGRST301';
+
         console.error('[usersService] Update error:', {
           message: errorMessage,
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
+          isRLSError,
         });
+
+        if (isRLSError) {
+          console.error('[usersService] 🔐 RLS POLICY ERROR DETECTED!');
+          console.error('[usersService] User role may not have permission to update');
+          throw new Error(`Erro de permissão (RLS): Você não tem permissão para atualizar este perfil. Se é admin, verifique as RLS policies.`);
+        }
+
         throw error;
       }
 
