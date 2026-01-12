@@ -268,7 +268,7 @@ export const authService = {
               username: username || email.split('@')[0],
               whatsapp: whatsapp || '',
               gender: gender || 'Outro',
-              role: 'client'
+              role: role
             }),
           }),
           new Promise((_, reject) =>
