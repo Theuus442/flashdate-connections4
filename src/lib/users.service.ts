@@ -173,7 +173,7 @@ export const usersService = {
       console.error('[usersService]   IsNetworkError:', isNetworkError);
       console.error('[usersService]   Supabase configured:', isSupabaseConfigured());
 
-      // Check if it's a network error
+      // Check if it's a network error and retry if we haven't exhausted retries
       if (isNetworkError) {
         console.error('[usersService] 🌐 NETWORK ERROR: Cannot reach Supabase');
         console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
@@ -184,8 +184,16 @@ export const usersService = {
         console.error('[usersService]   4. Firewall or corporate proxy blocking');
         console.error('[usersService]   5. Supabase service is temporarily unavailable');
 
-        // Return empty array instead of error for better UX
-        console.log('[usersService] Returning empty users array due to network error');
+        // Retry with exponential backoff
+        if (retryCount < maxRetries) {
+          const delayMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+          console.log(`[usersService] Retrying in ${delayMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          return this.getUsers(retryCount + 1, maxRetries);
+        }
+
+        // After all retries exhausted, return empty array for better UX
+        console.log('[usersService] Returning empty users array due to network error (retries exhausted)');
         return { data: [], error: null };
       }
 
