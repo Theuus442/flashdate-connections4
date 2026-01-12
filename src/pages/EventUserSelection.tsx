@@ -19,6 +19,8 @@ export default function EventUserSelection() {
   const [selections, setSelections] = useState<Selection[]>([]);
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'original'>('original');
+  const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F' | 'Outro'>('all');
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
