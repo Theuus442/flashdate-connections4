@@ -486,9 +486,8 @@ export const usersService = {
         throw new Error('Falha ao atualizar perfil - nenhum dado retornado');
       }
 
-      // If update didn't affect any rows, user doesn't exist with that ID
-      let userData: any;
-      if (!data || data.length === 0) {
+      const userData: any = result.user;
+      if (!userData) {
         // Update affected 0 rows - try to find user by email instead
         console.warn('[usersService] Update affected 0 rows for ID:', id);
         console.warn('[usersService] User ID:', id, 'Email:', updates.email);
