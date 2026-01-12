@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, Heart, Users, X } from 'lucide-react';
+import { LogOut, Heart, Users, X, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
@@ -22,15 +22,25 @@ export default function EventUserSelection() {
 
   // Load current user and participants from database
   useEffect(() => {
-    if (!authUser || !users.length) return;
+    if (!authUser) {
+      console.log('[EventUserSelection] No auth user yet');
+      return;
+    }
 
-    console.log('[EventUserSelection] Loading data...');
+    console.log('[EventUserSelection] Loading data...', {
+      authUserId: authUser.id,
+      usersCount: users.length,
+      isLoading,
+    });
 
     // Get current user from users array
     const user = users.find(u => u.id === authUser.id);
     if (user) {
       console.log('[EventUserSelection] Current user loaded:', user.name);
       setCurrentUser(user);
+    } else {
+      console.log('[EventUserSelection] Current user not found in users array');
+      // Don't block - show what we have
     }
 
     // Get other participants (excluding current user and admin users)
@@ -38,10 +48,49 @@ export default function EventUserSelection() {
     console.log('[EventUserSelection] Participants loaded:', otherUsers.length);
     setParticipants(otherUsers);
 
-    if (otherUsers.length === 0) {
+    if (otherUsers.length === 0 && users.length > 0) {
+      console.warn('[EventUserSelection] No participants found but users exist');
       toast.warning('Nenhum outro participante disponível');
     }
   }, [authUser, users]);
+
+  // Show error if not authenticated
+  if (!authUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Erro: Você precisa estar autenticado</p>
+          <Button onClick={() => navigate('/login')} variant="gold">
+            Ir para Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no participants and finished loading
+  if (!isLoading && participants.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="mb-6">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+              Nenhum participante disponível
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              No momento não há outros participantes para você selecionar.
+            </p>
+          </div>
+          <Button onClick={() => navigate('/dashboard')} variant="gold" className="w-full">
+            Voltar ao Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSelection = (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
     const existingSelection = selections.find(s => s.userId === participantId);
@@ -90,6 +139,15 @@ export default function EventUserSelection() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-20">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft size={20} />
+              <span>Voltar</span>
+            </Button>
             <a href="/" className="flex items-center gap-2">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
@@ -102,17 +160,8 @@ export default function EventUserSelection() {
             </a>
             <div className="flex items-center gap-4">
               <span className="hidden sm:inline text-sm text-muted-foreground">
-                Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
+                Bem-vindo, <span className="text-foreground font-medium">{currentUser?.name || 'Usuário'}</span>
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <LogOut size={18} />
-                <span className="hidden sm:inline">Voltar</span>
-              </Button>
             </div>
           </div>
         </div>
@@ -156,7 +205,7 @@ export default function EventUserSelection() {
                       />
                     ) : (
                       <span className="text-6xl font-bold text-amber-300/80">
-                        {participant.name.charAt(0)}
+                        {participant.name?.charAt(0) || 'U'}
                       </span>
                     )}
                   </div>
@@ -166,13 +215,13 @@ export default function EventUserSelection() {
                     {/* User Info */}
                     <div className="mb-4">
                       <h3 className="font-serif text-xl font-bold text-foreground">
-                        {participant.name}
+                        {participant.name || 'Usuário'}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {participant.age} anos • {getGenderLabel(participant.gender)}
+                        {participant.age || '-'} anos • {getGenderLabel(participant.gender)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {participant.profession}
+                        {participant.profession || '-'}
                       </p>
                     </div>
 

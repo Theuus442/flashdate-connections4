@@ -6,12 +6,14 @@ import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
 import { useAuth } from '@/context/AuthContext';
+import { eventsService } from '@/lib/events.service';
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
   const { users: allUsers, updateUser } = useUsers();
   const { updateSelection, setCurrentUserId, setCurrentEventId, getSelectionsByVote } = useSelections();
+  const [currentEventId, setEventId] = useState<string | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -24,18 +26,41 @@ export default function UserProfile() {
     }
   };
 
-  // Use the first user as the current user (in a real app, this would be the logged-in user)
-  const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
+  // Get the logged-in user from authenticated context
+  const currentUser = useMemo(() => {
+    if (!authUser) return null;
+    return allUsers.find(u => u.id === authUser.id) || null;
+  }, [authUser, allUsers]);
 
-  // Set current user in selections context
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          setEventId(data[0].id);
+        }
+      } catch (error) {
+        console.error('Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
   useEffect(() => {
     if (currentUser) {
       setCurrentUserId(currentUser.id);
-      // For demo purposes, use a fixed event ID
-      // In a real app, this would come from the current event context
-      setCurrentEventId('default-event-id');
     }
-  }, [currentUser, setCurrentUserId, setCurrentEventId]);
+    if (currentEventId) {
+      setCurrentEventId(currentEventId);
+    }
+  }, [currentUser, currentEventId, setCurrentUserId, setCurrentEventId]);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
@@ -110,11 +135,9 @@ export default function UserProfile() {
   };
 
   const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!currentUser) return;
+    if (!currentUser || !currentEventId) return;
     try {
-      // For demo purposes, use a fixed event ID
-      const eventId = 'default-event-id';
-      await updateSelection(eventId, currentUser.id, selectedUserId, vote);
+      await updateSelection(currentEventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
@@ -255,6 +278,13 @@ export default function UserProfile() {
           {/* Participants View */}
           {activeTab === 'participants' && (
             <div className="flex-1 flex flex-col">
+              {!currentEventId && (
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <p className="text-sm text-amber-900 dark:text-amber-100">
+                    ⚠️ Nenhum evento disponível no momento. Participe de um evento para visualizar e selecionar participantes.
+                  </p>
+                </div>
+              )}
               <div className="space-y-3">
                 {otherUsers.map(user => {
                   const selection = getSelectionForUser(user.id);
@@ -298,36 +328,45 @@ export default function UserProfile() {
                         <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
                             onClick={() => handleSelection(user.id, 'SIM')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'SIM'
                                 ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="SIM"
+                            title={currentEventId ? "SIM" : "Nenhum evento disponível"}
                           >
                             <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'TALVEZ')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'TALVEZ'
                                 ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="TALVEZ"
+                            title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
                           >
                             <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
                           </button>
                           <button
                             onClick={() => handleSelection(user.id, 'NÃO')}
+                            disabled={!currentEventId}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${
                               selection?.vote === 'NÃO'
                                 ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="NÃO"
+                            title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
                           >
                             <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
                             <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>

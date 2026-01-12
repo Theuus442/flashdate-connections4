@@ -43,26 +43,36 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       try {
         console.log('[UsersContext] Attempting to load users from Supabase...');
-        const { data, error } = await usersService.getUsers();
 
-        if (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          console.error('[UsersContext] Error loading users:', {
-            message: errorMessage,
-            isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
-            error,
-          });
+        // Set a timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('User load timeout after 10 seconds')), 10000)
+        );
 
-          // If it's a network error, show more helpful message
-          if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-            console.error('[UsersContext] Network Error: Cannot reach Supabase. This may be a temporary connectivity issue or a CORS/network isolation problem in your environment.');
+        const loadPromise = (async () => {
+          const { data, error } = await usersService.getUsers();
+
+          if (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('[UsersContext] Error loading users:', {
+              message: errorMessage,
+              isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
+              error,
+            });
+
+            // If it's a network error, show more helpful message
+            if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+              console.error('[UsersContext] Network Error: Cannot reach Supabase. This may be a temporary connectivity issue or a CORS/network isolation problem in your environment.');
+            }
+
+            setUsers([]);
+          } else if (data) {
+            console.log('[UsersContext] Successfully loaded users:', data.length);
+            setUsers(data);
           }
+        })();
 
-          setUsers([]);
-        } else if (data) {
-          console.log('[UsersContext] Successfully loaded users:', data.length);
-          setUsers(data);
-        }
+        await Promise.race([loadPromise, timeoutPromise]);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('[UsersContext] Unexpected error loading users:', {
