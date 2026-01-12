@@ -384,39 +384,12 @@ export const usersService = {
         throw error;
       }
 
-      // If update didn't affect any rows, user doesn't exist - need to handle this
+      // If update didn't affect any rows, user doesn't exist
       let userData: any;
       if (!data || data.length === 0) {
-        // User doesn't exist - this is a data sync issue
-        console.error('[usersService] Update affected 0 rows - user does not exist in database:', id);
-
-        // Try to fetch the user to see if it actually exists
-        const { data: checkData, error: checkError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle();
-
-        if (checkError) {
-          const checkErrorMsg = checkError instanceof Error
-            ? checkError.message
-            : (checkError?.message || 'Unknown error');
-          console.error('[usersService] Error checking user existence:', {
-            userId: id,
-            message: checkErrorMsg,
-            code: checkError?.code,
-          });
-          throw new Error(`Could not verify user: ${checkErrorMsg}`);
-        }
-
-        if (!checkData) {
-          console.error('[usersService] User not found in database:', id);
-          throw new Error(`User with ID ${id} does not exist in database. Please logout and login again.`);
-        }
-
-        // User exists, use the fetched data
-        userData = checkData;
-        console.log('[usersService] User data retrieved after update returned no rows');
+        // Update affected 0 rows - user doesn't exist in database
+        console.error('[usersService] Update affected 0 rows - user does not exist:', id);
+        throw new Error(`User with ID ${id} does not exist in database. Please logout and login again.`);
       } else {
         userData = data[0];
         console.log('[usersService] User updated successfully');
