@@ -393,8 +393,16 @@ export const usersService = {
           .single();
 
         if (fetchError) {
-          console.error('[usersService] Failed to fetch updated user:', fetchError);
-          throw new Error(`User with ID ${id} not found`);
+          const fetchErrorMsg = fetchError instanceof Error
+            ? fetchError.message
+            : (fetchError?.message || JSON.stringify(fetchError));
+          console.error('[usersService] Failed to fetch updated user:', {
+            message: fetchErrorMsg,
+            code: fetchError?.code,
+            details: fetchError?.details,
+            hint: fetchError?.hint,
+          });
+          throw new Error(`User with ID ${id} not found (fetch error: ${fetchErrorMsg})`);
         }
 
         if (!fetchedUser) {
