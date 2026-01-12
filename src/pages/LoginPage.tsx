@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,15 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
+
+  // Redirect authenticated users to appropriate dashboard
+  useEffect(() => {
+    if (user) {
+      const destination = user.role === 'admin' ? '/admin' : '/dashboard';
+      navigate(destination, { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,15 +40,21 @@ export default function LoginPage() {
         return;
       }
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Authenticate with Supabase
+      console.log('[LoginPage] Attempting to sign in with:', email);
+      const result = await signIn(email, password);
 
-      // Success - redirect to user profile
+      if (!result.success) {
+        setError(result.error || 'Erro ao fazer login. Tente novamente.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Success message will be shown, then redirect will happen via useEffect
       toast.success('Bem-vindo de volta!');
-      navigate('/user-profile');
     } catch (err) {
+      console.error('[LoginPage] Unexpected error:', err);
       setError('Erro ao fazer login. Tente novamente.');
-    } finally {
       setIsLoading(false);
     }
   };

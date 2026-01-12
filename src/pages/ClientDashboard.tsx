@@ -1,50 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useUsers } from '@/context/UsersContext';
 import { toast } from 'sonner';
-
-interface ClientUser {
-  id: string;
-  name: string;
-  username: string;
-  age: number;
-  email: string;
-  whatsapp: string;
-  profession: string;
-  profileImage?: string;
-}
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
+  const { users, updateUser, isLoading } = useUsers();
 
-  // Mock user data - in real app this would come from auth context
-  const [clientUser, setClientUser] = useState<ClientUser>({
-    id: '1',
-    name: 'Maria Silva',
-    username: 'maria.silva',
-    age: 32,
-    email: 'maria@example.com',
-    whatsapp: '(11) 98765-4321',
-    profession: 'Advogada',
-    profileImage: undefined,
-  });
+  // Load real user data from users array
+  const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
+  const [clientUser, setClientUser] = useState<any>(null);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // Update clientUser when realUser or users changes
+  useEffect(() => {
+    if (realUser) {
+      console.log('[ClientDashboard] Loading user data:', realUser);
+      setClientUser(realUser);
+    }
+  }, [realUser, users]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && clientUser) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
-        setClientUser(prev => ({
+        setClientUser(prev => prev ? {
           ...prev,
           profileImage: imageUrl,
-        }));
+        } : prev);
         setIsEditingImage(false);
       };
       reader.readAsDataURL(file);
@@ -52,10 +44,45 @@ export default function ClientDashboard() {
   };
 
   const handleRemoveImage = () => {
-    setClientUser(prev => ({
-      ...prev,
-      profileImage: undefined,
-    }));
+    if (clientUser) {
+      setClientUser(prev => prev ? {
+        ...prev,
+        profileImage: undefined,
+      } : prev);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!clientUser || !authUser) {
+      toast.error('Erro: dados do usuário não encontrados');
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const updatedData = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        whatsapp: formData.get('whatsapp') as string,
+      };
+
+      const result = await updateUser(authUser.id, updatedData);
+
+      if (result) {
+        toast.success('Perfil atualizado com sucesso!');
+        setClientUser(result);
+      } else {
+        toast.error('Erro ao atualizar perfil');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erro ao atualizar perfil');
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -69,6 +96,30 @@ export default function ClientDashboard() {
       navigate('/login');
     }
   };
+
+  // Debug logs
+  useEffect(() => {
+    console.log('[ClientDashboard] State update:', {
+      isLoading,
+      hasAuthUser: !!authUser,
+      usersCount: users.length,
+      hasClientUser: !!clientUser,
+      userId: authUser?.id,
+      clientUserData: clientUser ? { id: clientUser.id, name: clientUser.name, email: clientUser.email } : null,
+    });
+  }, [isLoading, authUser, users, clientUser]);
+
+  // Show loading state while data is being fetched
+  if (isLoading && !clientUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando seu perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -97,7 +148,7 @@ export default function ClientDashboard() {
                 Selecionar Matches
               </Button>
               <span className="hidden sm:inline text-sm text-muted-foreground">
-                Bem-vindo, <span className="text-foreground font-medium">{clientUser.name}</span>
+                Bem-vindo, <span className="text-foreground font-medium">{clientUser?.name || 'Usuário'}</span>
               </span>
               <Button
                 variant="ghost"
@@ -180,7 +231,7 @@ export default function ClientDashboard() {
                     <div className="flex flex-col items-center text-center mb-6">
                       {/* Profile Image Section */}
                       <div className="relative mb-4">
-                        {clientUser.profileImage ? (
+                        {clientUser && clientUser.profileImage ? (
                           <>
                             <img
                               src={clientUser.profileImage}
@@ -207,7 +258,7 @@ export default function ClientDashboard() {
                         ) : (
                           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-0">
                             <span className="text-5xl font-bold text-secondary-foreground">
-                              {clientUser.name.charAt(0)}
+                              {clientUser?.name.charAt(0) || 'U'}
                             </span>
                           </div>
                         )}
@@ -230,7 +281,7 @@ export default function ClientDashboard() {
                         className="hidden"
                       />
 
-                      {isEditingImage && !clientUser.profileImage && (
+                      {isEditingImage && !clientUser?.profileImage && (
                         <button
                           onClick={() => document.getElementById('profileImageInput')?.click()}
                           className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
@@ -246,66 +297,69 @@ export default function ClientDashboard() {
                         {isEditingImage ? 'Cancelar' : 'Editar Foto'}
                       </button>
 
-                      <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser.name}</h2>
-                      <p className="text-muted-foreground text-sm">@{clientUser.username}</p>
+                      <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser?.name || 'Usuário'}</h2>
+                      <p className="text-muted-foreground text-sm">@{clientUser?.username || 'username'}</p>
                     </div>
 
                     <div className="space-y-4 border-t border-border pt-6">
-                      <InfoItem label="Profissão" value={clientUser.profession} />
-                      <InfoItem label="Idade" value={`${clientUser.age} anos`} />
-                      <InfoItem label="Email" value={clientUser.email} />
-                      <InfoItem label="WhatsApp" value={clientUser.whatsapp} />
+                      <InfoItem label="Email" value={clientUser?.email || '-'} />
+                      <InfoItem label="WhatsApp" value={clientUser?.whatsapp || '-'} />
+                      <InfoItem label="Gênero" value={clientUser?.gender || '-'} />
                     </div>
                   </div>
 
                   {/* Edit Profile Card */}
                   <div className="bg-card border border-border rounded-2xl p-8">
                     <h3 className="font-serif text-xl font-bold text-foreground mb-6">Editar Perfil</h3>
-                    <form className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Nome Completo
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={clientUser.name}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
+                    {clientUser ? (
+                      <form onSubmit={handleSaveProfile} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            Nome Completo
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            defaultValue={clientUser.name}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            defaultValue={clientUser.email}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">
+                            WhatsApp
+                          </label>
+                          <input
+                            type="tel"
+                            name="whatsapp"
+                            defaultValue={clientUser.whatsapp || ''}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                          />
+                        </div>
+                        <Button
+                          type="submit"
+                          variant="gold"
+                          className="w-full mt-6"
+                          disabled={isUpdatingProfile}
+                        >
+                          {isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações'}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Carregando dados do perfil...</p>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          defaultValue={clientUser.email}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          WhatsApp
-                        </label>
-                        <input
-                          type="tel"
-                          defaultValue={clientUser.whatsapp}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Profissão
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={clientUser.profession}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
-                        />
-                      </div>
-                      <Button variant="gold" className="w-full mt-6">
-                        Salvar Alterações
-                      </Button>
-                    </form>
+                    )}
                   </div>
                 </div>
               </div>

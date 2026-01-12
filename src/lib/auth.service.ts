@@ -230,7 +230,14 @@ export const authService = {
    * Create user as admin with email and password (for admin panel)
    * Attempts to use Edge Function first, then falls back to regular signUp
    */
-  async createUserAsAdmin(email: string, password: string) {
+  async createUserAsAdmin(
+    email: string,
+    password: string,
+    name?: string,
+    username?: string,
+    whatsapp?: string,
+    gender?: string
+  ) {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
@@ -253,7 +260,15 @@ export const authService = {
               'Authorization': `Bearer ${anonKey}`,
               'apikey': anonKey,
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({
+              email,
+              password,
+              name: name || email.split('@')[0],
+              username: username || email.split('@')[0],
+              whatsapp: whatsapp || '',
+              gender: gender || 'Outro',
+              role: 'client'
+            }),
           }),
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Edge function timeout')), 10000)
@@ -266,13 +281,22 @@ export const authService = {
           const responseData = await (response as Response).json();
           const user = responseData.user || responseData.data?.user;
 
-          if (user) {
+          if (user && user.id) {
             console.log('[authService] ✅ User created via Edge Function:', user.id);
-            return { data: user, error: null };
+            return {
+              data: {
+                id: user.id,
+                email: user.email,
+                name: user.name || name || email.split('@')[0],
+                username: user.username || username || email.split('@')[0],
+              },
+              error: null
+            };
           }
         } else {
           const status = (response as Response).status;
-          console.warn(`[authService] Edge Function returned ${status}, will try fallback method`);
+          const errorData = await (response as Response).json();
+          console.warn(`[authService] Edge Function returned ${status}:`, errorData);
         }
       } catch (edgeFunctionError) {
         const errorMsg = edgeFunctionError instanceof Error
