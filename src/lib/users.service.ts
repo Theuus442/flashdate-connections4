@@ -389,11 +389,24 @@ export const usersService = {
       if (!data || data.length === 0) {
         // Update affected 0 rows - try to find user by email instead
         console.warn('[usersService] Update affected 0 rows for ID:', id);
-        console.warn('[usersService] Attempting fallback: updating by email instead:', updates.email);
+        console.warn('[usersService] User ID:', id, 'Email:', updates.email);
 
         if (!updates.email) {
           console.error('[usersService] No email provided for fallback update');
-          throw new Error(`User with ID ${id} not found and no email provided for fallback`);
+          throw new Error(`Usuário com ID ${id} não foi encontrado. Verifique sua conexão com o servidor.`);
+        }
+
+        // First, let's check if user exists by email
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id, email')
+          .eq('email', updates.email)
+          .maybeSingle();
+
+        if (!existingUser) {
+          console.error('[usersService] User not found with email:', updates.email);
+          console.error('[usersService] Database lookup failed - user data mismatch detected');
+          throw new Error(`Usuário com email ${updates.email} não foi encontrado no banco de dados. Verifique se sua conta está sincronizada corretamente.`);
         }
 
         // Try to update by email instead
@@ -406,18 +419,18 @@ export const usersService = {
         if (emailUpdateError) {
           const emailErrorMsg = emailUpdateError instanceof Error
             ? emailUpdateError.message
-            : (emailUpdateError?.message || 'Unknown error');
+            : (emailUpdateError?.message || 'Erro desconhecido');
           console.error('[usersService] Email-based update failed:', {
             message: emailErrorMsg,
             code: emailUpdateError?.code,
             details: emailUpdateError?.details,
           });
-          throw new Error(`Could not update user by email: ${emailErrorMsg}`);
+          throw new Error(`Falha ao atualizar usuário: ${emailErrorMsg}`);
         }
 
         if (!emailUpdateData || emailUpdateData.length === 0) {
           console.error('[usersService] Email-based update affected 0 rows:', updates.email);
-          throw new Error(`User with email ${updates.email} not found in database`);
+          throw new Error(`Falha ao salvar alterações. Tente fazer login novamente.`);
         }
 
         userData = emailUpdateData[0];
