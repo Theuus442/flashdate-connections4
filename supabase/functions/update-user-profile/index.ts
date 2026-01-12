@@ -239,13 +239,23 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('[update-user-profile] Error:', error.message)
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      type: error.constructor.name
-    }), { 
-      status: 500, 
-      headers: { ...corsHeaders, "Content-Type": "application/json" } 
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorStack = error instanceof Error ? error.stack : 'N/A'
+
+    console.error('[update-user-profile] ❌ Unexpected error:', {
+      message: errorMessage,
+      stack: errorStack,
+      type: error?.constructor?.name || typeof error,
+      fullError: JSON.stringify(error)
+    })
+
+    return new Response(JSON.stringify({
+      error: "Erro interno ao atualizar perfil: " + errorMessage,
+      details: errorStack,
+      type: error?.constructor?.name || typeof error
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
     })
   }
 })
