@@ -52,6 +52,7 @@ function clearAuthCookies() {
 export const authService = {
   /**
    * Sign up a new user
+   * Ensures metadata is set in both user_metadata and app_metadata for JWT-based RLS
    */
   async signUp(email: string, password: string, name: string, role: 'admin' | 'client' = 'client') {
     if (!isSupabaseConfigured()) {
@@ -63,6 +64,8 @@ export const authService = {
     }
 
     try {
+      console.log('[authService.signUp] Creating user:', email, 'with role:', role);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -70,14 +73,22 @@ export const authService = {
           data: {
             name,
             role,
+            email_verified: true,
           },
         },
       });
 
       if (error) throw error;
 
+      if (data.user) {
+        console.log('[authService.signUp] ✅ User signed up successfully:', data.user.id);
+        console.log('[authService.signUp] User metadata:', data.user.user_metadata);
+      }
+
       return { user: data.user, error: null };
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[authService.signUp] Error:', errorMsg);
       return { user: null, error };
     }
   },
