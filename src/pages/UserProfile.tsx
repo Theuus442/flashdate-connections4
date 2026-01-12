@@ -161,7 +161,7 @@ export default function UserProfile() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
+                onClick={handleLogout}
                 className="flex items-center gap-2"
               >
                 <LogOut size={18} />
