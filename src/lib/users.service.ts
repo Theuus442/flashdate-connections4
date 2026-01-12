@@ -462,17 +462,26 @@ export const usersService = {
       }
 
       const updateData: any = {};
-      if (updates.name) updateData.name = updates.name;
-      if (updates.username) updateData.username = updates.username;
-      if (updates.email) updateData.email = updates.email;
-      if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
-      if (updates.gender) updateData.gender = updates.gender;
-      if (updates.role) updateData.role = updates.role;
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.username !== undefined) updateData.username = updates.username;
+      if (updates.email !== undefined) updateData.email = updates.email;
+      if (updates.whatsapp !== undefined) updateData.whatsapp = updates.whatsapp;
+      if (updates.gender !== undefined) updateData.gender = updates.gender;
+      if (updates.role !== undefined) updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
+
+      console.log('[usersService] Building update request:', {
+        userId: id,
+        updateFields: Object.keys(updateData),
+        updateData: updateData,
+      });
 
       console.log('[usersService] Calling Edge Function to update user:', {
         userId: id,
-        fields: Object.keys(updateData).length
+        fields: Object.keys(updateData).length,
+        hasName: !!updateData.name,
+        hasEmail: !!updateData.email,
+        hasRole: !!updateData.role,
       });
 
       // Call Edge Function with SERVICE_ROLE permissions (bypasses RLS)
