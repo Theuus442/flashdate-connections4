@@ -28,14 +28,14 @@ export default function ClientDashboard() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && clientUser) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
-        setClientUser(prev => ({
+        setClientUser(prev => prev ? {
           ...prev,
-          profileImage: imageUrl,
-        }));
+          profile_image_url: imageUrl,
+        } : prev);
         setIsEditingImage(false);
       };
       reader.readAsDataURL(file);
