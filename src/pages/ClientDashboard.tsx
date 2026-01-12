@@ -52,28 +52,27 @@ export default function ClientDashboard() {
         console.log('[ClientDashboard] Attempting to fetch user by ID:', authUser.id);
         let result = await usersService.getUserById(authUser.id);
 
-        // If not found by ID, try by email (in case IDs are out of sync)
+        // If not found by ID (no data and no error, or error occurred), try by email
         if (!result.data && authUser.email) {
           console.log('[ClientDashboard] User not found by ID, trying by email:', authUser.email);
           result = await usersService.getUserByEmail(authUser.email);
         }
 
-        if (result.error) {
+        // Now check if we have data
+        if (result.data) {
+          console.log('[ClientDashboard] User data loaded successfully:', result.data);
+          setClientUser(result.data);
+        } else {
+          // Only report error if we couldn't find user by either ID or email
           const errorMessage = result.error instanceof Error
             ? result.error.message
             : (typeof result.error === 'object' && result.error !== null ? JSON.stringify(result.error) : String(result.error));
-          console.error('[ClientDashboard] Error fetching user:', {
+          console.error('[ClientDashboard] User not found in database:', {
             userId: authUser.id,
             userEmail: authUser.email,
             message: errorMessage,
             error: result.error,
           });
-          setClientUser(null);
-        } else if (result.data) {
-          console.log('[ClientDashboard] User data loaded successfully:', result.data);
-          setClientUser(result.data);
-        } else {
-          console.error('[ClientDashboard] User not found in database');
           setClientUser(null);
         }
       } catch (error) {
