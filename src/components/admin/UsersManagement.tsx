@@ -127,7 +127,7 @@ export const UsersManagement = () => {
 
         const result = await updateUser(editingId, updates, selectedImageFile);
 
-        if (result) {
+        if (result.data) {
           toast({
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
@@ -146,12 +146,10 @@ export const UsersManagement = () => {
           setEditingId(null);
           setShowForm(false);
         } else {
-          const errorMsg = result instanceof Error
-            ? result.message
-            : (typeof result === 'string' ? result : 'Falha ao atualizar usuário');
+          const errorMsg = result.error || 'Falha ao atualizar usuário';
 
           // User not found is a specific error to handle
-          if (errorMsg && errorMsg.includes('not found')) {
+          if (errorMsg.includes('not found')) {
             toast({
               title: 'Erro',
               description: 'Usuário não encontrado no banco de dados. Pode ter sido deletado. Recarregue a página.',
@@ -163,7 +161,7 @@ export const UsersManagement = () => {
           } else {
             toast({
               title: 'Erro',
-              description: `Falha ao atualizar usuário: ${errorMsg || 'Desconhecido'}`,
+              description: errorMsg,
               variant: 'destructive',
             });
           }
