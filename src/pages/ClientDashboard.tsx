@@ -122,12 +122,10 @@ export default function ClientDashboard() {
           }
         }
       } catch (error) {
-        const errorMessage = error instanceof Error
-          ? error.message
-          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        const errorMessage = serializeError(error);
         console.error('[ClientDashboard] ❌ Unexpected error loading user:', {
           userId: authUser.id,
-          message: errorMessage,
+          error: errorMessage,
         });
         setClientUser(null);
       } finally {
