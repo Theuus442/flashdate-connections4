@@ -21,6 +21,8 @@ export default function ClientDashboard() {
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [maxRetries] = useState(3);
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
