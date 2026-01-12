@@ -278,15 +278,30 @@ export const UsersManagement = () => {
   const handleConfirmBulkDelete = async () => {
     setIsLoading(true);
     try {
+      console.log('[UsersManagement] Starting bulk delete for role:', bulkDeleteRole);
       const result = await deleteAllByRole(bulkDeleteRole);
 
+      console.log('[UsersManagement] Bulk delete result:', result);
+
       if (result.error) {
+        const errorMsg = result.error instanceof Error
+          ? result.error.message
+          : (typeof result.error === 'object' ? JSON.stringify(result.error) : String(result.error));
+        console.error('[UsersManagement] Bulk delete error:', errorMsg);
         toast({
           title: 'Erro',
-          description: `Erro ao deletar ${bulkDeleteRole === 'admin' ? 'administradores' : 'clientes'}`,
+          description: `Erro ao deletar ${bulkDeleteRole === 'admin' ? 'administradores' : 'clientes'}: ${errorMsg}`,
+          variant: 'destructive',
+        });
+      } else if (result.count === 0) {
+        console.warn('[UsersManagement] No users were deleted');
+        toast({
+          title: 'Nenhum usuário deletado',
+          description: `Não foi encontrado nenhum ${bulkDeleteRole === 'admin' ? 'administrador' : 'cliente'} para deletar`,
           variant: 'destructive',
         });
       } else {
+        console.log('[UsersManagement] Successfully deleted', result.count, 'users');
         toast({
           title: 'Sucesso',
           description: `${result.count} ${bulkDeleteRole === 'admin' ? 'administrador(es)' : 'cliente(s)'} deletado(s) com sucesso!`,
@@ -294,10 +309,11 @@ export const UsersManagement = () => {
         setShowBulkDeleteModal(false);
       }
     } catch (error) {
-      console.error('Error during bulk delete:', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[UsersManagement] Error during bulk delete:', errorMsg);
       toast({
         title: 'Erro',
-        description: 'Erro ao deletar usuários',
+        description: `Erro ao deletar usuários: ${errorMsg}`,
         variant: 'destructive',
       });
     } finally {

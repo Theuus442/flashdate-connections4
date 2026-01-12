@@ -11,6 +11,44 @@ export interface AuthUser {
   role: 'admin' | 'client';
 }
 
+/**
+ * Helper function to clear auth-related cookies
+ */
+function clearAuthCookies() {
+  try {
+    // List of cookie names that might contain auth data
+    const authCookiePatterns = [
+      'supabase',
+      'auth',
+      'sb-',
+      'session',
+      'jwt',
+      'token',
+    ];
+
+    // Get all cookies
+    const cookies = document.cookie.split(';');
+
+    cookies.forEach(cookie => {
+      const cookieName = cookie.split('=')[0].trim();
+
+      // Check if cookie matches any auth pattern
+      const isAuthCookie = authCookiePatterns.some(pattern =>
+        cookieName.toLowerCase().includes(pattern.toLowerCase())
+      );
+
+      if (isAuthCookie) {
+        // Clear cookie by setting expiration to past date
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}; SameSite=Lax;`;
+        console.log(`[clearAuthCookies] Cleared cookie: ${cookieName}`);
+      }
+    });
+  } catch (error) {
+    console.warn('[clearAuthCookies] Error clearing cookies:', error);
+  }
+}
+
 export const authService = {
   /**
    * Sign up a new user
@@ -90,38 +128,83 @@ export const authService = {
   },
 
   /**
-   * Sign out the current user and clear all session data
+   * Sign out the current user and clear ALL session/auth data
    */
   async signOut() {
     try {
-      // Clear Supabase session if configured
+      console.log('[signOut] Starting sign out process...');
+
+      // 1. Clear Supabase session via API
       if (isSupabaseConfigured()) {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
+        console.log('[signOut] Clearing Supabase session...');
+        try {
+          const { error } = await supabase.auth.signOut({ scope: 'global' });
+          if (error) {
+            console.warn('[signOut] Supabase signOut error (continuing anyway):', error.message);
+          } else {
+            console.log('[signOut] ✅ Supabase session cleared');
+          }
+        } catch (supabaseError) {
+          console.warn('[signOut] Supabase signOut exception:', supabaseError);
+        }
       }
 
-      // Clear localStorage items that may contain session data
-      const storageKeys = Object.keys(localStorage);
-      storageKeys.forEach(key => {
-        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+      // 2. Clear ALL localStorage - aggressive approach
+      console.log('[signOut] Clearing localStorage...');
+      const localStorageKeys = Object.keys(localStorage);
+      console.log(`[signOut] Found ${localStorageKeys.length} localStorage items`);
+      localStorageKeys.forEach(key => {
+        try {
           localStorage.removeItem(key);
+          console.log(`[signOut] Removed localStorage: ${key}`);
+        } catch (e) {
+          console.warn(`[signOut] Failed to remove localStorage key "${key}":`, e);
         }
       });
 
-      // Clear sessionStorage
-      sessionStorage.clear();
+      // 3. Clear sessionStorage completely
+      console.log('[signOut] Clearing sessionStorage...');
+      try {
+        sessionStorage.clear();
+        console.log('[signOut] ✅ sessionStorage cleared');
+      } catch (e) {
+        console.warn('[signOut] Failed to clear sessionStorage:', e);
+      }
 
+      // 4. Clear specific auth-related cookies
+      console.log('[signOut] Clearing auth cookies...');
+      clearAuthCookies();
+
+      // 5. Clear IndexedDB if it exists (some session data might be there)
+      console.log('[signOut] Clearing IndexedDB...');
+      try {
+        const dbs = await (window.indexedDB?.databases?.() || Promise.resolve([]));
+        for (const db of dbs) {
+          if (db.name && (db.name.includes('supabase') || db.name.includes('auth'))) {
+            indexedDB.deleteDatabase(db.name);
+            console.log(`[signOut] Deleted IndexedDB: ${db.name}`);
+          }
+        }
+      } catch (e) {
+        console.warn('[signOut] Could not access IndexedDB:', e);
+      }
+
+      console.log('[signOut] ✅ Sign out completed successfully');
       return { error: null };
     } catch (error) {
-      console.error('Error during sign out:', error);
-      // Clear data anyway even if error occurs
-      const storageKeys = Object.keys(localStorage);
-      storageKeys.forEach(key => {
-        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
-          localStorage.removeItem(key);
-        }
-      });
-      sessionStorage.clear();
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[signOut] Unexpected error during sign out:', errorMsg);
+
+      // Force clear everything anyway
+      console.log('[signOut] Force clearing all storage...');
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        clearAuthCookies();
+      } catch (e) {
+        console.error('[signOut] Failed to force clear:', e);
+      }
+
       return { error };
     }
   },
@@ -145,7 +228,7 @@ export const authService = {
 
   /**
    * Create user as admin with email and password (for admin panel)
-   * Uses Edge Function to create confirmed user without sending email
+   * Attempts to use Edge Function first, then falls back to regular signUp
    */
   async createUserAsAdmin(email: string, password: string) {
     if (!isSupabaseConfigured()) {
@@ -153,33 +236,78 @@ export const authService = {
     }
 
     try {
-      console.log('[authService] Creating user as admin via Supabase Edge Function:', email);
+      console.log('[authService] Creating user as admin:', email);
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
       const functionUrl = `${supabaseUrl}/functions/v1/create-user-confirmed`;
 
-      console.log('[authService] Calling Edge Function at:', functionUrl);
+      // Attempt 1: Try Edge Function (primary method)
+      console.log('[authService] Attempting Edge Function method...');
+      try {
+        const response = await Promise.race([
+          fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${anonKey}`,
+              'apikey': anonKey,
+            },
+            body: JSON.stringify({ email, password }),
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Edge function timeout')), 10000)
+          ),
+        ]);
 
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+        console.log('[authService] Edge Function response - status:', (response as Response).status);
 
-      console.log('[authService] Response received - status:', response.status);
+        if ((response as Response).ok) {
+          const responseData = await (response as Response).json();
+          const user = responseData.user || responseData.data?.user;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-        const errorMsg = errorData.error || `HTTP ${response.status}`;
-        console.error('[authService] Edge Function error:', errorMsg);
-        throw new Error(errorMsg);
+          if (user) {
+            console.log('[authService] ✅ User created via Edge Function:', user.id);
+            return { data: user, error: null };
+          }
+        } else {
+          const status = (response as Response).status;
+          console.warn(`[authService] Edge Function returned ${status}, will try fallback method`);
+        }
+      } catch (edgeFunctionError) {
+        const errorMsg = edgeFunctionError instanceof Error
+          ? edgeFunctionError.message
+          : String(edgeFunctionError);
+        console.warn('[authService] Edge Function failed:', errorMsg);
+        // Continue to fallback
       }
 
-      const { data } = await response.json();
-      console.log('[authService] Auth user created:', data?.user?.id);
-      return { data: data.user, error: null };
+      // Attempt 2: Fallback to regular signUp with email_confirm flag (requires email confirmation)
+      console.log('[authService] Falling back to regular signUp method...');
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: 'client',
+            created_via: 'admin_panel',
+          },
+          emailRedirectTo: `${window.location.origin}/login`,
+        },
+      });
+
+      if (error) {
+        console.error('[authService] SignUp error:', error.message);
+        throw error;
+      }
+
+      if (data.user) {
+        console.log('[authService] ✅ User created via fallback signUp:', data.user.id);
+        // Note: User will need to confirm email with this method
+        return { data: data.user, error: null };
+      }
+
+      throw new Error('No user data returned');
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message

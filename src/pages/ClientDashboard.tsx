@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 interface ClientUser {
   id: string;
@@ -16,6 +18,7 @@ interface ClientUser {
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   // Mock user data - in real app this would come from auth context
   const [clientUser, setClientUser] = useState<ClientUser>({
@@ -55,8 +58,16 @@ export default function ClientDashboard() {
     }));
   };
 
-  const handleLogout = () => {
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Desconectado com sucesso');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Erro ao desconectar');
+      navigate('/login');
+    }
   };
 
   return (
