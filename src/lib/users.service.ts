@@ -402,8 +402,8 @@ export const usersService = {
 
       // Upload profile image if provided
       if (profileImage) {
-        console.log('[usersService] Uploading profile image for user:', validId);
-        const result = await storageService.uploadUserProfileImage(validId, profileImage);
+        console.log('[usersService] Uploading profile image for user:', id);
+        const result = await storageService.uploadUserProfileImage(id, profileImage);
         if (result.error) {
           console.error('[usersService] Error uploading profile image:', result.error);
           throw result.error;
