@@ -97,6 +97,18 @@ export default function ClientDashboard() {
     }
   };
 
+  // Debug logs
+  useEffect(() => {
+    console.log('[ClientDashboard] State update:', {
+      isLoading,
+      hasAuthUser: !!authUser,
+      usersCount: users.length,
+      hasClientUser: !!clientUser,
+      userId: authUser?.id,
+      clientUserData: clientUser ? { id: clientUser.id, name: clientUser.name, email: clientUser.email } : null,
+    });
+  }, [isLoading, authUser, users, clientUser]);
+
   // Show loading state while data is being fetched
   if (isLoading && !clientUser) {
     return (
