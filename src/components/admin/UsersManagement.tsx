@@ -112,13 +112,13 @@ export const UsersManagement = () => {
       return;
     }
 
-    // Validate no duplicates in email or username
-    const duplicateCheck = checkDuplicateField(users, formData.email, formData.username, editingId);
+    // Validate no duplicates in email (username and name can be duplicated now)
+    const duplicateCheck = checkDuplicateField(users, formData.email, editingId);
     if (duplicateCheck.isDuplicate) {
-      console.warn('[UsersManagement] Duplicate field detected:', duplicateCheck);
+      console.warn('[UsersManagement] Duplicate email detected:', duplicateCheck);
       toast({
         title: 'Erro',
-        description: `Este ${duplicateCheck.field} já está registrado no sistema. Escolha um ${duplicateCheck.field} único.`,
+        description: 'Este email já está registrado no sistema. Escolha um email único.',
         variant: 'destructive',
       });
       setIsLoading(false);
