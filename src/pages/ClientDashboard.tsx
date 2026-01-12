@@ -219,10 +219,10 @@ export default function ClientDashboard() {
                     <div className="flex flex-col items-center text-center mb-6">
                       {/* Profile Image Section */}
                       <div className="relative mb-4">
-                        {clientUser && clientUser.profile_image_url ? (
+                        {clientUser && clientUser.profileImage ? (
                           <>
                             <img
-                              src={clientUser.profile_image_url}
+                              src={clientUser.profileImage}
                               alt={clientUser.name}
                               className="w-32 h-32 rounded-full object-cover border-4 border-gold shadow-lg"
                             />
@@ -269,7 +269,7 @@ export default function ClientDashboard() {
                         className="hidden"
                       />
 
-                      {isEditingImage && !clientUser?.profile_image_url && (
+                      {isEditingImage && !clientUser?.profileImage && (
                         <button
                           onClick={() => document.getElementById('profileImageInput')?.click()}
                           className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
