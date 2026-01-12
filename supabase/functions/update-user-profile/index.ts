@@ -180,27 +180,68 @@ serve(async (req) => {
     })
 
     // Try to update by ID first (most common case)
-    let response = await supabase
-      .from('users')
-      .update(updateData)
-      .eq('id', id)
-      .select()
+    console.log('[update-user-profile] Attempting database update with ID:', {
+      id,
+      updateDataKeys: Object.keys(updateData),
+      updateDataValues: updateData
+    })
+
+    let response: any = null
+    try {
+      response = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+
+      console.log('[update-user-profile] Database update by ID response:', {
+        hasError: !!response.error,
+        hasData: !!response.data,
+        dataLength: response.data?.length || 0
+      })
+    } catch (dbError) {
+      console.error('[update-user-profile] ❌ Database update by ID failed:', {
+        message: dbError instanceof Error ? dbError.message : String(dbError),
+        error: dbError
+      })
+      throw dbError
+    }
 
     // If no rows affected and we have an email, try updating by email
     if ((!response.data || response.data.length === 0) && email) {
       console.log('[update-user-profile] ID update returned 0 rows, trying by email:', email)
-      response = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('email', email)
-        .select()
+      try {
+        response = await supabase
+          .from('users')
+          .update(updateData)
+          .eq('email', email)
+          .select()
+
+        console.log('[update-user-profile] Database update by email response:', {
+          hasError: !!response.error,
+          hasData: !!response.data,
+          dataLength: response.data?.length || 0
+        })
+      } catch (dbError) {
+        console.error('[update-user-profile] ❌ Database update by email failed:', {
+          message: dbError instanceof Error ? dbError.message : String(dbError),
+          error: dbError
+        })
+        throw dbError
+      }
     }
 
     if (response.error) {
-      console.error('[update-user-profile] Database error:', response.error)
-      return new Response(JSON.stringify({ 
+      console.error('[update-user-profile] ❌ Database returned error:', {
+        code: response.error.code,
+        message: response.error.message,
+        details: response.error.details,
+        hint: response.error.hint
+      })
+      return new Response(JSON.stringify({
         error: "Erro ao atualizar perfil",
-        details: response.error.message
+        details: response.error.message,
+        code: response.error.code
       }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
