@@ -149,11 +149,18 @@ export default function ClientDashboard() {
         whatsapp: formData.get('whatsapp') as string,
       };
 
-      const result = await updateUser(authUser.id, updatedData);
+      console.log('[ClientDashboard] Saving profile with image:', {
+        hasImage: !!selectedImageFile,
+        fileName: selectedImageFile?.name,
+      });
+
+      // Pass the selected image file if available
+      const result = await updateUser(authUser.id, updatedData, selectedImageFile);
 
       if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
         setClientUser(result.data);
+        setSelectedImageFile(undefined); // Clear the selected file after successful upload
       } else {
         const errorMsg = result.error || 'Erro desconhecido';
         console.error('Error updating profile:', errorMsg);
