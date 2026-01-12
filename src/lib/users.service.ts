@@ -518,16 +518,6 @@ export const usersService = {
         role: userData.role || 'client',
         profileImage: userData.profile_image_url,
       };
-      const transformedData: User = {
-        id: userData.id,
-        name: userData.name,
-        username: userData.username,
-        email: userData.email,
-        whatsapp: userData.whatsapp,
-        gender: userData.gender,
-        role: userData.role || 'client',
-        profileImage: userData.profile_image_url,
-      };
 
       console.log('[usersService] User updated successfully via Edge Function');
       return { data: transformedData, error: null };
