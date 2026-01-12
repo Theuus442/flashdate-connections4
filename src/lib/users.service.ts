@@ -389,10 +389,10 @@ export const usersService = {
       if (!data || data.length === 0) {
         console.warn('[usersService] Update affected 0 rows - user does not exist. Attempting to create...', id);
 
-        // Try to create user with upsert
-        const { data: upsertData, error: upsertError } = await supabase
+        // Try to create user record
+        const { data: createData, error: createError } = await supabase
           .from('users')
-          .upsert([{
+          .insert([{
             id: id,
             name: updates.name || 'Usuário',
             username: updates.username || `user-${id.slice(0, 8)}`,
@@ -403,31 +403,31 @@ export const usersService = {
             profile_image_url: profileImageUrl,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-          }], { onConflict: 'id' })
+          }])
           .select();
 
-        if (upsertError) {
-          const upsertErrorMsg = upsertError instanceof Error
-            ? upsertError.message
-            : (upsertError?.message || 'Failed to create user');
+        if (createError) {
+          const createErrorMsg = createError instanceof Error
+            ? createError.message
+            : (createError?.message || 'Failed to create user');
           const errorDetails = {
             userId: id,
-            message: upsertErrorMsg,
-            code: upsertError?.code,
-            details: upsertError?.details,
-            hint: upsertError?.hint,
+            message: createErrorMsg,
+            code: createError?.code,
+            details: createError?.details,
+            hint: createError?.hint,
           };
           console.error('[usersService] Failed to create user record:', errorDetails);
-          throw new Error(`User with ID ${id} not found and could not be created: ${upsertErrorMsg}`);
+          throw new Error(`User with ID ${id} not found and could not be created: ${createErrorMsg}`);
         }
 
-        if (!upsertData || upsertData.length === 0) {
-          console.error('[usersService] Upsert succeeded but returned no data for user:', id);
+        if (!createData || createData.length === 0) {
+          console.error('[usersService] Insert succeeded but returned no data for user:', id);
           throw new Error(`User with ID ${id} could not be created (no data returned)`);
         }
 
-        userData = upsertData[0];
-        console.log('[usersService] User created successfully via upsert');
+        userData = createData[0];
+        console.log('[usersService] User created successfully');
       } else {
         userData = data[0];
         console.log('[usersService] User updated successfully');
