@@ -65,13 +65,25 @@ export const usersService = {
     }
 
     try {
+      console.log('[usersService] Fetching user by ID:', id);
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
+        console.error('[usersService] Supabase error fetching user:', {
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+        });
+        throw error;
+      }
 
       const transformedData = data ? {
         id: data.id,
@@ -85,8 +97,17 @@ export const usersService = {
         password: data.password,
       } : null;
 
+      console.log('[usersService] Successfully fetched user:', id);
       return { data: transformedData, error: null };
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error in getUserById:', {
+        userId: id,
+        message: errorMessage,
+        error,
+      });
       return { data: null, error };
     }
   },
