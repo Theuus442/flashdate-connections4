@@ -2,342 +2,85 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 serve(async (req) => {
-  // Log immediately to verify this function is being called
-  console.log('🟢 [update-user-profile] Function called!')
-  console.log('📍 [update-user-profile] Request details:', {
-    method: req.method,
-    url: req.url,
-    headers: {
-      contentType: req.headers.get('content-type'),
-      authorization: req.headers.get('authorization') ? 'Bearer ...' : 'none'
-    }
-  })
-
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   }
 
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders })
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders })
 
   try {
-    console.log('🟢 [update-user-profile] Starting main try block...')
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     const authHeader = req.headers.get('Authorization')
-
-    console.log('[update-user-profile] Request started:', {
-      hasAuthHeader: !!authHeader,
-      authHeaderLength: authHeader?.length || 0,
-      supabaseUrl: supabaseUrl.substring(0, 30) + '...',
-      hasServiceKey: !!serviceKey,
-      hasAnonKey: !!anonKey,
-    })
-
-    // Extract token from Authorization header (format: "Bearer TOKEN")
     const token = authHeader?.replace('Bearer ', '') || ''
 
-    if (!token) {
-      console.error('[update-user-profile] ❌ No auth token provided')
-      return new Response(JSON.stringify({
-        error: "Token de autenticação não fornecido",
-        details: "Header Authorization não contém um token válido"
-      }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
+    // Cliente com Service Role para ter poder total
+    const supabase = createClient(supabaseUrl, serviceKey)
 
-    console.log('[update-user-profile] Token extracted:', {
-      tokenLength: token.length,
-      tokenStart: token.substring(0, 20) + '...'
-    })
+    // 1. Validar quem está pedindo a alteração
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !authUser) throw new Error("Não autorizado ou token inválido")
 
-    // Create service role client (can bypass RLS)
-    const supabase = createClient(supabaseUrl, serviceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      }
-    })
+    const body = await req.json()
+    const targetId = body.id || authUser.id
 
-    // Create auth client to verify user is logged in - pass token in Authorization header
-    const supabaseAuth = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      },
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      }
-    })
-
-    // Verify user is authenticated
-    console.log('[update-user-profile] Calling auth.getUser()...')
-    const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser()
-
-    console.log('[update-user-profile] Auth response:', {
-      hasUser: !!authUser,
-      userId: authUser?.id,
-      userEmail: authUser?.email,
-      hasError: !!authError,
-      errorMessage: authError?.message,
-      errorStatus: authError?.status,
-    })
-
-    if (authError || !authUser) {
-      console.error('[update-user-profile] ❌ Auth verification failed:', {
-        message: authError?.message,
-        status: authError?.status,
-        hasToken: !!token,
-        tokenLength: token.length
-      })
-      return new Response(JSON.stringify({
-        error: "Usuário não autenticado",
-        details: authError?.message || "Token inválido ou expirado"
-      }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    console.log('[update-user-profile] ✅ User authenticated:', authUser.id)
-
-    let body: any = {}
-    let rawRequestText = ''
-    try {
-      const contentType = req.headers.get('content-type')
-      console.log('[update-user-profile] Request content-type:', contentType)
-
-      // Read body safely
-      const bodyText = await req.text()
-      rawRequestText = bodyText
-      console.log('[update-user-profile] Raw request body (first 500 chars):', bodyText.substring(0, 500))
-
-      if (!bodyText || bodyText.trim() === '') {
-        console.error('[update-user-profile] ❌ Empty request body')
-        return new Response(JSON.stringify({
-          error: "Corpo da solicitação vazio"
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        })
-      }
-
-      body = JSON.parse(bodyText)
-      console.log('[update-user-profile] Request JSON parsed successfully')
-    } catch (e) {
-      const errorMsg = e instanceof Error ? e.message : String(e)
-      console.error('[update-user-profile] ❌ Failed to parse request JSON:', {
-        message: errorMsg,
-        rawBodyLength: rawRequestText.length,
-        rawBodyPreview: rawRequestText.substring(0, 200)
-      })
-      return new Response(JSON.stringify({
-        error: "Falha ao processar solicitação - JSON inválido",
-        details: errorMsg,
-        preview: rawRequestText.substring(0, 200)
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    const { id, name, username, email, whatsapp, gender, profile_image_url } = body
-
-    console.log('[update-user-profile] Request fields extracted:', {
-      hasId: id !== undefined,
-      id: id,
-      name: name,
-      username: username,
-      email: email,
-      whatsapp: whatsapp,
-      gender: gender,
-      profile_image_url: profile_image_url,
-      allKeys: Object.keys(body),
-      authUserId: authUser.id,
-      authEmail: authUser.email,
-    })
-
-    // Check if user is an admin by querying the users table
-    let isAdmin = false
-    const { data: currentUserData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', authUser.id)
-      .maybeSingle()
-
-    if (currentUserData?.role === 'admin') {
-      isAdmin = true
-      console.log('[update-user-profile] ✅ User is admin, allowing update of other profiles')
-    } else {
-      console.log('[update-user-profile] User is not admin, checking ownership')
-    }
-
-    // Verify user can only update their own profile (unless they're an admin)
-    if (!isAdmin && id !== authUser.id && email !== authUser.email) {
-      console.error('[update-user-profile] ❌ Unauthorized update attempt - user is not admin and trying to update different profile')
-      return new Response(JSON.stringify({
-        error: "Você não tem permissão para atualizar este perfil"
-      }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    // Validate that we have at least one field to update
-    if (!id) {
-      console.error('[update-user-profile] ❌ Missing required field: id')
-      return new Response(JSON.stringify({
-        error: "ID do usuário não fornecido"
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    // Build update object - only include fields that are provided
+    // 2. Atualizar a tabela PUBLIC.USERS primeiro
     const updateData: any = {}
-    if (name !== undefined && name !== null && name !== '') updateData.name = name
-    if (username !== undefined && username !== null && username !== '') updateData.username = username
-    if (email !== undefined && email !== null && email !== '') updateData.email = email
-    if (whatsapp !== undefined && whatsapp !== null) updateData.whatsapp = whatsapp
-    if (gender !== undefined && gender !== null && gender !== '') updateData.gender = gender
-    if (profile_image_url !== undefined && profile_image_url !== null && profile_image_url !== '') updateData.profile_image_url = profile_image_url
+    if (body.name) updateData.name = body.name
+    if (body.username) updateData.username = body.username
+    if (body.whatsapp) updateData.whatsapp = body.whatsapp
+    if (body.gender) updateData.gender = body.gender
+    if (body.role) updateData.role = body.role
     updateData.updated_at = new Date().toISOString()
 
-    console.log('[update-user-profile] Building update with fields:', {
-      fieldNames: Object.keys(updateData),
-      fieldCount: Object.keys(updateData).length,
-      hasName: !!updateData.name,
-      hasUsername: !!updateData.username,
-      hasEmail: !!updateData.email,
-      hasGender: !!updateData.gender,
-      hasWhatsapp: !!updateData.whatsapp,
-      hasImage: !!updateData.profile_image_url,
-    })
+    const { data: publicUser, error: pError } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', targetId)
+      .select()
+      .single()
 
-    // Try to update by ID first (most common case)
-    console.log('[update-user-profile] Attempting database update with ID:', {
-      id,
-      updateDataKeys: Object.keys(updateData),
-      updateDataValues: updateData
-    })
+    if (pError) throw new Error(`Erro na tabela users: ${pError.message}`)
 
-    let response: any = null
-    try {
-      response = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-
-      console.log('[update-user-profile] Database update by ID response:', {
-        hasError: !!response.error,
-        hasData: !!response.data,
-        dataLength: response.data?.length || 0
-      })
-    } catch (dbError) {
-      console.error('[update-user-profile] ❌ Database update by ID failed:', {
-        message: dbError instanceof Error ? dbError.message : String(dbError),
-        error: dbError
-      })
-      throw dbError
-    }
-
-    // If no rows affected and we have an email, try updating by email
-    if ((!response.data || response.data.length === 0) && email) {
-      console.log('[update-user-profile] ID update returned 0 rows, trying by email:', email)
-      try {
-        response = await supabase
-          .from('users')
-          .update(updateData)
-          .eq('email', email)
-          .select()
-
-        console.log('[update-user-profile] Database update by email response:', {
-          hasError: !!response.error,
-          hasData: !!response.data,
-          dataLength: response.data?.length || 0
-        })
-      } catch (dbError) {
-        console.error('[update-user-profile] ❌ Database update by email failed:', {
-          message: dbError instanceof Error ? dbError.message : String(dbError),
-          error: dbError
-        })
-        throw dbError
+    // 3. Atualizar o AUTHENTICATION (O que você vê no painel de Auth)
+    // Aqui sincronizamos o Metadata para ficar igual ao seu print
+    const { data: authUpdate, error: aError } = await supabase.auth.admin.updateUserById(targetId, {
+      // Se o email foi enviado e é diferente do atual, tentamos mudar no auth também
+      email: (body.email && body.email !== publicUser.email) ? body.email : undefined,
+      user_metadata: {
+        role: publicUser.role, // Aqui atualiza o raw_user_meta_data
+        name: publicUser.name,
+        email_verified: true
+      },
+      app_metadata: {
+        role: publicUser.role // Aqui atualiza o raw_app_meta_data (essencial para RLS)
       }
-    }
+    })
 
-    if (response.error) {
-      console.error('[update-user-profile] ❌ Database returned error:', {
-        code: response.error.code,
-        message: response.error.message,
-        details: response.error.details,
-        hint: response.error.hint
-      })
-      return new Response(JSON.stringify({
-        error: "Erro ao atualizar perfil",
-        details: response.error.message,
-        code: response.error.code
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
+    if (aError) {
+      console.error("Aviso: Falha ao sincronizar Auth, mas tabela users atualizada:", aError.message)
+      // Não lançamos erro aqui para não dar 500 se apenas o e-mail falhar
     }
-
-    if (!response.data || response.data.length === 0) {
-      console.error('[update-user-profile] Update affected 0 rows')
-      return new Response(JSON.stringify({ 
-        error: "Usuário não encontrado ou perfil não pode ser atualizado"
-      }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    const updatedUser = response.data[0]
-    console.log('[update-user-profile] User updated successfully:', updatedUser.id)
 
     return new Response(JSON.stringify({
       success: true,
-      user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        username: updatedUser.username,
-        email: updatedUser.email,
-        whatsapp: updatedUser.whatsapp,
-        gender: updatedUser.gender,
-        profileImage: updatedUser.profile_image_url,
-        role: updatedUser.role
-      },
-      message: "Perfil atualizado com sucesso!"
+      message: "Perfil sincronizado com sucesso!",
+      data: {
+        public: publicUser,
+        auth_metadata: authUpdate?.user?.raw_user_meta_data
+      }
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     })
 
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    const errorStack = error instanceof Error ? error.stack : 'N/A'
-
-    console.error('[update-user-profile] ❌ Unexpected error:', {
-      message: errorMessage,
-      stack: errorStack,
-      type: error?.constructor?.name || typeof error,
-      fullError: JSON.stringify(error)
-    })
-
+  } catch (error: any) {
+    console.error(`[ERRO 500] ${error.message}`)
     return new Response(JSON.stringify({
-      error: "Erro interno ao atualizar perfil: " + errorMessage,
-      details: errorStack,
-      type: error?.constructor?.name || typeof error
+      error: error.message,
+      details: "Verifique se o ID do usuário existe em ambas as tabelas."
     }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
