@@ -388,53 +388,50 @@ export const usersService = {
         hasImage: !!profileImageUrl,
       });
 
-      // Create user in database
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{
-          id: userId,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          whatsapp: user.whatsapp,
-          gender: user.gender,
-          role: user.role || 'client',
-          profile_image_url: profileImageUrl,
-          created_at: new Date().toISOString(),
-        }])
-        .select();
+      // NOTE: User is already created in database by the Edge Function, no need to insert again
+      // If we have a profile image, we need to update it in the database
+      if (profileImageUrl) {
+        console.log('[usersService] Updating profile image URL in database...');
+        const { data: updateData, error: updateError } = await supabase
+          .from('users')
+          .update({ profile_image_url: profileImageUrl })
+          .eq('id', userId)
+          .select();
 
-      if (error) {
-        let errorMsg = error instanceof Error
-          ? error.message
-          : (error?.message || 'Unknown database error');
-
-        // Provide better error messages for common issues
-        if (error?.code === '23505') {
-          if (errorMsg.includes('email')) {
-            errorMsg = 'Este email já está cadastrado.';
-          } else {
-            errorMsg = 'Erro de dados duplicados. Verifique as informações.';
-          }
+        if (updateError) {
+          const errorStr = serializeError(updateError);
+          console.error('[usersService] Error updating profile image:', {
+            code: updateError?.code,
+            details: updateError?.details,
+            dbError: errorStr,
+          });
+          throw new Error('Falha ao atualizar imagem de perfil');
         }
 
-        const errorStr = serializeError(error);
-        console.error('[usersService] Database insert error:', {
-          message: errorMsg,
-          code: error?.code,
-          details: error?.details,
+        console.log('[usersService] Profile image updated successfully');
+      }
+
+      // Fetch the created user from database
+      console.log('[usersService] Fetching created user from database...');
+      const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (fetchError) {
+        const errorStr = serializeError(fetchError);
+        console.error('[usersService] Error fetching created user:', {
+          code: fetchError?.code,
+          details: fetchError?.details,
           dbError: errorStr,
         });
-        throw new Error(errorMsg);
+        throw new Error('Falha ao buscar usuário criado');
       }
 
-      console.log('[usersService] Insert result:', { hasData: !!data, dataLength: data?.length });
-
-      if (!data || data.length === 0) {
-        throw new Error('Failed to insert user - no data returned');
+      if (!userData) {
+        throw new Error('Failed to fetch created user - no data returned');
       }
-
-      const userData = data[0];
       const transformedData: User = {
         id: userData.id,
         name: userData.name,
