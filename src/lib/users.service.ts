@@ -103,15 +103,19 @@ export const usersService = {
     try {
       console.log('[usersService] Creating user:', user);
       let profileImageUrl: string | undefined;
+      let userId = crypto.randomUUID();
 
-      // Generate a unique ID for the user
-      const userId = crypto.randomUUID();
-      console.log('[usersService] Generated user ID:', userId);
-
-      // Create auth user if password provided (Edge Function handles no email confirmation)
+      // Create auth user if password provided (Edge Function handles both Auth and DB)
       if (user.password && user.password.trim()) {
         console.log('[usersService] Creating auth user with Edge Function...');
-        const authResult = await authService.createUserAsAdmin(user.email, user.password.trim());
+        const authResult = await authService.createUserAsAdmin(
+          user.email,
+          user.password.trim(),
+          user.name,
+          user.username,
+          user.whatsapp,
+          user.gender
+        );
         if (authResult.error) {
           const errorMsg = authResult.error instanceof Error
             ? authResult.error.message
@@ -119,8 +123,10 @@ export const usersService = {
           console.error('[usersService] Error creating auth user:', errorMsg);
           // Don't throw - auth creation is secondary, we can still create user in DB
           console.log('[usersService] Continuing with database creation despite auth error');
-        } else {
-          console.log('[usersService] Auth user created:', authResult.data?.id);
+        } else if (authResult.data?.id) {
+          // Use the ID from Auth to keep them in sync
+          userId = authResult.data.id;
+          console.log('[usersService] Auth user created, using ID:', userId);
         }
       }
 
