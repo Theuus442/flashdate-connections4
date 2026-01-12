@@ -442,12 +442,34 @@ export const usersService = {
         fields: Object.keys(updateData).length
       });
 
-      // First attempt: try normal update with validated ID
-      const { data, error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', validId)
-        .select();
+      // Call Edge Function with SERVICE_ROLE permissions (bypasses RLS)
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      const functionUrl = `${supabaseUrl}/functions/v1/update-user-profile`;
+
+      // Get auth token from Supabase client
+      const { data: { session } } = await supabase.auth.getSession();
+      const authToken = session?.access_token;
+
+      if (!authToken) {
+        console.error('[usersService] No auth token available');
+        throw new Error('Sessao expirada. Faca login novamente.');
+      }
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+          'apikey': anonKey,
+        },
+        body: JSON.stringify({
+          id,
+          ...updateData
+        }),
+      });
+
+      const result = await response.json();
 
       console.log('[usersService] Update response received:', { hasData: !!data, hasError: !!error, dataLength: data?.length });
 
