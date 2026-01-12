@@ -99,6 +99,25 @@ export default function EventUserSelection() {
     }
   }, [authUser, users]);
 
+  // Filter and sort participants based on current filters
+  const filteredParticipants = useMemo(() => {
+    let filtered = participants;
+
+    // Apply gender filter
+    if (genderFilter !== 'all') {
+      filtered = filtered.filter(u => u.gender === genderFilter);
+    }
+
+    // Apply sorting
+    if (sortBy === 'name') {
+      filtered = [...filtered].sort((a, b) =>
+        (a.username || '').localeCompare(b.username || '', 'pt-BR')
+      );
+    }
+
+    return filtered;
+  }, [participants, sortBy, genderFilter]);
+
   // Show error if not authenticated
   if (!authUser) {
     return (
