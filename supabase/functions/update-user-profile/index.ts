@@ -98,13 +98,39 @@ serve(async (req) => {
     console.log('[update-user-profile] ✅ User authenticated:', authUser.id)
 
     let body: any = {}
+    let rawRequestText = ''
     try {
-      body = await req.json()
+      const contentType = req.headers.get('content-type')
+      console.log('[update-user-profile] Request content-type:', contentType)
+
+      // Read body safely
+      const bodyText = await req.text()
+      rawRequestText = bodyText
+      console.log('[update-user-profile] Raw request body (first 500 chars):', bodyText.substring(0, 500))
+
+      if (!bodyText || bodyText.trim() === '') {
+        console.error('[update-user-profile] ❌ Empty request body')
+        return new Response(JSON.stringify({
+          error: "Corpo da solicitação vazio"
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        })
+      }
+
+      body = JSON.parse(bodyText)
+      console.log('[update-user-profile] Request JSON parsed successfully')
     } catch (e) {
-      console.error('[update-user-profile] ❌ Failed to parse request JSON:', e.message)
+      const errorMsg = e instanceof Error ? e.message : String(e)
+      console.error('[update-user-profile] ❌ Failed to parse request JSON:', {
+        message: errorMsg,
+        rawBodyLength: rawRequestText.length,
+        rawBodyPreview: rawRequestText.substring(0, 200)
+      })
       return new Response(JSON.stringify({
         error: "Falha ao processar solicitação - JSON inválido",
-        details: e.message
+        details: errorMsg,
+        preview: rawRequestText.substring(0, 200)
       }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
@@ -113,10 +139,16 @@ serve(async (req) => {
 
     const { id, name, username, email, whatsapp, gender, profile_image_url } = body
 
-    console.log('[update-user-profile] Request received:', {
-      hasId: !!id,
-      idValue: id,
-      fields: Object.keys(body),
+    console.log('[update-user-profile] Request fields extracted:', {
+      hasId: id !== undefined,
+      id: id,
+      name: name,
+      username: username,
+      email: email,
+      whatsapp: whatsapp,
+      gender: gender,
+      profile_image_url: profile_image_url,
+      allKeys: Object.keys(body),
       authUserId: authUser.id,
       authEmail: authUser.email,
     })
