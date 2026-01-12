@@ -83,7 +83,7 @@ export default function ClientDashboard() {
             username: 'usuario',
             email: authUser.email || '',
             whatsapp: '',
-            gender: 'Outro' as const,
+            gender: 'Outro' as 'M' | 'F' | 'Outro',
             role: authUser.role || 'client',
           };
           setClientUser(fallbackUser);
@@ -105,7 +105,7 @@ export default function ClientDashboard() {
           username: 'usuario',
           email: authUser.email || '',
           whatsapp: '',
-          gender: 'Outro' as const,
+          gender: 'Outro' as 'M' | 'F' | 'Outro',
           role: authUser.role || 'client',
         };
         setClientUser(fallbackUser);
