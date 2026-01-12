@@ -267,31 +267,37 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       );
 
       const refreshPromise = (async () => {
-        const { data, error } = await usersService.getUsers();
+        try {
+          const { data, error } = await usersService.getUsers();
 
-        if (error) {
-          const errorMessage = error instanceof Error
-            ? error.message
-            : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+          if (error) {
+            const errorMessage = error instanceof Error
+              ? error.message
+              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-          const isNetworkError =
-            (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
-            errorMessage.includes('Failed to fetch') ||
-            errorMessage.includes('Network') ||
-            (error instanceof TypeError && errorMessage.includes('fetch'));
+            const isNetworkError =
+              (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+              errorMessage.includes('Failed to fetch') ||
+              errorMessage.includes('Network') ||
+              (error instanceof TypeError && errorMessage.includes('fetch'));
 
-          console.error('[UsersContext] ⚠️ Error refreshing users:');
-          console.error('[UsersContext]   Message:', errorMessage);
-          console.error('[UsersContext]   Type:', typeof error);
-          console.error('[UsersContext]   IsNetworkError:', isNetworkError);
+            console.error('[UsersContext] ⚠️ Error refreshing users:');
+            console.error('[UsersContext]   Message:', errorMessage);
+            console.error('[UsersContext]   Type:', typeof error);
+            console.error('[UsersContext]   IsNetworkError:', isNetworkError);
 
-          // On network error, keep existing users instead of clearing them
-          if (isNetworkError) {
-            console.log('[UsersContext] Network error detected, keeping existing users');
+            // On network error, keep existing users instead of clearing them
+            if (isNetworkError) {
+              console.log('[UsersContext] Network error detected, keeping existing users');
+            }
+            return; // Don't throw - just exit gracefully
+          } else if (data) {
+            console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
+            setUsers(data);
           }
-        } else if (data) {
-          console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
-          setUsers(data);
+        } catch (innerError) {
+          console.error('[UsersContext] Unexpected error in refresh promise:', innerError);
+          // Don't re-throw - keep existing users
         }
       })();
 
