@@ -35,7 +35,7 @@ const Index = () => {
     },
     {
       id: 'sobre',
-      content: <WhoAttendsSection />,
+      content: <AboutSection />,
     },
     {
       id: 'faq',

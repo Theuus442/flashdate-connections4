@@ -1,28 +1,53 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, Users, X, LogOut, Camera, ChevronDown, ChevronUp, UserCircle2, XCircle, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function UserProfile() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const { users: allUsers, updateUser } = useUsers();
-  const { updateSelection, getSelectionsByType } = useSelections();
+  const { updateSelection, setCurrentUserId, setCurrentEventId, getSelectionsByVote } = useSelections();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Desconectado com sucesso');
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Erro ao desconectar');
+    }
+  };
 
   // Use the first user as the current user (in a real app, this would be the logged-in user)
   const currentUser = useMemo(() => allUsers[0] || null, [allUsers]);
 
+  // Set current user in selections context
+  useEffect(() => {
+    if (currentUser) {
+      setCurrentUserId(currentUser.id);
+      // For demo purposes, use a fixed event ID
+      // In a real app, this would come from the current event context
+      setCurrentEventId('default-event-id');
+    }
+  }, [currentUser, setCurrentUserId, setCurrentEventId]);
+
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  // Filter and sort users excluding the current user
+  // Filter and sort users excluding the current user and admins
   const otherUsers = useMemo(() => {
-    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id) : allUsers;
+    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id && user.role !== 'admin') : allUsers;
 
     // Apply gender filter
     if (genderFilter !== 'all') {
@@ -40,49 +65,92 @@ export default function UserProfile() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && currentUser) {
+    if (file) {
+      setSelectedImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
-        const updatedUser = { ...currentUser, profileImage: imageUrl };
-        updateUser(currentUser.id, updatedUser);
-        toast.success('Foto atualizada com sucesso!');
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
-    if (currentUser) {
-      setImagePreview(undefined);
-      const updatedUser = { ...currentUser, profileImage: undefined };
-      updateUser(currentUser.id, updatedUser);
-      toast.success('Foto removida');
+  const handleSaveImage = async () => {
+    if (selectedImageFile && currentUser && imagePreview) {
+      setIsUploadingImage(true);
+      try {
+        const result = await updateUser(currentUser.id, { profileImage: imagePreview }, selectedImageFile);
+        if (result) {
+          toast.success('Foto atualizada com sucesso!');
+          setSelectedImageFile(undefined);
+        } else {
+          toast.error('Falha ao atualizar foto');
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Erro ao fazer upload da foto');
+      } finally {
+        setIsUploadingImage(false);
+      }
     }
   };
 
-  const handleSelection = (userId: string, type: 'match' | 'friendship' | 'no-interest') => {
-    updateSelection(userId, type);
+  const handleRemoveImage = async () => {
+    if (currentUser) {
+      setImagePreview(undefined);
+      setSelectedImageFile(undefined);
+      const result = await updateUser(currentUser.id, { profileImage: undefined });
+      if (result) {
+        toast.success('Foto removida');
+      } else {
+        toast.error('Falha ao remover foto');
+      }
+    }
   };
 
-  const matchCount = getSelectionsByType('match').length;
-  const friendshipCount = getSelectionsByType('friendship').length;
-  const allSelections = getSelectionsByType('match').concat(
-    getSelectionsByType('friendship'),
-    getSelectionsByType('no-interest')
+  const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
+    if (!currentUser) return;
+    try {
+      // For demo purposes, use a fixed event ID
+      const eventId = 'default-event-id';
+      await updateSelection(eventId, currentUser.id, selectedUserId, vote);
+    } catch (error) {
+      console.error('Error updating selection:', error);
+      toast.error('Erro ao processar seleção');
+    }
+  };
+
+  const matchCount = getSelectionsByVote('SIM').length;
+  const talvezCount = getSelectionsByVote('TALVEZ').length;
+  const naoCount = getSelectionsByVote('NÃO').length;
+  const allSelections = getSelectionsByVote('SIM').concat(
+    getSelectionsByVote('TALVEZ'),
+    getSelectionsByVote('NÃO')
   );
 
   const getSelectionForUser = (userId: string) => {
-    return allSelections.find(s => s.userId === userId);
+    return allSelections.find(s => s.selectedUserId === userId);
   };
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Nenhum usuário disponível</p>
-          <Button onClick={() => navigate('/')} variant="gold">Voltar à Página Inicial</Button>
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="mb-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+              Nenhum usuário cadastrado
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              No momento, não existem usuários no sistema. Peça ao administrador para cadastrar participantes antes de prosseguir.
+            </p>
+          </div>
+          <Button onClick={() => navigate('/')} variant="gold" className="w-full">
+            Voltar à Página Inicial
+          </Button>
         </div>
       </div>
     );
@@ -111,7 +179,7 @@ export default function UserProfile() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
+                onClick={handleLogout}
                 className="flex items-center gap-2"
               >
                 <LogOut size={18} />
@@ -163,7 +231,7 @@ export default function UserProfile() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Matches ({matchCount})
+                SIM ({matchCount})
                 {activeTab === 'matches' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
                 )}
@@ -229,40 +297,40 @@ export default function UserProfile() {
                         {/* Action Buttons */}
                         <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
                           <button
-                            onClick={() => handleSelection(user.id, 'match')}
+                            onClick={() => handleSelection(user.id, 'SIM')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'match'
+                              selection?.vote === 'SIM'
                                 ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Match"
+                            title="SIM"
                           >
-                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'match' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Match</span>
+                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'friendship')}
+                            onClick={() => handleSelection(user.id, 'TALVEZ')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'friendship'
+                              selection?.vote === 'TALVEZ'
                                 ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Amizade"
+                            title="TALVEZ"
                           >
-                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'friendship' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Amigos</span>
+                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
                           </button>
                           <button
-                            onClick={() => handleSelection(user.id, 'no-interest')}
+                            onClick={() => handleSelection(user.id, 'NÃO')}
                             className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              selection?.type === 'no-interest'
+                              selection?.vote === 'NÃO'
                                 ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
                                 : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
                             }`}
-                            title="Não faz meu tipo"
+                            title="NÃO"
                           >
-                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.type === 'no-interest' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">Não meu tipo</span>
+                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
+                            <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
                           </button>
                         </div>
                       </div>
@@ -335,6 +403,30 @@ export default function UserProfile() {
                       className="hidden"
                     />
                   </label>
+
+                  {selectedImageFile && imagePreview && (
+                    <div className="flex gap-3 justify-center max-w-sm mx-auto mt-4">
+                      <Button
+                        onClick={handleSaveImage}
+                        disabled={isUploadingImage}
+                        variant="gold"
+                        className="flex-1"
+                      >
+                        {isUploadingImage ? 'Salvando...' : 'Salvar Foto'}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedImageFile(undefined);
+                          setImagePreview(currentUser?.profileImage);
+                        }}
+                        disabled={isUploadingImage}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Profile Info */}
@@ -362,15 +454,15 @@ export default function UserProfile() {
                   {/* Stats */}
                   <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Matches</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">SIM</p>
                       <p className="text-3xl font-bold text-gold">{matchCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Amizades</p>
-                      <p className="text-3xl font-bold text-secondary">{friendshipCount}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">TALVEZ</p>
+                      <p className="text-3xl font-bold text-secondary">{talvezCount}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Seleções</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">Total</p>
                       <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
                     </div>
                   </div>
@@ -382,10 +474,10 @@ export default function UserProfile() {
           {/* Matches View */}
           {activeTab === 'matches' && (
             <div className="flex-1 flex flex-col">
-              {getSelectionsByType('match').length > 0 ? (
+              {getSelectionsByVote('SIM').length > 0 ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getSelectionsByType('match').map(sel => {
-                    const user = allUsers.find(u => u.id === sel.userId);
+                  {getSelectionsByVote('SIM').map(sel => {
+                    const user = allUsers.find(u => u.id === sel.selectedUserId);
                     if (!user) return null;
                     return (
                       <div
@@ -406,7 +498,7 @@ export default function UserProfile() {
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                             <div className="text-white text-center">
                               <Heart size={40} className="mb-2 mx-auto" fill="white" />
-                              <p className="text-xs font-medium">Match</p>
+                              <p className="text-xs font-medium">SIM</p>
                             </div>
                           </div>
                         </div>
@@ -437,8 +529,8 @@ export default function UserProfile() {
                 <div className="text-center py-12 flex-1 flex items-center justify-center">
                   <div>
                     <Heart size={64} className="text-gold/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground text-lg">Nenhum match ainda</p>
-                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "Match" com outros participantes</p>
+                    <p className="text-muted-foreground text-lg">Nenhum SIM ainda</p>
+                    <p className="text-muted-foreground text-sm mt-2">Comece a fazer conexões selecionando "SIM" em outros participantes</p>
                   </div>
                 </div>
               )}

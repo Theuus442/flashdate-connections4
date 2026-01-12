@@ -238,11 +238,11 @@ export const FAQSection = () => {
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-4">
+          <span className="inline-block text-blue-600 text-sm font-medium tracking-widest uppercase mb-4">
             Tire Suas Dúvidas
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Central de <span className="text-gradient-gold">Dúvidas</span>
+            Central de <span className="text-blue-600">Dúvidas</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Encontre respostas para as perguntas mais frequentes sobre o Flashdate
@@ -253,8 +253,8 @@ export const FAQSection = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           {faqData.map((category, categoryIndex) => (
             <div key={categoryIndex}>
-              <h3 className="font-serif text-xl font-bold text-secondary mb-4 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-sm">
+              <h3 className="font-serif text-xl font-bold text-blue-600 mb-4 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-sm text-blue-600">
                   {categoryIndex + 1}
                 </span>
                 {category.category}
@@ -264,9 +264,9 @@ export const FAQSection = () => {
                   <AccordionItem
                     key={index}
                     value={`${categoryIndex}-${index}`}
-                    className="bg-card rounded-xl border border-border px-6 data-[state=open]:border-gold/30 transition-colors"
+                    className="bg-card rounded-xl border border-border px-6 data-[state=open]:border-blue-600/30 transition-colors"
                   >
-                    <AccordionTrigger className="text-left font-medium text-foreground hover:text-gold py-5">
+                    <AccordionTrigger className="text-left font-medium text-foreground hover:text-blue-600 py-5">
                       {item.q}
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
@@ -283,7 +283,7 @@ export const FAQSection = () => {
         <div className="max-w-5xl mx-auto mt-20">
           <div className="text-center mb-12">
             <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Veja Nossos Eventos em <span className="text-gradient-gold">Ação</span>
+              Veja Nossos Eventos em <span className="text-blue-600">Ação</span>
             </h3>
             <p className="text-muted-foreground text-lg">
               Confira como são nossos eventos de speed dating em ambientes elegantes e acolhedores

@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UsersProvider } from "@/context/UsersContext";
 import { SelectionsProvider } from "@/context/SelectionsContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import AdminPanel from "./pages/AdminPanel";
@@ -19,25 +21,27 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <UsersProvider>
-        <SelectionsProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
+      <AuthProvider>
+        <UsersProvider>
+          <SelectionsProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/landing" element={<LandingSimple />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/dashboard" element={<ClientDashboard />} />
-              <Route path="/event-selection" element={<EventUserSelection />} />
-              <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPanel /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
+              <Route path="/event-selection" element={<ProtectedRoute><EventUserSelection /></ProtectedRoute>} />
+              <Route path="/user-profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </SelectionsProvider>
       </UsersProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
