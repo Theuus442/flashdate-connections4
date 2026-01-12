@@ -320,6 +320,27 @@ export const usersService = {
 
     try {
       console.log('[usersService] Updating user:', id);
+
+      // Verify user exists before attempting update
+      const { data: existingUser, error: existsError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', id)
+        .single();
+
+      if (existsError || !existingUser) {
+        const existsErrorMsg = existsError instanceof Error
+          ? existsError.message
+          : (existsError?.message || 'User not found');
+        console.error('[usersService] User does not exist:', {
+          userId: id,
+          message: existsErrorMsg,
+          code: existsError?.code,
+        });
+        throw new Error(`User with ID ${id} not found in database`);
+      }
+
+      console.log('[usersService] User exists, proceeding with update:', id);
       let profileImageUrl: string | undefined;
 
       // Upload profile image if provided
