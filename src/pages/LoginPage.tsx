@@ -30,28 +30,12 @@ export default function LoginPage() {
         return;
       }
 
-      // Check credentials (accept both email and username)
-      const credential = TEST_CREDENTIALS.find(
-        c => (c.email === email || c.username === email) && c.password === password
-      );
-
-      if (!credential) {
-        setError('Usuário/Email ou senha inválidos');
-        setIsLoading(false);
-        return;
-      }
-
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Success - redirect based on role
-      toast.success(`Bem-vindo de volta, ${credential.role === 'admin' ? 'Administrador' : 'Cliente'}!`);
-
-      if (credential.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/user-profile');
-      }
+      // Success - redirect to user profile
+      toast.success('Bem-vindo de volta!');
+      navigate('/user-profile');
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
