@@ -5,6 +5,83 @@ import { authService } from './auth.service';
 
 export const usersService = {
   /**
+   * Sync user from Auth to Database if missing
+   * Creates a database record for an auth user that doesn't exist in DB
+   */
+  async syncAuthUserToDatabase(authUser: { id: string; email: string; user_metadata?: any }): Promise<{ data: User | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[usersService] Attempting to sync auth user to database:', authUser.email);
+
+      // Extract metadata from auth user
+      const name = authUser.user_metadata?.name || authUser.email.split('@')[0];
+      const username = authUser.user_metadata?.username || authUser.email.split('@')[0];
+
+      // Try to insert user record
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{
+          id: authUser.id,
+          email: authUser.email,
+          name,
+          username,
+          whatsapp: '',
+          gender: 'Outro',
+          role: 'client',
+          created_at: new Date().toISOString(),
+        }])
+        .select();
+
+      if (error) {
+        // If it's a duplicate key error, the user already exists - that's fine
+        if (error.code === '23505') {
+          console.log('[usersService] User already exists in database');
+          // Try to fetch existing user
+          return this.getUserById(authUser.id);
+        }
+
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
+        console.error('[usersService] Error syncing user:', {
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+        });
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('Failed to sync user - no data returned');
+      }
+
+      const userData = data[0];
+      const transformedData: User = {
+        id: userData.id,
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        whatsapp: userData.whatsapp,
+        gender: userData.gender,
+        role: userData.role || 'client',
+        profileImage: userData.profile_image_url,
+      };
+
+      console.log('[usersService] User synced to database successfully:', transformedData);
+      return { data: transformedData, error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error syncing auth user:', errorMessage);
+      return { data: null, error };
+    }
+  },
+
+  /**
    * Get all users
    */
   async getUsers(): Promise<{ data: User[] | null; error: any }> {
