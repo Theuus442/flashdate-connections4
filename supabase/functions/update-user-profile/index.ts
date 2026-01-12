@@ -97,13 +97,28 @@ serve(async (req) => {
 
     console.log('[update-user-profile] ✅ User authenticated:', authUser.id)
 
-    const { id, name, username, email, whatsapp, gender, profile_image_url } = await req.json()
+    let body: any = {}
+    try {
+      body = await req.json()
+    } catch (e) {
+      console.error('[update-user-profile] ❌ Failed to parse request JSON:', e.message)
+      return new Response(JSON.stringify({
+        error: "Falha ao processar solicitação - JSON inválido",
+        details: e.message
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
 
-    console.log('[update-user-profile] Request:', {
-      userId: id,
+    const { id, name, username, email, whatsapp, gender, profile_image_url } = body
+
+    console.log('[update-user-profile] Request received:', {
+      hasId: !!id,
+      idValue: id,
+      fields: Object.keys(body),
       authUserId: authUser.id,
       authEmail: authUser.email,
-      updateEmail: email
     })
 
     // Check if user is an admin by querying the users table
