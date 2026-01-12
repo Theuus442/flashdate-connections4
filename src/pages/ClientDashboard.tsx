@@ -24,7 +24,7 @@ export default function ClientDashboard() {
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
-    if (authUser && !clientUser) {
+    if (authUser) {
       console.log('[ClientDashboard] Auth user detected, refreshing users list...');
       refreshUsers();
     }
