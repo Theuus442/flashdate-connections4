@@ -135,11 +135,9 @@ export default function UserProfile() {
   };
 
   const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    if (!currentUser) return;
+    if (!currentUser || !currentEventId) return;
     try {
-      // For demo purposes, use a fixed event ID
-      const eventId = 'default-event-id';
-      await updateSelection(eventId, currentUser.id, selectedUserId, vote);
+      await updateSelection(currentEventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
