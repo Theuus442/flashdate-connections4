@@ -314,7 +314,8 @@ export const usersService = {
           user.name,
           user.username,
           user.whatsapp,
-          user.gender
+          user.gender,
+          user.role
         );
         if (authResult.error) {
           const errorMsg = authResult.error instanceof Error
