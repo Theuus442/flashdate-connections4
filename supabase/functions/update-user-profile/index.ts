@@ -2,6 +2,17 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 serve(async (req) => {
+  // Log immediately to verify this function is being called
+  console.log('🟢 [update-user-profile] Function called!')
+  console.log('📍 [update-user-profile] Request details:', {
+    method: req.method,
+    url: req.url,
+    headers: {
+      contentType: req.headers.get('content-type'),
+      authorization: req.headers.get('authorization') ? 'Bearer ...' : 'none'
+    }
+  })
+
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -13,6 +24,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log('🟢 [update-user-profile] Starting main try block...')
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
