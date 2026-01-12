@@ -17,7 +17,7 @@ export interface User {
 interface UsersContextType {
   users: User[];
   addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
-  updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<User | null>;
+  updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
   deleteUser: (id: string) => Promise<boolean>;
   deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
   getUserById: (id: string) => User | undefined;
@@ -134,9 +134,9 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (updatedUser) {
         const newUser = { ...updatedUser, ...updates };
         setUsers(prev => prev.map(u => (u.id === id ? newUser : u)));
-        return newUser;
+        return { data: newUser, error: null };
       }
-      return null;
+      return { data: null, error: 'User not found' };
     }
 
     try {
@@ -153,20 +153,21 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           ? error.message
           : (error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error)));
         console.error('[UsersContext] Error updating user:', errorMessage);
-        return null;
+        return { data: null, error: errorMessage };
       }
       if (data) {
         console.log('[UsersContext] User updated successfully:', data);
         setUsers(prev => prev.map(u => (u.id === id ? data : u)));
-        return data;
+        return { data, error: null };
       }
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' ? JSON.stringify(error) : String(error));
       console.error('[UsersContext] Error updating user:', errorMessage);
+      return { data: null, error: errorMessage };
     }
-    return null;
+    return { data: null, error: 'Unknown error' };
   };
 
   const deleteUser = async (id: string) => {

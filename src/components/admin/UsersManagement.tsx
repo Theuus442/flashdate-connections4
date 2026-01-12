@@ -127,7 +127,7 @@ export const UsersManagement = () => {
 
         const result = await updateUser(editingId, updates, selectedImageFile);
 
-        if (result) {
+        if (result.data) {
           toast({
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
@@ -146,11 +146,25 @@ export const UsersManagement = () => {
           setEditingId(null);
           setShowForm(false);
         } else {
-          toast({
-            title: 'Erro',
-            description: 'Falha ao atualizar usuário - verifique o console para detalhes',
-            variant: 'destructive',
-          });
+          const errorMsg = result.error || 'Falha ao atualizar usuário';
+
+          // User not found is a specific error to handle
+          if (errorMsg.includes('not found')) {
+            toast({
+              title: 'Erro',
+              description: 'Usuário não encontrado no banco de dados. Pode ter sido deletado. Recarregue a página.',
+              variant: 'destructive',
+            });
+            // Refresh the users list to sync with DB
+            setShowForm(false);
+            setEditingId(null);
+          } else {
+            toast({
+              title: 'Erro',
+              description: errorMsg,
+              variant: 'destructive',
+            });
+          }
         }
       } else {
         console.log('[UsersManagement] Creating new user with data:', formData);

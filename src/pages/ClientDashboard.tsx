@@ -16,6 +16,7 @@ export default function ClientDashboard() {
   const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
   const [clientUser, setClientUser] = useState<any>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
@@ -104,6 +105,10 @@ export default function ClientDashboard() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && clientUser) {
+      // Store the file for upload when saving
+      setSelectedImageFile(file);
+
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
@@ -119,6 +124,7 @@ export default function ClientDashboard() {
 
   const handleRemoveImage = () => {
     if (clientUser) {
+      setSelectedImageFile(undefined);
       setClientUser(prev => prev ? {
         ...prev,
         profileImage: undefined,
@@ -143,16 +149,35 @@ export default function ClientDashboard() {
         whatsapp: formData.get('whatsapp') as string,
       };
 
-      const result = await updateUser(authUser.id, updatedData);
+      console.log('[ClientDashboard] Saving profile with image:', {
+        hasImage: !!selectedImageFile,
+        fileName: selectedImageFile?.name,
+      });
 
-      if (result) {
+      // Pass the selected image file if available
+      const result = await updateUser(authUser.id, updatedData, selectedImageFile);
+
+      if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
-        setClientUser(result);
+        setClientUser(result.data);
+        setSelectedImageFile(undefined); // Clear the selected file after successful upload
       } else {
-        toast.error('Erro ao atualizar perfil');
+        const errorMsg = result.error || 'Erro desconhecido';
+        console.error('Error updating profile:', errorMsg);
+
+        // Check if it's a user not found error
+        if (errorMsg && errorMsg.includes('does not exist')) {
+          toast.error('Sua sessão expirou. Por favor, faça login novamente.');
+          setTimeout(() => {
+            navigate('/login');
+          }, 2000);
+        } else {
+          toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
+        }
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Error updating profile:', errorMessage);
       toast.error('Erro ao atualizar perfil');
     } finally {
       setIsUpdatingProfile(false);
@@ -333,7 +358,7 @@ export default function ClientDashboard() {
                         ) : (
                           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center mb-0">
                             <span className="text-5xl font-bold text-secondary-foreground">
-                              {clientUser?.name.charAt(0) || 'U'}
+                              {clientUser?.name?.[0] || 'U'}
                             </span>
                           </div>
                         )}

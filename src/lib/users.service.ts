@@ -362,6 +362,7 @@ export const usersService = {
 
       console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
+      // First attempt: try normal update
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
@@ -383,28 +384,47 @@ export const usersService = {
         throw error;
       }
 
-      // If select() didn't return data (RLS issue), fetch the user separately
+      // If update didn't affect any rows, user doesn't exist with that ID
       let userData: any;
       if (!data || data.length === 0) {
-        const { data: fetchedUser, error: fetchError } = await supabase
+        // Update affected 0 rows - try to find user by email instead
+        console.warn('[usersService] Update affected 0 rows for ID:', id);
+        console.warn('[usersService] Attempting fallback: updating by email instead:', updates.email);
+
+        if (!updates.email) {
+          console.error('[usersService] No email provided for fallback update');
+          throw new Error(`User with ID ${id} not found and no email provided for fallback`);
+        }
+
+        // Try to update by email instead
+        const { data: emailUpdateData, error: emailUpdateError } = await supabase
           .from('users')
-          .select('*')
-          .eq('id', id)
-          .single();
+          .update(updateData)
+          .eq('email', updates.email)
+          .select();
 
-        if (fetchError) {
-          console.error('[usersService] Failed to fetch updated user:', fetchError);
-          throw new Error(`User with ID ${id} not found`);
+        if (emailUpdateError) {
+          const emailErrorMsg = emailUpdateError instanceof Error
+            ? emailUpdateError.message
+            : (emailUpdateError?.message || 'Unknown error');
+          console.error('[usersService] Email-based update failed:', {
+            message: emailErrorMsg,
+            code: emailUpdateError?.code,
+            details: emailUpdateError?.details,
+          });
+          throw new Error(`Could not update user by email: ${emailErrorMsg}`);
         }
 
-        if (!fetchedUser) {
-          console.error('[usersService] No user found with ID:', id);
-          throw new Error(`User with ID ${id} not found`);
+        if (!emailUpdateData || emailUpdateData.length === 0) {
+          console.error('[usersService] Email-based update affected 0 rows:', updates.email);
+          throw new Error(`User with email ${updates.email} not found in database`);
         }
 
-        userData = fetchedUser;
+        userData = emailUpdateData[0];
+        console.log('[usersService] User updated successfully via email fallback');
       } else {
         userData = data[0];
+        console.log('[usersService] User updated successfully via ID');
       }
       const transformedData: User = {
         id: userData.id,
