@@ -232,11 +232,9 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const errorMessage = error instanceof Error
           ? error.message
           : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-        console.error('[UsersContext] ⚠️ Error refreshing users:', {
-          message: errorMessage,
-          type: typeof error,
-          error,
-        });
+        console.error('[UsersContext] ⚠️ Error refreshing users:');
+        console.error('[UsersContext]   Message:', errorMessage);
+        console.error('[UsersContext]   Type:', typeof error);
       } else if (data) {
         console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
         setUsers(data);
