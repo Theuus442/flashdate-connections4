@@ -485,16 +485,25 @@ export const usersService = {
         }),
       });
 
-      const result = await response.json();
+      let result: any = {};
+      try {
+        result = await response.json();
+      } catch (e) {
+        console.error('[usersService] Failed to parse Edge Function response as JSON');
+      }
 
       if (!response.ok) {
         const errorMessage = result.error || `HTTP ${response.status}`;
-        console.error('[usersService] Edge Function error:', {
+        const errorDetails = result.details || '';
+        const fullError = errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage;
+
+        console.error('[usersService] ❌ Edge Function error:', {
           status: response.status,
           message: errorMessage,
-          details: result.details
+          details: errorDetails,
+          fullResponse: result,
         });
-        throw new Error(result.details || errorMessage || 'Falha ao atualizar perfil');
+        throw new Error(fullError || 'Falha ao atualizar perfil');
       }
 
       if (!result.user) {
