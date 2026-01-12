@@ -35,7 +35,7 @@ export default function ClientDashboard() {
         const imageUrl = reader.result as string;
         setClientUser(prev => prev ? {
           ...prev,
-          profile_image_url: imageUrl,
+          profileImage: imageUrl,
         } : prev);
         setIsEditingImage(false);
       };
@@ -47,7 +47,7 @@ export default function ClientDashboard() {
     if (clientUser) {
       setClientUser(prev => prev ? {
         ...prev,
-        profile_image_url: undefined,
+        profileImage: undefined,
       } : prev);
     }
   };
