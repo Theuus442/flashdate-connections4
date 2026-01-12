@@ -9,22 +9,23 @@ import { toast } from 'sonner';
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
-  const { getUserById, updateUser, isLoading } = useUsers();
+  const { users, updateUser, isLoading } = useUsers();
 
-  // Load real user data from context
-  const realUser = authUser ? getUserById(authUser.id) : null;
-  const [clientUser, setClientUser] = useState(realUser);
+  // Load real user data from users array
+  const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
+  const [clientUser, setClientUser] = useState<any>(null);
 
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
-  // Update clientUser when realUser changes
+  // Update clientUser when realUser or users changes
   useEffect(() => {
     if (realUser) {
+      console.log('[ClientDashboard] Loading user data:', realUser);
       setClientUser(realUser);
     }
-  }, [realUser]);
+  }, [realUser, users]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
