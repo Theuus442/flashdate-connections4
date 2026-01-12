@@ -166,11 +166,16 @@ export default function ClientDashboard() {
         console.error('Error updating profile:', errorMsg);
 
         // Check if it's a user not found error
-        if (errorMsg && errorMsg.includes('does not exist')) {
-          toast.error('Sua sessão expirou. Por favor, faça login novamente.');
+        if (errorMsg && (errorMsg.includes('does not exist') || errorMsg.includes('não foi encontrado'))) {
+          console.warn('[ClientDashboard] User not found in database. Auth ID:', authUser?.id, 'Email:', authUser?.email);
+          toast.error('Erro: Sua conta não foi encontrada no servidor. Faça login novamente.');
           setTimeout(() => {
+            signOut();
             navigate('/login');
           }, 2000);
+        } else if (errorMsg && errorMsg.includes('sincronizada')) {
+          toast.error(errorMsg);
+          console.warn('[ClientDashboard] Data synchronization issue detected');
         } else {
           toast.error(`Erro ao atualizar perfil: ${errorMsg}`);
         }
