@@ -498,6 +498,18 @@ export const usersService = {
         throw new Error('Sessao expirada. Faca login novamente.');
       }
 
+      const requestBody = {
+        id,
+        ...updateData
+      };
+
+      console.log('[usersService] Edge Function request details:', {
+        functionUrl: functionUrl,
+        method: 'POST',
+        requestBody: requestBody,
+        hasAuthToken: !!authToken,
+      });
+
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -505,20 +517,24 @@ export const usersService = {
           'Authorization': `Bearer ${authToken}`,
           'apikey': anonKey,
         },
-        body: JSON.stringify({
-          id,
-          ...updateData
-        }),
+        body: JSON.stringify(requestBody),
+      });
+
+      const responseText = await response.text();
+
+      console.log('[usersService] Edge Function response received:', {
+        status: response.status,
+        ok: response.ok,
+        responseTextLength: responseText.length,
+        responseTextPreview: responseText.substring(0, 300),
       });
 
       let result: any = {};
-      const responseText = await response.text();
-
       try {
         result = JSON.parse(responseText);
       } catch (e) {
         console.error('[usersService] Failed to parse Edge Function response as JSON:', {
-          responseText: responseText.substring(0, 200),
+          responseText: responseText.substring(0, 500),
           error: e instanceof Error ? e.message : String(e),
         });
         result = { error: responseText || 'Unknown error' };
