@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -11,20 +10,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { signIn, isAuthenticated, user } = useAuth();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    console.log('[LoginPage] Auth state changed:', { isAuthenticated, userRole: user?.role });
-    if (isAuthenticated && user) {
-      console.log('[LoginPage] Redirecting to', user.role === 'admin' ? '/admin' : '/user-profile');
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/user-profile');
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,14 +30,12 @@ export default function LoginPage() {
         return;
       }
 
-      const result = await signIn(email, password);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (result.success) {
-        toast.success('Login realizado com sucesso!');
-        // Navigation will happen via the useEffect above
-      } else {
-        setError(result.error || 'Erro ao fazer login');
-      }
+      // Success - redirect to user profile
+      toast.success('Bem-vindo de volta!');
+      navigate('/user-profile');
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
@@ -68,7 +51,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-between h-20">
             <a href="/" className="flex items-center gap-2">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F2df169346ab544fb91e72465f352b070?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
                 alt="Flashdate Logo"
                 className="h-16 w-auto"
               />
@@ -105,7 +88,6 @@ export default function LoginPage() {
                 Faça login para acessar sua conta
               </p>
             </div>
-
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -162,7 +144,7 @@ export default function LoginPage() {
           {/* Footer Text */}
           <div className="text-center mt-8">
             <p className="text-xs text-muted-foreground">
-              © 2025 Flashdate. Todos os direitos reservados.
+              © 2026 Flashdate. Todos os direitos reservados.
             </p>
           </div>
         </div>

@@ -41,7 +41,7 @@ export const Header = ({ currentSectionId }: HeaderProps) => {
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2Ffae7ecada4844c0581ac57c386a17510?format=webp&width=800"
+              src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2F72efb2f93aeb4f98a010f02c385b13d6?format=webp&width=800"
               alt="Flashdate Logo"
               className="h-16 w-auto"
             />
