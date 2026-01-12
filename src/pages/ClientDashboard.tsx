@@ -152,10 +152,13 @@ export default function ClientDashboard() {
       console.log('[ClientDashboard] Saving profile with image:', {
         hasImage: !!selectedImageFile,
         fileName: selectedImageFile?.name,
+        userId: clientUser.id,
+        authId: authUser.id,
       });
 
-      // Pass the selected image file if available
-      const result = await updateUser(authUser.id, updatedData, selectedImageFile);
+      // Use clientUser.id (from database) not authUser.id (from auth)
+      // They may be different due to auth/db sync issues
+      const result = await updateUser(clientUser.id, updatedData, selectedImageFile);
 
       if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
