@@ -68,41 +68,47 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         );
 
         const loadPromise = (async () => {
-          const { data, error } = await usersService.getUsers();
+          try {
+            const { data, error } = await usersService.getUsers();
 
-          if (error) {
-            const errorMessage = error instanceof Error
-              ? error.message
-              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+            if (error) {
+              const errorMessage = error instanceof Error
+                ? error.message
+                : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-            const isNetworkError =
-              (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
-              errorMessage.includes('Failed to fetch') ||
-              errorMessage.includes('Network') ||
-              (error instanceof TypeError && errorMessage.includes('fetch'));
+              const isNetworkError =
+                (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+                errorMessage.includes('Failed to fetch') ||
+                errorMessage.includes('Network') ||
+                (error instanceof TypeError && errorMessage.includes('fetch'));
 
-            console.error('[UsersContext] ⚠️ Error loading users:', {
-              message: errorMessage,
-              isNetworkError,
-              error,
-            });
+              console.error('[UsersContext] ⚠️ Error loading users:', {
+                message: errorMessage,
+                isNetworkError,
+                error,
+              });
 
-            // If it's a network error, log helpful info but don't fail
-            if (isNetworkError) {
-              console.error('[UsersContext] 🌐 NETWORK ERROR: Cannot reach Supabase');
-              console.error('[UsersContext] This may be a temporary connectivity issue or environment isolation problem.');
-              console.error('[UsersContext] App will continue with empty user list.');
+              // If it's a network error, log helpful info but don't fail
+              if (isNetworkError) {
+                console.error('[UsersContext] 🌐 NETWORK ERROR: Cannot reach Supabase');
+                console.error('[UsersContext] This may be a temporary connectivity issue or environment isolation problem.');
+                console.error('[UsersContext] App will continue with empty user list.');
+              }
+
+              // In case of network error or any error, return empty array (not an error)
+              // This prevents the app from breaking completely
+              console.log('[UsersContext] Setting empty user list as fallback');
+              setUsers([]);
+            } else if (data) {
+              console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
+              setUsers(data);
+            } else {
+              console.log('[UsersContext] No data returned, setting empty list');
+              setUsers([]);
             }
-
-            // In case of network error or any error, return empty array (not an error)
-            // This prevents the app from breaking completely
-            console.log('[UsersContext] Setting empty user list as fallback');
-            setUsers([]);
-          } else if (data) {
-            console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
-            setUsers(data);
-          } else {
-            console.log('[UsersContext] No data returned, setting empty list');
+          } catch (innerError) {
+            console.error('[UsersContext] Unexpected error in load promise:', innerError);
+            // Don't re-throw - just continue with empty users
             setUsers([]);
           }
         })();
