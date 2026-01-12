@@ -503,10 +503,16 @@ export const usersService = {
       });
 
       let result: any = {};
+      const responseText = await response.text();
+
       try {
-        result = await response.json();
+        result = JSON.parse(responseText);
       } catch (e) {
-        console.error('[usersService] Failed to parse Edge Function response as JSON');
+        console.error('[usersService] Failed to parse Edge Function response as JSON:', {
+          responseText: responseText.substring(0, 200),
+          error: e instanceof Error ? e.message : String(e),
+        });
+        result = { error: responseText || 'Unknown error' };
       }
 
       if (!response.ok) {
@@ -518,7 +524,8 @@ export const usersService = {
           status: response.status,
           message: errorMessage,
           details: errorDetails,
-          fullResponse: JSON.stringify(result),
+          responseText: responseText.substring(0, 500),
+          resultKeys: Object.keys(result),
         });
         throw new Error(fullError || 'Falha ao atualizar perfil');
       }
