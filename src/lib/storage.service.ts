@@ -21,7 +21,7 @@ export const storageService = {
       // Sanitize filename to remove accents and special characters
       const sanitizedFileName = sanitizeFilename(file.name);
       const fileName = `${userId}-${Date.now()}-${sanitizedFileName}`;
-      const filePath = `profiles/${fileName}`;
+      const filePath = fileName;
 
       console.log('[storageService] Uploading profile image to bucket: profiles');
       console.log('[storageService] Original filename:', file.name);
