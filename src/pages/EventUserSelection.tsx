@@ -15,10 +15,17 @@ interface Selection {
 export default function EventUserSelection() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
-  const { users, isLoading } = useUsers();
+  const { users, isLoading, refreshUsers } = useUsers();
   const [selections, setSelections] = useState<Selection[]>([]);
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Refresh users on mount to ensure we have latest data
+  useEffect(() => {
+    if (!authUser) return;
+    console.log('[EventUserSelection] Refreshing users list...');
+    refreshUsers();
+  }, [authUser, refreshUsers]);
 
   // Load current user and participants from database
   useEffect(() => {
@@ -36,11 +43,22 @@ export default function EventUserSelection() {
     // Get current user from users array
     const user = users.find(u => u.id === authUser.id);
     if (user) {
-      console.log('[EventUserSelection] Current user loaded:', user.name);
+      console.log('[EventUserSelection] ✅ Current user loaded:', user.name);
       setCurrentUser(user);
     } else {
-      console.log('[EventUserSelection] Current user not found in users array');
-      // Don't block - show what we have
+      console.log('[EventUserSelection] ⚠️ Current user not found in users array');
+      // Fallback: try to create a minimal user object from auth
+      if (authUser.email) {
+        setCurrentUser({
+          id: authUser.id,
+          email: authUser.email,
+          name: authUser.email.split('@')[0], // Use part of email as name
+          username: authUser.email.split('@')[0],
+          whatsapp: '',
+          gender: 'Outro',
+          role: 'client',
+        });
+      }
     }
 
     // Get other participants (excluding current user and admin users)
