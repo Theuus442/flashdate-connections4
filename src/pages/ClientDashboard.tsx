@@ -161,7 +161,7 @@ export default function ClientDashboard() {
   }, [isLoading, authUser, users, clientUser]);
 
   // Show loading state while data is being fetched
-  if (isLoading && !clientUser) {
+  if ((isLoading || isLoadingUserData) && !clientUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
