@@ -364,29 +364,45 @@ export const usersService = {
     try {
       console.log('[usersService] Deleting all users with role:', role);
 
-      // First, get count of users to delete
-      const { data: countData, error: countError } = await supabase
+      // First, fetch ALL users with this role to count them
+      const { data: usersToDelete, error: fetchError } = await supabase
         .from('users')
-        .select('id', { count: 'exact' })
+        .select('id')
         .eq('role', role);
 
-      if (countError) throw countError;
-      const count = countData?.length || 0;
+      if (fetchError) {
+        console.error('[usersService] Error fetching users:', fetchError);
+        throw fetchError;
+      }
 
-      console.log('[usersService] Found', count, 'users to delete');
+      const count = usersToDelete?.length || 0;
+      console.log('[usersService] Found', count, 'users with role:', role);
 
-      // Then delete them
-      const { error } = await supabase
+      if (count === 0) {
+        console.log('[usersService] No users to delete');
+        return { count: 0, error: null };
+      }
+
+      // Delete all users with this role
+      console.log('[usersService] Deleting', count, 'users with role:', role);
+      const { error: deleteError, count: deletedCount } = await supabase
         .from('users')
         .delete()
-        .eq('role', role);
+        .eq('role', role)
+        .select();
 
-      if (error) throw error;
+      if (deleteError) {
+        console.error('[usersService] Error deleting users:', deleteError);
+        throw deleteError;
+      }
 
       console.log('[usersService] Successfully deleted', count, 'users with role:', role);
       return { count, error: null };
     } catch (error) {
-      console.error('[usersService] Error deleting users by role:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error deleting users by role:', errorMessage);
       return { count: 0, error };
     }
   },
