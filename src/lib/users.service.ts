@@ -3,6 +3,26 @@ import { User } from '@/context/UsersContext';
 import { storageService } from './storage.service';
 import { authService } from './auth.service';
 
+/**
+ * Helper function to safely serialize any error to a readable string
+ */
+function serializeError(error: any): string {
+  if (error === null) return 'No error';
+  if (error === undefined) return 'Undefined error';
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object') {
+    // Try to get meaningful properties
+    const message = (error.message || error.msg || error.error || error.detail || '').toString();
+    const code = (error.code || '').toString();
+    const details = (error.details || '').toString();
+
+    const parts = [message, code && `[${code}]`, details].filter(Boolean);
+    return parts.length > 0 ? parts.join(' - ') : JSON.stringify(error);
+  }
+  return String(error);
+}
+
 export const usersService = {
   /**
    * Sync user from Auth to Database if missing
