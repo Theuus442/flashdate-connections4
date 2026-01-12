@@ -104,20 +104,16 @@ export default function ClientDashboard() {
               console.log('[ClientDashboard] ✅ User synced successfully from auth:', syncResult.data);
               setClientUser(syncResult.data);
             } else {
-              const syncError = syncResult.error instanceof Error
-                ? syncResult.error.message
-                : (typeof syncResult.error === 'object' && syncResult.error !== null ? JSON.stringify(syncResult.error) : String(syncResult.error));
+              const syncErrorStr = serializeError(syncResult.error);
               console.error('[ClientDashboard] ❌ Failed to sync user from auth:', {
                 userId: authUser.id,
                 userEmail: authUser.email,
-                syncError,
+                error: syncErrorStr,
               });
               setClientUser(null);
             }
           } catch (syncError) {
-            const syncErrorMsg = syncError instanceof Error
-              ? syncError.message
-              : (typeof syncError === 'object' && syncError !== null ? JSON.stringify(syncError) : String(syncError));
+            const syncErrorMsg = serializeError(syncError);
             console.error('[ClientDashboard] ❌ Unexpected error during sync:', {
               userId: authUser.id,
               error: syncErrorMsg,
