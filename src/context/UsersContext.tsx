@@ -53,7 +53,9 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           const { data, error } = await usersService.getUsers();
 
           if (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorMessage = error instanceof Error
+              ? error.message
+              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
             console.error('[UsersContext] Error loading users:', {
               message: errorMessage,
               isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
@@ -74,9 +76,12 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         await Promise.race([loadPromise, timeoutPromise]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
         console.error('[UsersContext] Unexpected error loading users:', {
           message: errorMessage,
+          type: error instanceof TypeError ? 'Network/Fetch Error' : 'Other Error',
           error,
         });
         setUsers([]);
