@@ -64,26 +64,54 @@ export default function ClientDashboard() {
           console.log('[ClientDashboard] User data loaded successfully:', result.data);
           setClientUser(result.data);
         } else {
-          // Only report error if we couldn't find user by either ID or email
-          const errorMessage = result.error instanceof Error
-            ? result.error.message
-            : (typeof result.error === 'object' && result.error !== null ? JSON.stringify(result.error) : String(result.error));
-          console.error('[ClientDashboard] User not found in database:', {
+          // User not found by ID or email - try to sync from auth
+          console.warn('[ClientDashboard] ⚠️ User not found in database:', {
             userId: authUser.id,
             userEmail: authUser.email,
-            message: errorMessage,
-            error: result.error,
+            result: result.error ? 'Error during fetch' : 'No data found',
           });
-          setClientUser(null);
+
+          // Try to sync user from auth to database
+          console.log('[ClientDashboard] 🔄 Attempting to sync user from auth to database...');
+          try {
+            const syncResult = await usersService.syncAuthUserToDatabase({
+              id: authUser.id,
+              email: authUser.email || '',
+              user_metadata: authUser.user_metadata,
+            });
+
+            if (syncResult.data) {
+              console.log('[ClientDashboard] ✅ User synced successfully from auth:', syncResult.data);
+              setClientUser(syncResult.data);
+            } else {
+              const syncError = syncResult.error instanceof Error
+                ? syncResult.error.message
+                : (typeof syncResult.error === 'object' && syncResult.error !== null ? JSON.stringify(syncResult.error) : String(syncResult.error));
+              console.error('[ClientDashboard] ❌ Failed to sync user from auth:', {
+                userId: authUser.id,
+                userEmail: authUser.email,
+                syncError,
+              });
+              setClientUser(null);
+            }
+          } catch (syncError) {
+            const syncErrorMsg = syncError instanceof Error
+              ? syncError.message
+              : (typeof syncError === 'object' && syncError !== null ? JSON.stringify(syncError) : String(syncError));
+            console.error('[ClientDashboard] ❌ Unexpected error during sync:', {
+              userId: authUser.id,
+              error: syncErrorMsg,
+            });
+            setClientUser(null);
+          }
         }
       } catch (error) {
         const errorMessage = error instanceof Error
           ? error.message
           : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-        console.error('[ClientDashboard] Unexpected error loading user:', {
+        console.error('[ClientDashboard] ❌ Unexpected error loading user:', {
           userId: authUser.id,
           message: errorMessage,
-          error,
         });
         setClientUser(null);
       } finally {
