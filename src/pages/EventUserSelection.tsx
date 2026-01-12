@@ -104,9 +104,16 @@ export default function EventUserSelection() {
                 : 'No momento não há outros participantes para você selecionar.'}
             </p>
           </div>
-          <Button onClick={() => navigate('/dashboard')} variant="gold" className="w-full">
-            Voltar ao Dashboard
-          </Button>
+          <div className="flex gap-3">
+            {users.length === 0 && (
+              <Button onClick={() => window.location.reload()} variant="outline" className="flex-1">
+                Recarregar
+              </Button>
+            )}
+            <Button onClick={() => navigate('/dashboard')} variant="gold" className="flex-1">
+              {users.length === 0 ? 'Voltar' : 'Dashboard'}
+            </Button>
+          </div>
         </div>
       </div>
     );
