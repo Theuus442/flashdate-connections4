@@ -4,6 +4,25 @@ import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * Helper to check if email or username already exists
+ */
+function checkDuplicateField(users: User[], email: string, username: string, excludeId?: string): { isDuplicate: boolean; field: string; existingUser?: User } {
+  for (const user of users) {
+    // If we're editing, exclude the current user
+    if (excludeId && user.id === excludeId) continue;
+
+    if (user.email === email && user.username === username) {
+      return { isDuplicate: true, field: 'email e apelido', existingUser: user };
+    } else if (user.email === email) {
+      return { isDuplicate: true, field: 'email', existingUser: user };
+    } else if (user.username === username) {
+      return { isDuplicate: true, field: 'apelido', existingUser: user };
+    }
+  }
+  return { isDuplicate: false, field: '' };
+}
+
 export const UsersManagement = () => {
   const { users, addUser, updateUser, deleteUser, deleteAllByRole } = useUsers();
   const { toast } = useToast();
@@ -90,6 +109,19 @@ export const UsersManagement = () => {
       toast({
         title: 'Erro',
         description: 'Por favor, preencha todos os campos obrigatórios (Nome, Apelido, Email, Telefone)',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate no duplicates in email or username
+    const duplicateCheck = checkDuplicateField(users, formData.email, formData.username, editingId);
+    if (duplicateCheck.isDuplicate) {
+      console.warn('[UsersManagement] Duplicate field detected:', duplicateCheck);
+      toast({
+        title: 'Erro',
+        description: `Este ${duplicateCheck.field} já está registrado no sistema. Escolha um ${duplicateCheck.field} único.`,
         variant: 'destructive',
       });
       setIsLoading(false);

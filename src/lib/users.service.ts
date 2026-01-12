@@ -3,6 +3,26 @@ import { User } from '@/context/UsersContext';
 import { storageService } from './storage.service';
 import { authService } from './auth.service';
 
+/**
+ * Helper function to safely serialize any error to a readable string
+ */
+function serializeError(error: any): string {
+  if (error === null) return 'No error';
+  if (error === undefined) return 'Undefined error';
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object') {
+    // Try to get meaningful properties
+    const message = (error.message || error.msg || error.error || error.detail || '').toString();
+    const code = (error.code || '').toString();
+    const details = (error.details || '').toString();
+
+    const parts = [message, code && `[${code}]`, details].filter(Boolean);
+    return parts.length > 0 ? parts.join(' - ') : JSON.stringify(error);
+  }
+  return String(error);
+}
+
 export const usersService = {
   /**
    * Sync user from Auth to Database if missing
@@ -216,13 +236,10 @@ export const usersService = {
       console.log('[usersService] User not found by ID, will try email fallback:', id);
       return { data: null, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      const errorStr = serializeError(error);
       console.error('[usersService] Error in getUserById:', {
         userId: id,
-        message: errorMessage,
-        error,
+        error: errorStr,
       });
       return { data: null, error };
     }
@@ -277,15 +294,12 @@ export const usersService = {
 
       // If user not found by email
       console.warn('[usersService] User not found by email:', email);
-      return { data: null, error: 'User not found in database' };
+      return { data: null, error: null };
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      const errorStr = serializeError(error);
       console.error('[usersService] Error in getUserByEmail:', {
         email,
-        message: errorMessage,
-        error,
+        error: errorStr,
       });
       return { data: null, error };
     }
@@ -301,9 +315,41 @@ export const usersService = {
     }
 
     try {
-      console.log('[usersService] Creating user:', user);
+      console.log('[usersService] Creating user:', {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      });
       let profileImageUrl: string | undefined;
       let userId = crypto.randomUUID();
+
+      // Pre-check for duplicate email or username to provide better error message
+      console.log('[usersService] Checking for duplicate email or username...');
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('id, email, username')
+        .or(`email.eq.${user.email},username.eq.${user.username}`)
+        .maybeSingle();
+
+      if (checkError) {
+        const errorStr = serializeError(checkError);
+        console.warn('[usersService] Error checking for duplicates:', errorStr);
+        // Continue anyway - the insert will fail if there are duplicates
+      } else if (existingUser) {
+        // Found a duplicate
+        let duplicateField = 'dados';
+        if (existingUser.email === user.email && existingUser.username === user.username) {
+          duplicateField = 'email e apelido';
+        } else if (existingUser.email === user.email) {
+          duplicateField = 'email';
+        } else if (existingUser.username === user.username) {
+          duplicateField = 'apelido';
+        }
+        const errorMsg = `Este ${duplicateField} já está registrado no sistema. Escolha um ${duplicateField === 'email e apelido' ? 'email e apelido' : duplicateField} único.`;
+        console.warn('[usersService] Duplicate found:', { duplicateField, existingId: existingUser.id });
+        throw new Error(errorMsg);
+      }
 
       // Create auth user if password provided (Edge Function handles both Auth and DB)
       if (user.password && user.password.trim()) {
@@ -369,7 +415,7 @@ export const usersService = {
       if (error) {
         let errorMsg = error instanceof Error
           ? error.message
-          : (error?.message || JSON.stringify(error));
+          : (error?.message || 'Unknown database error');
 
         // Provide better error messages for common issues
         if (error?.code === '23505') {
@@ -382,11 +428,12 @@ export const usersService = {
           }
         }
 
+        const errorStr = serializeError(error);
         console.error('[usersService] Database insert error:', {
           message: errorMsg,
           code: error?.code,
           details: error?.details,
-          hint: error?.hint,
+          dbError: errorStr,
         });
         throw new Error(errorMsg);
       }
@@ -414,9 +461,9 @@ export const usersService = {
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
-        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        : serializeError(error);
       console.error('[usersService] Error creating user:', errorMessage);
-      return { data: null, error };
+      return { data: null, error: errorMessage };
     }
   },
 

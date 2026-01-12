@@ -2,6 +2,24 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { usersService } from '@/lib/users.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
+/**
+ * Helper function to safely serialize any error to a readable string
+ */
+function serializeError(error: any): string {
+  if (error === null) return 'No error';
+  if (error === undefined) return 'Undefined error';
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object') {
+    const message = (error.message || error.msg || error.error || error.detail || '').toString();
+    const code = (error.code || '').toString();
+    const details = (error.details || '').toString();
+    const parts = [message, code && `[${code}]`, details].filter(Boolean);
+    return parts.length > 0 ? parts.join(' - ') : JSON.stringify(error);
+  }
+  return String(error);
+}
+
 export interface User {
   id: string;
   name: string;
@@ -129,21 +147,29 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.log('[UsersContext] Calling usersService.createUser...');
       const { data, error } = await usersService.createUser(user, profileImage);
 
-      const errorMessage = error instanceof Error ? error.message : (error?.message || JSON.stringify(error));
-      console.log('[UsersContext] createUser response:', { hasData: !!data, hasError: !!error, errorMessage });
+      const errorMessage = typeof error === 'string' ? error : serializeError(error);
+      console.log('[UsersContext] createUser response:', {
+        hasData: !!data,
+        hasError: !!error,
+        errorMessage
+      });
 
       if (error) {
         console.error('[UsersContext] Error adding user:', errorMessage);
-        console.error('[UsersContext] Full error:', error);
         return { data: null, error: errorMessage };
       }
       if (data) {
-        console.log('[UsersContext] User created successfully:', data);
+        console.log('[UsersContext] User created successfully:', {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          username: data.username,
+        });
         setUsers(prev => [...prev, data]);
         return { data, error: null };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = serializeError(error);
       console.error('[UsersContext] Error adding user:', errorMessage);
       return { data: null, error: errorMessage };
     }

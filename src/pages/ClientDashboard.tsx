@@ -7,6 +7,24 @@ import { useUsers } from '@/context/UsersContext';
 import { usersService } from '@/lib/users.service';
 import { toast } from 'sonner';
 
+/**
+ * Helper function to safely serialize any error to a readable string
+ */
+function serializeError(error: any): string {
+  if (error === null) return 'No error';
+  if (error === undefined) return 'Undefined error';
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object') {
+    const message = (error.message || error.msg || error.error || error.detail || '').toString();
+    const code = (error.code || '').toString();
+    const details = (error.details || '').toString();
+    const parts = [message, code && `[${code}]`, details].filter(Boolean);
+    return parts.length > 0 ? parts.join(' - ') : JSON.stringify(error);
+  }
+  return String(error);
+}
+
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
@@ -21,6 +39,8 @@ export default function ClientDashboard() {
   const [activeTab, setActiveTab] = useState<'profile' | 'events' | 'matches'>('profile');
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [maxRetries] = useState(3);
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
@@ -64,26 +84,48 @@ export default function ClientDashboard() {
           console.log('[ClientDashboard] User data loaded successfully:', result.data);
           setClientUser(result.data);
         } else {
-          // Only report error if we couldn't find user by either ID or email
-          const errorMessage = result.error instanceof Error
-            ? result.error.message
-            : (typeof result.error === 'object' && result.error !== null ? JSON.stringify(result.error) : String(result.error));
-          console.error('[ClientDashboard] User not found in database:', {
+          // User not found by ID or email - try to sync from auth
+          console.warn('[ClientDashboard] ⚠️ User not found in database:', {
             userId: authUser.id,
             userEmail: authUser.email,
-            message: errorMessage,
-            error: result.error,
+            result: result.error ? 'Error during fetch' : 'No data found',
           });
-          setClientUser(null);
+
+          // Try to sync user from auth to database
+          console.log('[ClientDashboard] 🔄 Attempting to sync user from auth to database...');
+          try {
+            const syncResult = await usersService.syncAuthUserToDatabase({
+              id: authUser.id,
+              email: authUser.email || '',
+              user_metadata: authUser.user_metadata,
+            });
+
+            if (syncResult.data) {
+              console.log('[ClientDashboard] ✅ User synced successfully from auth:', syncResult.data);
+              setClientUser(syncResult.data);
+            } else {
+              const syncErrorStr = serializeError(syncResult.error);
+              console.error('[ClientDashboard] ❌ Failed to sync user from auth:', {
+                userId: authUser.id,
+                userEmail: authUser.email,
+                error: syncErrorStr,
+              });
+              setClientUser(null);
+            }
+          } catch (syncError) {
+            const syncErrorMsg = serializeError(syncError);
+            console.error('[ClientDashboard] ❌ Unexpected error during sync:', {
+              userId: authUser.id,
+              error: syncErrorMsg,
+            });
+            setClientUser(null);
+          }
         }
       } catch (error) {
-        const errorMessage = error instanceof Error
-          ? error.message
-          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-        console.error('[ClientDashboard] Unexpected error loading user:', {
+        const errorMessage = serializeError(error);
+        console.error('[ClientDashboard] ❌ Unexpected error loading user:', {
           userId: authUser.id,
-          message: errorMessage,
-          error,
+          error: errorMessage,
         });
         setClientUser(null);
       } finally {
@@ -92,7 +134,7 @@ export default function ClientDashboard() {
     };
 
     loadUserData();
-  }, [authUser, users, clientUser]);
+  }, [authUser, users, clientUser, retryCount]);
 
   // Update clientUser when realUser changes
   useEffect(() => {
@@ -231,6 +273,70 @@ export default function ClientDashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
           <p className="text-muted-foreground">Carregando seu perfil...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if user could not be loaded
+  if (!clientUser && !isLoading && !isLoadingUserData && authUser) {
+    const handleRetry = () => {
+      setRetryCount(prev => prev + 1);
+      setClientUser(null);
+    };
+
+    const handleLogout = async () => {
+      try {
+        await signOut();
+        navigate('/login');
+      } catch (error) {
+        console.error('Error logging out:', error);
+        navigate('/login');
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+              <X size={32} className="text-destructive" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+              Perfil não carregado
+            </h2>
+            <p className="text-muted-foreground mb-2">
+              Ocorreu um problema ao carregar seus dados do servidor.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              ID de autenticação: <code className="text-xs bg-muted px-2 py-1 rounded">{authUser.id}</code>
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {retryCount < maxRetries ? (
+              <>
+                <Button onClick={handleRetry} variant="gold" className="w-full">
+                  Tentar Novamente ({retryCount}/{maxRetries})
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Se o problema persistir, tente fazer logout e login novamente.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-destructive font-medium mb-4">
+                  Não conseguimos carregar seu perfil após várias tentativas.
+                </p>
+                <Button onClick={handleLogout} variant="outline" className="w-full mb-3">
+                  Fazer Logout
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Faça login novamente para sincronizar seus dados.
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
     );

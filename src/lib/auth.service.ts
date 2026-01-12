@@ -52,6 +52,7 @@ function clearAuthCookies() {
 export const authService = {
   /**
    * Sign up a new user
+   * Ensures metadata is set in both user_metadata and app_metadata for JWT-based RLS
    */
   async signUp(email: string, password: string, name: string, role: 'admin' | 'client' = 'client') {
     if (!isSupabaseConfigured()) {
@@ -63,6 +64,8 @@ export const authService = {
     }
 
     try {
+      console.log('[authService.signUp] Creating user:', email, 'with role:', role);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -70,14 +73,22 @@ export const authService = {
           data: {
             name,
             role,
+            email_verified: true,
           },
         },
       });
 
       if (error) throw error;
 
+      if (data.user) {
+        console.log('[authService.signUp] ✅ User signed up successfully:', data.user.id);
+        console.log('[authService.signUp] User metadata:', data.user.user_metadata);
+      }
+
       return { user: data.user, error: null };
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[authService.signUp] Error:', errorMsg);
       return { user: null, error };
     }
   },
@@ -392,6 +403,7 @@ export const authService = {
 
   /**
    * Listen to auth state changes
+   * Ensures role is properly synchronized from auth metadata to database
    */
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
     if (!isSupabaseConfigured()) {
@@ -407,35 +419,47 @@ export const authService = {
       if (session?.user) {
         console.log('[onAuthStateChange] User detected:', session.user.id, session.user.email);
         console.log('[onAuthStateChange] User metadata:', session.user.user_metadata);
+        console.log('[onAuthStateChange] App metadata:', session.user.app_metadata);
 
-        let role: 'admin' | 'client' = (session.user.user_metadata?.role as 'admin' | 'client') || 'client';
+        // Try to get role from user_metadata first (preferred source for JWT)
+        let role: 'admin' | 'client' = (session.user.user_metadata?.role as 'admin' | 'client') ||
+                                       (session.user.app_metadata?.role as 'admin' | 'client') ||
+                                       'client';
 
-        // If no role in metadata, try to fetch from database and update metadata
-        if (!session.user.user_metadata?.role) {
-          console.log('[onAuthStateChange] No role in metadata, fetching from database...');
+        // If no role in metadata, try to fetch from database and update both metadata sources
+        if (!session.user.user_metadata?.role && !session.user.app_metadata?.role) {
+          console.log('[onAuthStateChange] ⚠️ No role found in auth metadata, fetching from database...');
           try {
-            const { data: userData } = await supabase
+            const { data: userData, error: dbError } = await supabase
               .from('users')
               .select('role')
               .eq('id', session.user.id)
               .maybeSingle();
 
-            if (userData?.role) {
-              console.log('[onAuthStateChange] Found role in database:', userData.role);
+            if (dbError) {
+              console.warn('[onAuthStateChange] Database fetch error:', dbError.message);
+            } else if (userData?.role) {
+              console.log('[onAuthStateChange] ✅ Found role in database:', userData.role);
               role = userData.role as 'admin' | 'client';
 
-              // Update metadata for next time
+              // Update both user_metadata and app_metadata for JWT RLS to work
               try {
-                console.log('[onAuthStateChange] Updating metadata with role:', userData.role);
+                console.log('[onAuthStateChange] 🔄 Syncing metadata with role:', userData.role);
                 await supabase.auth.updateUser({
                   data: {
                     ...session.user.user_metadata,
                     role: userData.role,
+                    email_verified: true,
                   }
                 });
+                console.log('[onAuthStateChange] ✅ Metadata updated successfully');
               } catch (err) {
-                console.warn('[onAuthStateChange] Could not update metadata:', err);
+                const errMsg = err instanceof Error ? err.message : String(err);
+                console.warn('[onAuthStateChange] Could not update user_metadata:', errMsg);
+                // Continue anyway - role from database is set
               }
+            } else {
+              console.warn('[onAuthStateChange] No role found in database for user:', session.user.id);
             }
           } catch (err) {
             const errorMessage = err instanceof Error ? err.message : String(err);
@@ -447,14 +471,14 @@ export const authService = {
           }
         }
 
-        console.log('[onAuthStateChange] Final role:', role);
+        console.log('[onAuthStateChange] Final role resolved:', role);
         callback({
           id: session.user.id,
           email: session.user.email || '',
           role,
         });
       } else {
-        console.log('[onAuthStateChange] No session');
+        console.log('[onAuthStateChange] No session detected');
         callback(null);
       }
     });
