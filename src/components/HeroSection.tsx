@@ -14,7 +14,7 @@ export const HeroSection = () => {
           className="w-full h-full object-cover"
           style={{ objectPosition: 'center top' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10" />
       </div>
 
       {/* Decorative Elements */}
