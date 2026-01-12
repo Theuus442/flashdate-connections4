@@ -100,12 +100,16 @@ export const usersService = {
         const errorMessage = error instanceof Error
           ? error.message
           : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-        console.error('[usersService] Supabase error:', {
-          message: errorMessage,
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-        });
+
+        // Safely serialize error properties
+        const safeErrorCode = String(error?.code || 'unknown');
+        const safeErrorDetails = String(error?.details || 'no details');
+        const safeErrorHint = String(error?.hint || 'no hint');
+
+        console.error('[usersService] ❌ Supabase error:', errorMessage);
+        console.error('[usersService]   Code:', safeErrorCode);
+        console.error('[usersService]   Details:', safeErrorDetails);
+        console.error('[usersService]   Hint:', safeErrorHint);
         throw error;
       }
 
