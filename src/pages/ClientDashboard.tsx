@@ -122,7 +122,7 @@ export default function ClientDashboard() {
     };
 
     loadUserData();
-  }, [authUser, users, clientUser]);
+  }, [authUser, users, clientUser, retryCount]);
 
   // Update clientUser when realUser changes
   useEffect(() => {
