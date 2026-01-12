@@ -162,7 +162,14 @@ export default function ClientDashboard() {
 
       if (result.data) {
         toast.success('Perfil atualizado com sucesso!');
-        setClientUser(result.data);
+        // Add cache buster to profile image URL to force browser to reload image
+        const updatedUserData = {
+          ...result.data,
+          profileImage: result.data.profileImage
+            ? `${result.data.profileImage}?t=${Date.now()}`
+            : result.data.profileImage
+        };
+        setClientUser(updatedUserData);
         setSelectedImageFile(undefined); // Clear the selected file after successful upload
       } else {
         const errorMsg = result.error || 'Erro desconhecido';
