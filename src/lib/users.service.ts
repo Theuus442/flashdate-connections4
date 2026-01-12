@@ -362,6 +362,7 @@ export const usersService = {
 
       console.log('[usersService] Updating user:', id, 'with', Object.keys(updateData).length, 'fields');
 
+      // First attempt: try normal update
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
@@ -383,36 +384,53 @@ export const usersService = {
         throw error;
       }
 
-      // If select() didn't return data (RLS issue), fetch the user separately
+      // If update didn't affect any rows, user doesn't exist - try to create it
       let userData: any;
       if (!data || data.length === 0) {
-        const { data: fetchedUser, error: fetchError } = await supabase
+        console.warn('[usersService] Update affected 0 rows - user does not exist. Attempting to create...', id);
+
+        // Try to create user with upsert
+        const { data: upsertData, error: upsertError } = await supabase
           .from('users')
-          .select('*')
-          .eq('id', id)
-          .single();
+          .upsert([{
+            id: id,
+            name: updates.name || 'Usuário',
+            username: updates.username || `user-${id.slice(0, 8)}`,
+            email: updates.email || '',
+            whatsapp: updates.whatsapp || '',
+            gender: updates.gender || 'Outro',
+            role: updates.role || 'client',
+            profile_image_url: profileImageUrl,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }], { onConflict: 'id' })
+          .select();
 
-        if (fetchError) {
-          const fetchErrorMsg = fetchError instanceof Error
-            ? fetchError.message
-            : (fetchError?.message || JSON.stringify(fetchError));
-          console.error('[usersService] Failed to fetch updated user:', {
-            message: fetchErrorMsg,
-            code: fetchError?.code,
-            details: fetchError?.details,
-            hint: fetchError?.hint,
-          });
-          throw new Error(`User with ID ${id} not found (fetch error: ${fetchErrorMsg})`);
+        if (upsertError) {
+          const upsertErrorMsg = upsertError instanceof Error
+            ? upsertError.message
+            : (upsertError?.message || 'Failed to create user');
+          const errorDetails = {
+            userId: id,
+            message: upsertErrorMsg,
+            code: upsertError?.code,
+            details: upsertError?.details,
+            hint: upsertError?.hint,
+          };
+          console.error('[usersService] Failed to create user record:', errorDetails);
+          throw new Error(`User with ID ${id} not found and could not be created: ${upsertErrorMsg}`);
         }
 
-        if (!fetchedUser) {
-          console.error('[usersService] No user found with ID:', id);
-          throw new Error(`User with ID ${id} not found`);
+        if (!upsertData || upsertData.length === 0) {
+          console.error('[usersService] Upsert succeeded but returned no data for user:', id);
+          throw new Error(`User with ID ${id} could not be created (no data returned)`);
         }
 
-        userData = fetchedUser;
+        userData = upsertData[0];
+        console.log('[usersService] User created successfully via upsert');
       } else {
         userData = data[0];
+        console.log('[usersService] User updated successfully');
       }
       const transformedData: User = {
         id: userData.id,
