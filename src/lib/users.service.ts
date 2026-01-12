@@ -76,7 +76,8 @@ export const usersService = {
         const errorMessage = error instanceof Error
           ? error.message
           : (error?.message || JSON.stringify(error));
-        console.error('[usersService] Supabase error fetching user:', {
+        console.error('[usersService] Supabase error fetching user by ID:', {
+          userId: id,
           message: errorMessage,
           code: error?.code,
           details: error?.details,
@@ -98,12 +99,12 @@ export const usersService = {
           profileImage: data.profile_image_url,
           password: data.password,
         };
-        console.log('[usersService] Successfully fetched user from database:', id);
+        console.log('[usersService] Successfully fetched user from database by ID:', id);
         return { data: transformedData, error: null };
       }
 
-      // If user not found in database
-      console.warn('[usersService] User not found in database, this may happen if user was created via edge function but insert failed');
+      // If user not found by ID, this is an error - don't fallback
+      console.error('[usersService] User not found by ID:', id);
       return { data: null, error: 'User not found in database' };
     } catch (error) {
       const errorMessage = error instanceof Error
@@ -111,6 +112,69 @@ export const usersService = {
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
       console.error('[usersService] Error in getUserById:', {
         userId: id,
+        message: errorMessage,
+        error,
+      });
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Get user by email - useful when IDs don't match between Auth and DB
+   */
+  async getUserByEmail(email: string): Promise<{ data: User | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[usersService] Fetching user by email:', email);
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error?.message || JSON.stringify(error));
+        console.error('[usersService] Supabase error fetching user by email:', {
+          email,
+          message: errorMessage,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+        });
+        throw error;
+      }
+
+      // If user found in database, return it
+      if (data) {
+        const transformedData: User = {
+          id: data.id,
+          name: data.name,
+          username: data.username,
+          email: data.email,
+          whatsapp: data.whatsapp,
+          gender: data.gender,
+          role: data.role || 'client',
+          profileImage: data.profile_image_url,
+          password: data.password,
+        };
+        console.log('[usersService] Successfully fetched user from database by email:', email);
+        return { data: transformedData, error: null };
+      }
+
+      // If user not found by email
+      console.warn('[usersService] User not found by email:', email);
+      return { data: null, error: 'User not found in database' };
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+      console.error('[usersService] Error in getUserByEmail:', {
+        email,
         message: errorMessage,
         error,
       });
