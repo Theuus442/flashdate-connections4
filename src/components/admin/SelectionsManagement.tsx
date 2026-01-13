@@ -111,7 +111,7 @@ export const SelectionsManagement = () => {
         <div className="space-y-2">
           {selections.map(selection => (
             <div
-              key={selection.selectedUserId}
+              key={`${selection.userId}-${selection.selectedUserId}-${selection.vote}`}
               className={`flex items-center justify-between p-3 rounded-lg border ${
                 title === 'SIM'
                   ? 'bg-gold/10 border-gold/20'
