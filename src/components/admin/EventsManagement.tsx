@@ -129,6 +129,8 @@ export const EventsManagement = () => {
           setEventData(data);
           setFormData(data);
           setImagePreview(data.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
           setSelectedImageFile(null);
           toast({
             title: 'Sucesso',
@@ -139,6 +141,8 @@ export const EventsManagement = () => {
         // Fallback to local update
         setEventData(formData);
         setImagePreview(formData.eventImage);
+        setImageLoadError(false);
+        setPreviewLoadError(false);
         toast({
           title: 'Sucesso',
           description: 'Evento atualizado (local apenas)',
