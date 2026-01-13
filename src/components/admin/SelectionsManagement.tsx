@@ -67,6 +67,8 @@ export const SelectionsManagement = () => {
     }
 
     return filtered.map(s => ({
+      id: s.id,
+      eventId: s.eventId,
       selectedUserId: s.selectedUserId,
       vote: s.vote,
       userId: s.userId,
@@ -109,9 +111,9 @@ export const SelectionsManagement = () => {
         </p>
       ) : (
         <div className="space-y-2">
-          {selections.map(selection => (
+          {selections.map((selection, index) => (
             <div
-              key={`${selection.userId}-${selection.selectedUserId}-${selection.vote}`}
+              key={selection.id || `${selection.eventId}-${selection.userId}-${selection.selectedUserId}-${index}`}
               className={`flex items-center justify-between p-3 rounded-lg border ${
                 title === 'SIM'
                   ? 'bg-gold/10 border-gold/20'
@@ -284,8 +286,8 @@ export const SelectionsManagement = () => {
                   SIM ({matches.length})
                 </h3>
                 <div className="space-y-2 ml-6">
-                  {matches.map(match => (
-                    <div key={`${match.userId}-${match.selectedUserId}-SIM`} className="text-sm text-foreground">
+                  {matches.map((match, index) => (
+                    <div key={match.id || `${match.eventId}-${match.userId}-${match.selectedUserId}-SIM-${index}`} className="text-sm text-foreground">
                       💕 <span className="font-medium">{getUserName(match.selectedUserId)}</span>
                     </div>
                   ))}
@@ -301,8 +303,8 @@ export const SelectionsManagement = () => {
                   TALVEZ ({maybe.length})
                 </h3>
                 <div className="space-y-2 ml-6">
-                  {maybe.map(m => (
-                    <div key={`${m.userId}-${m.selectedUserId}-TALVEZ`} className="text-sm text-foreground">
+                  {maybe.map((m, index) => (
+                    <div key={m.id || `${m.eventId}-${m.userId}-${m.selectedUserId}-TALVEZ-${index}`} className="text-sm text-foreground">
                       👥 <span className="font-medium">{getUserName(m.selectedUserId)}</span>
                     </div>
                   ))}
@@ -324,8 +326,8 @@ export const SelectionsManagement = () => {
                   NÃO ({noInterests.length})
                 </h3>
                 <div className="space-y-2 ml-6">
-                  {noInterests.map(noInterest => (
-                    <div key={`${noInterest.userId}-${noInterest.selectedUserId}-NÃO`} className="text-sm text-foreground">
+                  {noInterests.map((noInterest, index) => (
+                    <div key={noInterest.id || `${noInterest.eventId}-${noInterest.userId}-${noInterest.selectedUserId}-NÃO-${index}`} className="text-sm text-foreground">
                       ❌ <span className="font-medium">{getUserName(noInterest.selectedUserId)}</span>
                     </div>
                   ))}

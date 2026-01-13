@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, AlertCircle, Search } from 'lucide-react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { searchCities } from '@/lib/cities.service';
+import { format, parse } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
+// Placeholder SVG for when images fail to load
+const PLACEHOLDER_IMAGE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect fill='%23f5f5f5' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, sans-serif' font-size='16' fill='%23999'%3EImagem não pode ser carregada%3C/text%3E%3C/svg%3E`;
+
+// Default event data with template values
 const defaultEventData: EventData = {
   id: '1',
   title: 'Armazém São Caetano',
@@ -20,11 +27,34 @@ const defaultEventData: EventData = {
   parking: 'Zona Azul gratuita a partir das 13h (aos sábados)',
   price: 'R$ 40,00',
   description: 'Encontros Presenciais com Inteligência Artificial',
-  eventImage: 'https://images.unsplash.com/photo-1519167758481-dc80e6f0b6da?w=600&h=400',
+  eventImage: 'https://kdwnptqxwnnzvdinhhin.supabase.co/storage/v1/object/public/events/placeholder.png',
   email: 'contato@flashdate.com.br',
   whatsapp: '(11) 97032-9710',
   vagas: '1',
   vagasLimitDate: '25/01/2026',
+};
+
+// Empty form for creating new events
+const emptyEventForm: EventData = {
+  id: '',
+  title: '',
+  location: '',
+  city: '',
+  date: '',
+  nextDate: '',
+  schedule: '',
+  checkIn: '',
+  environment: '',
+  music: '',
+  dressCode: '',
+  parking: '',
+  price: '',
+  description: '',
+  eventImage: '',
+  email: '',
+  whatsapp: '',
+  vagas: '',
+  vagasLimitDate: '',
 };
 
 export const EventsManagement = () => {
@@ -32,15 +62,22 @@ export const EventsManagement = () => {
   const supabaseConfigured = isSupabaseConfigured();
   const [eventData, setEventData] = useState<EventData>(defaultEventData);
   const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<EventData>(eventData);
   const [imagePreview, setImagePreview] = useState(eventData.eventImage);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [previewLoadError, setPreviewLoadError] = useState(false);
+  const [cities, setCities] = useState<Array<{ id: number; nome: string }>>([]);
+  const [citySearchInput, setCitySearchInput] = useState('');
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
 
   // Load event from Supabase on mount
   useEffect(() => {
     const loadEvent = async () => {
       if (!supabaseConfigured) {
+        console.log('[EventsManagement] Supabase not configured, using offline mode');
         return;
       }
 
@@ -50,19 +87,34 @@ export const EventsManagement = () => {
         if (events.data && events.data.length > 0) {
           // Get the first event (or latest)
           const event = events.data[0];
+          console.log('[EventsManagement] Loaded event:', event);
           setEventData(event);
           setFormData(event);
           setImagePreview(event.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
+        } else {
+          console.warn('[EventsManagement] No events found in database');
+          toast({
+            title: 'Aviso',
+            description: 'Nenhum evento encontrado no banco de dados',
+            variant: 'default',
+          });
         }
       } catch (error) {
-        console.error('Error loading event:', error);
+        console.error('[EventsManagement] Error loading event:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao carregar evento do banco de dados',
+          variant: 'destructive',
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadEvent();
-  }, [supabaseConfigured]);
+  }, [supabaseConfigured, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -72,10 +124,107 @@ export const EventsManagement = () => {
     }));
   };
 
+  const handleCitySearch = async (value: string) => {
+    setCitySearchInput(value);
+    if (value.length >= 2) {
+      try {
+        const results = await searchCities(value);
+        setCities(results);
+        setShowCitySuggestions(true);
+      } catch (error) {
+        console.error('[EventsManagement] Error searching cities:', error);
+      }
+    } else {
+      setCities([]);
+      setShowCitySuggestions(false);
+    }
+  };
+
+  const handleCitySelect = (cityName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      city: cityName,
+    }));
+    setCitySearchInput(cityName);
+    setShowCitySuggestions(false);
+  };
+
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    try {
+      // Try parsing as DD/MM/YYYY
+      const date = parse(dateString, 'dd/MM/yyyy', new Date());
+      return format(date, 'yyyy-MM-dd');
+    } catch {
+      // If it's already in a different format, return as is
+      return dateString;
+    }
+  };
+
+  const formatDateToDisplay = (dateString: string): string => {
+    if (!dateString) return '';
+    try {
+      // Handle both YYYY-MM-DD and DD/MM/YYYY formats
+      let date: Date;
+      if (dateString.includes('-')) {
+        date = new Date(dateString);
+      } else {
+        date = parse(dateString, 'dd/MM/yyyy', new Date());
+      }
+      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatTime = (timeString: string): string => {
+    if (!timeString) return '';
+    // If it's already in HH:mm format, return as is
+    if (timeString.match(/^\d{2}:\d{2}$/)) {
+      return timeString;
+    }
+    // If it contains a time pattern like "19h" or "19:00", try to extract it
+    const timeMatch = timeString.match(/(\d{1,2}):?(\d{0,2})/);
+    if (timeMatch) {
+      const hours = timeMatch[1].padStart(2, '0');
+      const minutes = timeMatch[2] ? timeMatch[2].padStart(2, '0') : '00';
+      return `${hours}:${minutes}`;
+    }
+    return timeString;
+  };
+
+  const formatPrice = (priceString: string): string => {
+    if (!priceString) return '';
+    // Remove non-numeric characters except decimal point
+    const numericValue = priceString.replace(/[^0-9.,]/g, '');
+    // Replace comma with dot for parsing
+    const value = parseFloat(numericValue.replace(',', '.'));
+    if (isNaN(value)) return priceString;
+    // Format as Brazilian currency
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  const formatWhatsApp = (phone: string): string => {
+    if (!phone) return '';
+    // Remove all non-numeric characters
+    const cleaned = phone.replace(/\D/g, '');
+    // Format as (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+    if (cleaned.length === 11) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImageFile(file);
+      setPreviewLoadError(false);
       // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -86,9 +235,42 @@ export const EventsManagement = () => {
     }
   };
 
+  const handleImageLoadError = (e: any) => {
+    console.error('[EventsManagement] Error loading event image:', {
+      url: eventData.eventImage,
+      error: e,
+    });
+    setImageLoadError(true);
+  };
+
+  const handlePreviewLoadError = (e: any) => {
+    console.error('[EventsManagement] Error loading preview image:', {
+      url: imagePreview,
+      error: e,
+    });
+    setPreviewLoadError(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If creating a new event, use handleCreateSubmit instead
+    if (isCreating) {
+      return handleCreateSubmit(e);
+    }
+
     setIsLoading(true);
+
+    // Validate that event ID exists
+    if (!eventData.id) {
+      toast({
+        title: 'Erro',
+        description: 'ID do evento não está disponível. Recarregue a página.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       if (supabaseConfigured) {
@@ -99,9 +281,11 @@ export const EventsManagement = () => {
         );
 
         if (error) {
+          const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+          console.error('[EventsManagement] Error updating event:', errorMsg);
           toast({
             title: 'Erro',
-            description: 'Falha ao atualizar evento',
+            description: `Falha ao atualizar evento: ${errorMsg}`,
             variant: 'destructive',
           });
           return;
@@ -111,6 +295,8 @@ export const EventsManagement = () => {
           setEventData(data);
           setFormData(data);
           setImagePreview(data.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
           setSelectedImageFile(null);
           toast({
             title: 'Sucesso',
@@ -121,6 +307,8 @@ export const EventsManagement = () => {
         // Fallback to local update
         setEventData(formData);
         setImagePreview(formData.eventImage);
+        setImageLoadError(false);
+        setPreviewLoadError(false);
         toast({
           title: 'Sucesso',
           description: 'Evento atualizado (local apenas)',
@@ -129,7 +317,7 @@ export const EventsManagement = () => {
 
       setIsEditing(false);
     } catch (error) {
-      console.error('Error saving event:', error);
+      console.error('[EventsManagement] Error saving event:', error);
       toast({
         title: 'Erro',
         description: 'Erro ao salvar evento',
@@ -143,8 +331,98 @@ export const EventsManagement = () => {
   const handleCancel = () => {
     setFormData(eventData);
     setImagePreview(eventData.eventImage);
+    setImageLoadError(false);
+    setPreviewLoadError(false);
     setSelectedImageFile(null);
     setIsEditing(false);
+    setIsCreating(false);
+  };
+
+  const handleCreateNew = () => {
+    setFormData(emptyEventForm);
+    setImagePreview('');
+    setImageLoadError(false);
+    setPreviewLoadError(false);
+    setSelectedImageFile(null);
+    setIsCreating(true);
+    setIsEditing(true);
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Validate required fields
+    if (!formData.title || !formData.email || !formData.whatsapp) {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, preencha os campos: Título, Email e WhatsApp',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      if (supabaseConfigured) {
+        const { data, error } = await eventsService.createEvent(
+          formData,
+          selectedImageFile || undefined
+        );
+
+        if (error) {
+          const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+          console.error('[EventsManagement] Error creating event:', errorMsg);
+          toast({
+            title: 'Erro',
+            description: `Falha ao criar evento: ${errorMsg}`,
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        if (data) {
+          setEventData(data);
+          setFormData(data);
+          setImagePreview(data.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
+          setSelectedImageFile(null);
+          toast({
+            title: 'Sucesso',
+            description: 'Evento criado com sucesso!',
+          });
+          setIsEditing(false);
+          setIsCreating(false);
+        }
+      } else {
+        // Fallback to local creation
+        const newEvent: EventData = {
+          ...formData,
+          id: Date.now().toString(),
+        };
+        setEventData(newEvent);
+        setFormData(newEvent);
+        setImagePreview(formData.eventImage);
+        setImageLoadError(false);
+        setPreviewLoadError(false);
+        toast({
+          title: 'Sucesso',
+          description: 'Evento criado (local apenas)',
+        });
+        setIsEditing(false);
+        setIsCreating(false);
+      }
+    } catch (error) {
+      console.error('[EventsManagement] Error creating event:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao criar evento',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading && !eventData.id) {
@@ -155,40 +433,81 @@ export const EventsManagement = () => {
     );
   }
 
+  // Show message if no event is loaded and not in loading state, but offer to create one
+  if (!isLoading && !eventData.id && !isEditing) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-foreground">Gerenciar Eventos</h1>
+            <p className="text-muted-foreground mt-2">Crie e edite os eventos</p>
+          </div>
+          <Button variant="gold" onClick={handleCreateNew} disabled={isLoading}>
+            + Adicionar Evento
+          </Button>
+        </div>
+        <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-8">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">Nenhum evento encontrado</h3>
+              <p className="text-yellow-800 dark:text-yellow-200">
+                Não há eventos no banco de dados. Clique no botão acima para criar um novo evento!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-serif text-3xl font-bold text-foreground">Gerenciar Eventos</h1>
-          <p className="text-muted-foreground mt-2">Edite as informações do próximo evento</p>
+          <p className="text-muted-foreground mt-2">Crie e edite os eventos</p>
         </div>
         {!isEditing && (
-          <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
-            Editar Evento
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={handleCreateNew} disabled={isLoading}>
+              + Adicionar Evento
+            </Button>
+            <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
+              Editar Evento
+            </Button>
+          </div>
         )}
       </div>
 
       {/* Event Form or Display */}
       {isEditing ? (
         <div className="bg-card border border-border rounded-2xl p-8">
-          <h2 className="font-serif text-2xl font-bold text-foreground mb-6">Editar Próximo Evento</h2>
+          <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
+            {isCreating ? 'Criar Novo Evento' : 'Editar Próximo Evento'}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Image Upload Section */}
             <div className="space-y-4">
               <label className="block text-sm font-medium text-foreground">Imagem do Estabelecimento</label>
               <div className="flex flex-col gap-4 md:flex-row">
-                <div className="flex-1">
+                <div className="flex-1 relative">
                   <img
-                    src={imagePreview}
+                    src={previewLoadError ? PLACEHOLDER_IMAGE : imagePreview}
                     alt="Event preview"
                     className="w-full h-64 object-cover rounded-lg border border-border"
-                    onError={(e) => {
-                      console.error('[EventsManagement] Error loading preview image');
-                    }}
+                    onError={handlePreviewLoadError}
                   />
+                  {previewLoadError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                      <div className="text-center text-white">
+                        <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+                        <p className="text-sm font-medium">Erro ao carregar imagem</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="md:w-64 flex flex-col justify-center">
                   <label className="flex items-center justify-center w-full h-32 px-4 py-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
@@ -237,16 +556,39 @@ export const EventsManagement = () => {
               </div>
 
               {/* City */}
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-foreground mb-2">Cidade</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  placeholder="Cidade, Estado"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="city"
+                    value={citySearchInput || formData.city}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        city: e.target.value,
+                      }));
+                      handleCitySearch(e.target.value);
+                    }}
+                    onFocus={() => citySearchInput.length >= 2 && setShowCitySuggestions(true)}
+                    placeholder="Digite o nome da cidade"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                  />
+                  {showCitySuggestions && cities.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                      {cities.slice(0, 10).map((city) => (
+                        <button
+                          key={city.id}
+                          type="button"
+                          onClick={() => handleCitySelect(city.nome)}
+                          className="w-full text-left px-4 py-2 hover:bg-muted/50 focus:bg-muted/50 outline-none transition-colors border-b border-border last:border-b-0"
+                        >
+                          {city.nome}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Date */}
@@ -266,11 +608,16 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Próxima Data</label>
                 <input
-                  type="text"
+                  type="date"
                   name="nextDate"
-                  value={formData.nextDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/AAAA"
+                  value={formatDate(formData.nextDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateToDisplay(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      nextDate: formatted,
+                    }));
+                  }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -279,11 +626,16 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Horário</label>
                 <input
-                  type="text"
+                  type="time"
                   name="schedule"
-                  value={formData.schedule}
-                  onChange={handleInputChange}
-                  placeholder="Conforme agendado"
+                  value={formatTime(formData.schedule)}
+                  onChange={(e) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      schedule: e.target.value,
+                    }));
+                  }}
+                  placeholder="19:00"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -360,7 +712,13 @@ export const EventsManagement = () => {
                   type="text"
                   name="price"
                   value={formData.price}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    const formatted = formatPrice(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      price: formatted || e.target.value,
+                    }));
+                  }}
                   placeholder="R$ 40,00"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
@@ -370,11 +728,12 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Vagas</label>
                 <input
-                  type="text"
+                  type="number"
                   name="vagas"
                   value={formData.vagas}
                   onChange={handleInputChange}
-                  placeholder="(1)"
+                  placeholder="0"
+                  min="0"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -383,11 +742,16 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Data Limite de Vagas</label>
                 <input
-                  type="text"
+                  type="date"
                   name="vagasLimitDate"
-                  value={formData.vagasLimitDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/AAAA"
+                  value={formatDate(formData.vagasLimitDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateToDisplay(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      vagasLimitDate: formatted,
+                    }));
+                  }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -412,7 +776,13 @@ export const EventsManagement = () => {
                   type="tel"
                   name="whatsapp"
                   value={formData.whatsapp}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    const formatted = formatWhatsApp(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      whatsapp: formatted || e.target.value,
+                    }));
+                  }}
                   placeholder="(11) 97032-9710"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
@@ -438,7 +808,7 @@ export const EventsManagement = () => {
                 Cancelar
               </Button>
               <Button variant="gold" type="submit" disabled={isLoading}>
-                {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+                {isLoading ? 'Processando...' : isCreating ? 'Criar Evento' : 'Salvar Alterações'}
               </Button>
             </div>
           </form>
@@ -446,15 +816,22 @@ export const EventsManagement = () => {
       ) : (
         <div className="grid md:grid-cols-2 gap-8">
           {/* Image */}
-          <div>
+          <div className="relative">
             <img
-              src={eventData.eventImage}
+              src={imageLoadError ? PLACEHOLDER_IMAGE : eventData.eventImage}
               alt={eventData.title}
               className="w-full h-96 object-cover rounded-2xl border border-border"
-              onError={(e) => {
-                console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
-              }}
+              onError={handleImageLoadError}
             />
+            {imageLoadError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-2xl">
+                <div className="text-center text-white">
+                  <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm font-medium">Erro ao carregar imagem</p>
+                  <p className="text-xs mt-1">Carregue uma nova imagem para continuar</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Event Info */}
