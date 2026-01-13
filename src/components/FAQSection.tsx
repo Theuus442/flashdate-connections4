@@ -293,7 +293,7 @@ export const FAQSection = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F4c6a42da1a654661a002b9df6c0a40a4?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2Fe00265569f15418587d07e0eb2028b63%2Fed68dc4ae3de429caa69f0910855b4d7?format=webp&width=800"
                 alt="Evento Flashdate - Participantes em speed dating"
                 className="w-full h-full object-cover"
               />
@@ -301,7 +301,7 @@ export const FAQSection = () => {
 
             <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F308f5dc2d9da4ceda9523eb08cf3ba9c?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2Fe00265569f15418587d07e0eb2028b63%2Fcd3af54682ee48ceb934c79ebd38e6b8?format=webp&width=800"
                 alt="Evento Flashdate - Ambiente de encontros com mascote"
                 className="w-full h-full object-cover"
               />
