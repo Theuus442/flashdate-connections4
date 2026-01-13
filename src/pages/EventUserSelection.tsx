@@ -106,8 +106,13 @@ export default function EventUserSelection() {
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
 
-    // Apply gender filter
-    if (genderFilter !== 'all') {
+    // Auto-filter by current user's gender (women see women, men see men)
+    if (currentUser?.gender && currentUser.gender !== 'Outro') {
+      filtered = filtered.filter(u => u.gender === currentUser.gender);
+    }
+
+    // Apply additional gender filter (only if selecting something different from auto-filter)
+    if (genderFilter !== 'all' && !(currentUser?.gender && currentUser.gender !== 'Outro')) {
       filtered = filtered.filter(u => u.gender === genderFilter);
     }
 
@@ -119,7 +124,7 @@ export default function EventUserSelection() {
     }
 
     return filtered;
-  }, [participants, sortBy, genderFilter]);
+  }, [participants, sortBy, genderFilter, currentUser?.gender]);
 
   // Show error if not authenticated
   if (!authUser) {
