@@ -296,4 +296,56 @@ export const selectionsService = {
       return { error: null };
     }
   },
+
+  /**
+   * Get mutual matches (where both users selected each other with SIM)
+   */
+  async getMutualMatches(): Promise<{ data: Array<{ userId: string; selectedUserId: string; createdAt: string }> | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      // Fetch all SIM selections
+      const { data: allSimSelections, error: queryError } = await supabase
+        .from('selections')
+        .select('id, user_id, selected_user_id, created_at')
+        .eq('vote', 'SIM')
+        .order('created_at', { ascending: false });
+
+      if (queryError) throw queryError;
+
+      if (!allSimSelections || allSimSelections.length === 0) {
+        return { data: [], error: null };
+      }
+
+      // Find mutual matches: where A->B exists AND B->A exists
+      const mutualMatches: Array<{ userId: string; selectedUserId: string; createdAt: string }> = [];
+      const seen = new Set<string>();
+
+      for (const selection of allSimSelections) {
+        const pair = [selection.user_id, selection.selected_user_id].sort().join('|');
+
+        if (seen.has(pair)) continue;
+
+        // Check if the reverse selection exists
+        const reverseExists = allSimSelections.some(
+          s => s.user_id === selection.selected_user_id && s.selected_user_id === selection.user_id
+        );
+
+        if (reverseExists) {
+          mutualMatches.push({
+            userId: selection.user_id,
+            selectedUserId: selection.selected_user_id,
+            createdAt: selection.created_at,
+          });
+          seen.add(pair);
+        }
+      }
+
+      return { data: mutualMatches, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
 };
