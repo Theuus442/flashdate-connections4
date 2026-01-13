@@ -102,6 +102,43 @@ export default function EventUserSelection() {
     }
   }, [authUser, users]);
 
+  // Load existing selections from database on mount
+  useEffect(() => {
+    if (!authUser) return;
+
+    const loadSelections = async () => {
+      try {
+        console.log('[EventUserSelection] Loading existing selections from database...');
+        // Fetch all selections to check what the user already voted on
+        const { data: allSelections } = await selectionsService.getSelections();
+
+        if (allSelections) {
+          // Filter to only selections made by current user
+          const userSelections = allSelections.filter(s => s.userId === authUser.id);
+
+          // Convert database format to local format
+          const voteTypeMap: Record<string, 'match' | 'friendship' | 'no-interest'> = {
+            'SIM': 'match',
+            'TALVEZ': 'friendship',
+            'NÃO': 'no-interest'
+          };
+
+          const convertedSelections = userSelections.map(s => ({
+            userId: s.selectedUserId,
+            type: voteTypeMap[s.vote] as 'match' | 'friendship' | 'no-interest'
+          }));
+
+          console.log('[EventUserSelection] Found existing selections:', convertedSelections);
+          setSelections(convertedSelections);
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Error loading selections:', error);
+      }
+    };
+
+    loadSelections();
+  }, [authUser]);
+
   // Filter and sort participants based on current filters
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
