@@ -15,6 +15,7 @@ export const SelectionsManagement = () => {
   const [selections, setSelections] = useState<Selection[]>([]);
   const [mutualMatches, setMutualMatches] = useState<MutualMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Load all selections from database on mount
   useEffect(() => {
