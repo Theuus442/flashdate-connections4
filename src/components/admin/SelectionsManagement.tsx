@@ -285,7 +285,7 @@ export const SelectionsManagement = () => {
                 </h3>
                 <div className="space-y-2 ml-6">
                   {matches.map(match => (
-                    <div key={match.selectedUserId} className="text-sm text-foreground">
+                    <div key={`${match.userId}-${match.selectedUserId}-SIM`} className="text-sm text-foreground">
                       💕 <span className="font-medium">{getUserName(match.selectedUserId)}</span>
                     </div>
                   ))}
