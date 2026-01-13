@@ -201,30 +201,40 @@ export const selectionsService = {
   },
 
   /**
-   * Update selection (change vote)
+   * Update selection (change vote) - event_id can be null
    */
-  async updateSelection(eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
-    // Return local selection object as fallback (always works, even without Supabase or valid UUIDs)
+  async updateSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
+    // Return local selection object as fallback (always works, even without Supabase)
     const selection: Selection = {
-      eventId,
+      eventId: eventId || '',
       userId,
       selectedUserId,
       vote,
       timestamp: Date.now(),
     };
 
-    if (!isSupabaseConfigured() || !isValidUUID(eventId)) {
+    if (!isSupabaseConfigured()) {
       return { data: selection, error: null };
     }
 
     try {
-      // Update existing selection
-      const { data, error } = await supabase
+      console.log('[selectionsService] Updating selection:', { eventId, userId, selectedUserId, vote });
+
+      // Build query
+      let query = supabase
         .from('selections')
         .update({ vote })
-        .eq('event_id', eventId)
         .eq('user_id', userId)
-        .eq('selected_user_id', selectedUserId)
+        .eq('selected_user_id', selectedUserId);
+
+      // Only add event_id filter if it's not null
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      } else {
+        query = query.is('event_id', null);
+      }
+
+      const { data, error } = await query
         .select()
         .single();
 
@@ -239,6 +249,7 @@ export const selectionsService = {
         timestamp: new Date(data.created_at).getTime(),
       };
 
+      console.log('[selectionsService] Selection updated successfully');
       return { data: transformedData, error: null };
     } catch (error: any) {
       console.error('Error updating selection in database:', error?.message || error);
