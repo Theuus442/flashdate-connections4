@@ -109,7 +109,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
         })();
 
-        await Promise.race([loadPromise, timeoutPromise]);
+        await loadPromise;
       } catch (error) {
         const errorMessage = error instanceof Error
           ? error.message
