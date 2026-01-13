@@ -106,8 +106,16 @@ export default function EventUserSelection() {
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
 
-    // Apply gender filter
-    if (genderFilter !== 'all') {
+    // Auto-filter by opposite gender (women see men, men see women)
+    if (currentUser?.gender && currentUser.gender !== 'Outro') {
+      // If user is Female (F), show only Male (M) participants
+      // If user is Male (M), show only Female (F) participants
+      const oppositeGender = currentUser.gender === 'F' ? 'M' : 'F';
+      filtered = filtered.filter(u => u.gender === oppositeGender);
+    }
+
+    // Apply additional gender filter (only if selecting something different from auto-filter)
+    if (genderFilter !== 'all' && !(currentUser?.gender && currentUser.gender !== 'Outro')) {
       filtered = filtered.filter(u => u.gender === genderFilter);
     }
 
@@ -119,7 +127,7 @@ export default function EventUserSelection() {
     }
 
     return filtered;
-  }, [participants, sortBy, genderFilter]);
+  }, [participants, sortBy, genderFilter, currentUser?.gender]);
 
   // Show error if not authenticated
   if (!authUser) {
@@ -285,6 +293,7 @@ export default function EventUserSelection() {
           {/* Filters Section */}
           <div className="bg-muted/30 rounded-xl p-6 mb-8 border border-border">
             <h3 className="text-sm font-semibold text-foreground mb-4">Filtros</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Sort By */}
               <div className="flex flex-col gap-2">
@@ -299,13 +308,11 @@ export default function EventUserSelection() {
                 </select>
               </div>
 
-              {/* Gender Filter */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-foreground">Filtrar por Gênero</label>
+              {/* Gender Filter - Hidden but kept for component state */}
+              <div className="hidden">
                 <select
                   value={genderFilter}
                   onChange={(e) => setGenderFilter(e.target.value as 'all' | 'M' | 'F' | 'Outro')}
-                  className="px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
                 >
                   <option value="all">Todos os Gêneros</option>
                   <option value="M">Masculino</option>
@@ -316,18 +323,11 @@ export default function EventUserSelection() {
             </div>
 
             {/* Active Filters Badge */}
-            {(sortBy !== 'original' || genderFilter !== 'all') && (
+            {sortBy !== 'original' && (
               <div className="mt-4 flex flex-wrap gap-2">
-                {sortBy !== 'original' && (
-                  <div className="bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-medium">
-                    Ordenado alfabeticamente
-                  </div>
-                )}
-                {genderFilter !== 'all' && (
-                  <div className="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-xs font-medium">
-                    {genderFilter === 'M' ? 'Masculino' : genderFilter === 'F' ? 'Feminino' : 'Outro'}
-                  </div>
-                )}
+                <div className="bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-medium">
+                  Ordenado alfabeticamente
+                </div>
               </div>
             )}
           </div>
@@ -365,10 +365,10 @@ export default function EventUserSelection() {
                     {/* User Info */}
                     <div className="mb-4">
                       <h3 className="font-serif text-xl font-bold text-foreground">
-                        {participant.username || 'Usuário'}
+                        {participant.name || 'Usuário'}
                       </h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {getGenderLabel(participant.gender)}
+                      <p className="text-sm text-gold font-medium mt-1">
+                        {participant.username || 'apelido'}
                       </p>
                     </div>
 
