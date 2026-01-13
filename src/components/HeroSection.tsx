@@ -38,14 +38,19 @@ export const HeroSection = () => {
         <div className="container mx-auto px-4 sm:px-6 text-center w-full flex-1 flex items-center">
           <div className="max-w-2xl mx-auto w-full">
             {/* Main Title */}
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4 md:mb-6 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
-              <span className="text-white block mb-3 md:mb-4">FlashDate</span>
-              <div className="space-y-0 text-white text-2xl sm:text-3xl md:text-4xl">
-                <div>
-                  <span style={{ color: '#ff3366' }}>Inteligência Artificial</span> para conexões verdadeiras
-                </div>
+            <div className="font-serif font-bold leading-tight mb-4 md:mb-6 animate-fade-up delay-100">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white block mb-2 md:mb-4" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+                FlashDate
+              </h1>
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-snug md:leading-normal">
+                <span className="text-white block" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+                  <span style={{ color: '#ff3366', textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>Inteligência Artificial</span>
+                </span>
+                <span className="text-white block" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+                  para conexões verdadeiras
+                </span>
               </div>
-            </h1>
+            </div>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed animate-fade-up delay-200 mt-4 px-2" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
