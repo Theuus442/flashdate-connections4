@@ -448,7 +448,7 @@ export const EventsManagement = () => {
           {/* Image */}
           <div>
             <img
-              src={getProxiedUrl(eventData.eventImage)}
+              src={eventData.eventImage}
               alt={eventData.title}
               className="w-full h-96 object-cover rounded-2xl border border-border"
               onError={(e) => {
