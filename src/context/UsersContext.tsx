@@ -258,7 +258,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return users.find(user => user.id === id);
   };
 
-  const refreshUsers = async () => {
+  const refreshUsers = useCallback(async () => {
     if (!supabaseConfigured) {
       console.log('[UsersContext] Supabase not configured, skipping refresh');
       return;
@@ -267,63 +267,48 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       console.log('[UsersContext] Refreshing users from Supabase...');
 
-      // Set a longer timeout to account for retries
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Refresh timeout after 20 seconds')), 20000)
-      );
+      // Set a timeout but don't use Promise.race (it can cause issues)
+      const { data, error } = await usersService.getUsers();
 
-      const refreshPromise = (async () => {
-        try {
-          const { data, error } = await usersService.getUsers();
+      if (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-          if (error) {
-            const errorMessage = error instanceof Error
-              ? error.message
-              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+        const isNetworkError =
+          (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+          errorMessage.includes('Failed to fetch') ||
+          errorMessage.includes('Network') ||
+          (error instanceof TypeError && errorMessage.includes('fetch'));
 
-            const isNetworkError =
-              (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
-              errorMessage.includes('Failed to fetch') ||
-              errorMessage.includes('Network') ||
-              (error instanceof TypeError && errorMessage.includes('fetch'));
+        console.error('[UsersContext] ⚠️ Error refreshing users:');
+        console.error('[UsersContext]   Message:', errorMessage);
+        console.error('[UsersContext]   Type:', typeof error);
+        console.error('[UsersContext]   IsNetworkError:', isNetworkError);
 
-            console.error('[UsersContext] ⚠️ Error refreshing users:');
-            console.error('[UsersContext]   Message:', errorMessage);
-            console.error('[UsersContext]   Type:', typeof error);
-            console.error('[UsersContext]   IsNetworkError:', isNetworkError);
-
-            // On network error, keep existing users instead of clearing them
-            if (isNetworkError) {
-              console.log('[UsersContext] Network error detected, keeping existing users');
-            }
-            return; // Don't throw - just exit gracefully
-          } else if (data) {
-            console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
-            setUsers(data);
-          }
-        } catch (innerError) {
-          console.error('[UsersContext] Unexpected error in refresh promise:', innerError);
-          // Don't re-throw - keep existing users
+        // On network error, keep existing users instead of clearing them
+        if (isNetworkError) {
+          console.log('[UsersContext] Network error detected, keeping existing users');
         }
-      })();
-
-      await Promise.race([refreshPromise, timeoutPromise]);
+        return; // Don't throw - just exit gracefully
+      } else if (data) {
+        console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
+        setUsers(data);
+      }
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-      const isTimeout = errorMessage.includes('timeout');
-      console.error('[UsersContext] ⚠️ Error during refresh:', {
+      console.error('[UsersContext] ⚠️ Unexpected error during refresh:', {
         message: errorMessage,
-        isTimeout,
         error,
       });
 
       // Don't clear users on error - keep the existing list
       console.log('[UsersContext] Keeping existing user list despite error');
     }
-  };
+  }, [supabaseConfigured]);
 
   const deleteAllByRole = async (role: 'admin' | 'client') => {
     if (!supabaseConfigured) {
