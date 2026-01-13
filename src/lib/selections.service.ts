@@ -367,6 +367,8 @@ export const selectionsService = {
           matchType = 'AMIZADE';
         }
 
+        console.log(`[getMutualMatches] Mutual connection: ${userA} (${voteAtoB}) <-> ${userB} (${voteBtoA}) = ${matchType}`);
+
         mutualMatches.push({
           userId: userA,
           selectedUserId: userB,
@@ -377,6 +379,7 @@ export const selectionsService = {
         seen.add(pair);
       }
 
+      console.log('[getMutualMatches] Total mutual matches found:', mutualMatches.length, mutualMatches);
       return { data: mutualMatches, error: null };
     } catch (error) {
       return { data: null, error };
