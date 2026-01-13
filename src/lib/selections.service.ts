@@ -150,27 +150,29 @@ export const selectionsService = {
   },
 
   /**
-   * Add selection
+   * Add selection (event_id can be null)
    */
-  async addSelection(eventId: string, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
-    // Return local selection object as fallback (always works, even without Supabase or valid UUIDs)
+  async addSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
+    // Return local selection object as fallback (always works, even without Supabase)
     const selection: Selection = {
-      eventId,
+      eventId: eventId || '',
       userId,
       selectedUserId,
       vote,
       timestamp: Date.now(),
     };
 
-    if (!isSupabaseConfigured() || !isValidUUID(eventId)) {
+    if (!isSupabaseConfigured()) {
       return { data: selection, error: null };
     }
 
     try {
+      console.log('[selectionsService] Adding selection:', { eventId, userId, selectedUserId, vote });
+
       const { data, error } = await supabase
         .from('selections')
         .insert([{
-          event_id: eventId,
+          event_id: eventId,  // Can be null
           user_id: userId,
           selected_user_id: selectedUserId,
           vote,
@@ -189,6 +191,7 @@ export const selectionsService = {
         timestamp: new Date(data.created_at).getTime(),
       };
 
+      console.log('[selectionsService] Selection added successfully');
       return { data: transformedData, error: null };
     } catch (error: any) {
       console.error('Error adding selection to database:', error?.message || error);
