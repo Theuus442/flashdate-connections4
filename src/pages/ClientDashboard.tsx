@@ -666,3 +666,153 @@ function InfoItem({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+interface MatchUser {
+  id: string;
+  name: string;
+  profileImage?: string;
+  email?: string;
+  whatsapp?: string;
+}
+
+function MatchesTab({ userId }: { userId?: string }) {
+  const [matches, setMatches] = useState<MatchUser[]>([]);
+  const [isLoadingMatches, setIsLoadingMatches] = useState(true);
+  const { users } = useUsers();
+
+  useEffect(() => {
+    const loadMatches = async () => {
+      if (!userId) return;
+
+      setIsLoadingMatches(true);
+      try {
+        const { selectionsService } = await import('@/lib/selections.service');
+        const { data: mutualData } = await selectionsService.getMutualMatches();
+
+        if (mutualData) {
+          // Filter matches for current user and get user details
+          const userMatches = mutualData
+            .filter(m => m.userId === userId || m.selectedUserId === userId)
+            .map(m => {
+              const matchedUserId = m.userId === userId ? m.selectedUserId : m.userId;
+              const matchedUser = users.find(u => u.id === matchedUserId);
+              return {
+                id: matchedUserId,
+                name: matchedUser?.name || 'Usuário desconhecido',
+                profileImage: matchedUser?.profileImage,
+                email: matchedUser?.email,
+                whatsapp: matchedUser?.whatsapp,
+              };
+            });
+
+          setMatches(userMatches);
+        }
+      } catch (error) {
+        console.error('Error loading matches:', error);
+        setMatches([]);
+      } finally {
+        setIsLoadingMatches(false);
+      }
+    };
+
+    loadMatches();
+  }, [userId, users]);
+
+  if (isLoadingMatches) {
+    return (
+      <div className="max-w-4xl">
+        <div className="mb-8">
+          <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
+          <p className="text-muted-foreground mt-2">Pessoas com quem você teve match</p>
+        </div>
+        <div className="bg-card border border-border rounded-2xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando seus matches...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl">
+      <div className="mb-8">
+        <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
+        <p className="text-muted-foreground mt-2">Pessoas com quem você teve match mútuo</p>
+      </div>
+
+      {matches.length > 0 ? (
+        <div className="grid md:grid-cols-2 gap-6">
+          {matches.map(match => (
+            <div key={match.id} className="bg-card border border-gold/20 rounded-2xl p-6 hover:border-gold/50 transition-colors">
+              <div className="flex items-center gap-4 mb-4">
+                {match.profileImage ? (
+                  <img
+                    src={match.profileImage}
+                    alt={match.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gold"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-white font-bold text-xl">
+                    {match.name[0]}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-serif text-xl font-bold text-foreground">
+                    {match.name}
+                  </h3>
+                  <p className="text-gold font-semibold text-sm">💕 Matched with you</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 border-t border-border/50 pt-4">
+                {match.email && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">Email:</span>
+                    <a href={`mailto:${match.email}`} className="text-gold hover:text-gold-light truncate">
+                      {match.email}
+                    </a>
+                  </div>
+                )}
+                {match.whatsapp && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">WhatsApp:</span>
+                    <a
+                      href={`https://wa.me/${match.whatsapp.replace(/[^\d]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gold hover:text-gold-light"
+                    >
+                      {match.whatsapp}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <Button variant="gold" className="w-full mt-4">
+                <Heart size={16} className="mr-2" />
+                Enviar Mensagem
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-card border border-border rounded-2xl p-8 text-center py-16">
+          <div className="max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Heart size={32} className="text-muted-foreground" />
+            </div>
+            <h3 className="font-serif text-xl font-bold text-foreground mb-2">
+              Nenhum match ainda
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Continue selecionando pessoas no próximo evento para encontrar seus matches!
+            </p>
+            <Button variant="gold" asChild>
+              <a href="/event-selection">Ir para Seleções</a>
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
