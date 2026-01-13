@@ -36,6 +36,8 @@ export const EventsManagement = () => {
   const [imagePreview, setImagePreview] = useState(eventData.eventImage);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [previewLoadError, setPreviewLoadError] = useState(false);
 
   // Load event from Supabase on mount
   useEffect(() => {
