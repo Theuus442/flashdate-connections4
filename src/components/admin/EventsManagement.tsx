@@ -220,6 +220,93 @@ export const EventsManagement = () => {
     setPreviewLoadError(false);
     setSelectedImageFile(null);
     setIsEditing(false);
+    setIsCreating(false);
+  };
+
+  const handleCreateNew = () => {
+    setFormData(emptyEventForm);
+    setImagePreview('');
+    setImageLoadError(false);
+    setPreviewLoadError(false);
+    setSelectedImageFile(null);
+    setIsCreating(true);
+    setIsEditing(true);
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Validate required fields
+    if (!formData.title || !formData.email || !formData.whatsapp) {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, preencha os campos: Título, Email e WhatsApp',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      if (supabaseConfigured) {
+        const { data, error } = await eventsService.createEvent(
+          formData,
+          selectedImageFile || undefined
+        );
+
+        if (error) {
+          console.error('[EventsManagement] Error creating event:', error);
+          toast({
+            title: 'Erro',
+            description: 'Falha ao criar evento',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        if (data) {
+          setEventData(data);
+          setFormData(data);
+          setImagePreview(data.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
+          setSelectedImageFile(null);
+          toast({
+            title: 'Sucesso',
+            description: 'Evento criado com sucesso!',
+          });
+          setIsEditing(false);
+          setIsCreating(false);
+        }
+      } else {
+        // Fallback to local creation
+        const newEvent: EventData = {
+          ...formData,
+          id: Date.now().toString(),
+        };
+        setEventData(newEvent);
+        setFormData(newEvent);
+        setImagePreview(formData.eventImage);
+        setImageLoadError(false);
+        setPreviewLoadError(false);
+        toast({
+          title: 'Sucesso',
+          description: 'Evento criado (local apenas)',
+        });
+        setIsEditing(false);
+        setIsCreating(false);
+      }
+    } catch (error) {
+      console.error('[EventsManagement] Error creating event:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao criar evento',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading && !eventData.id) {
