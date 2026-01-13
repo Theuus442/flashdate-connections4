@@ -27,7 +27,9 @@ export default function EventUserSelection() {
     if (!authUser) return;
     console.log('[EventUserSelection] Refreshing users list...');
     refreshUsers();
-  }, [authUser, refreshUsers]);
+    // Only refresh when authUser changes, not when refreshUsers reference changes
+    // refreshUsers is memoized so we don't need it in dependencies
+  }, [authUser]);
 
   // Load current user and participants from database
   useEffect(() => {
