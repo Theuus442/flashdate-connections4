@@ -32,8 +32,8 @@ export const HeroSection = () => {
             <h1 className="font-serif text-7xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(80px)' }}>
               <span className="text-white block mb-6">FlashDate</span>
               <div className="space-y-0 text-white">
-                <div className="text-white">
-                  Inteligência Artificial para conexões verdadeiras
+                <div>
+                  <span style={{ color: '#ff3366' }}>Inteligência Artificial</span> para conexões verdadeiras
                 </div>
               </div>
             </h1>
