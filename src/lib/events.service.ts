@@ -24,6 +24,33 @@ export interface EventData {
   vagasLimitDate: string;
 }
 
+/**
+ * Helper function to transform raw event data with proxied URLs
+ */
+function transformEventData(event: any): EventData {
+  return {
+    id: event.id,
+    title: event.title,
+    location: event.location,
+    city: event.city,
+    date: event.date,
+    nextDate: event.next_date,
+    schedule: event.schedule,
+    checkIn: event.check_in,
+    environment: event.environment,
+    music: event.music,
+    dressCode: event.dress_code,
+    parking: event.parking,
+    price: event.price,
+    description: event.description,
+    eventImage: getProxiedUrl(event.event_image_url), // Apply proxy transformation
+    email: event.email,
+    whatsapp: event.whatsapp,
+    vagas: event.vagas?.toString() || '',
+    vagasLimitDate: event.vagas_limit_date,
+  };
+}
+
 export const eventsService = {
   /**
    * Get all events
