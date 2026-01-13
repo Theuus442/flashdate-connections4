@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { getProxiedUrl } from '@/lib/url-proxy';
 import { useToast } from '@/hooks/use-toast';
 
 const defaultEventData: EventData = {
