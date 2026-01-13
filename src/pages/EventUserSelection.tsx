@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { User } from '@/context/UsersContext';
+import { selectionsService } from '@/lib/selections.service';
 
 interface Selection {
   userId: string;
