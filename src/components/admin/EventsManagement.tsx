@@ -647,7 +647,7 @@ export const EventsManagement = () => {
                 Cancelar
               </Button>
               <Button variant="gold" type="submit" disabled={isLoading}>
-                {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+                {isLoading ? 'Processando...' : isCreating ? 'Criar Evento' : 'Salvar Alterações'}
               </Button>
             </div>
           </form>
