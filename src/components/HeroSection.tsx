@@ -34,7 +34,7 @@ export const HeroSection = () => {
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Main Title */}
-            <h1 className="font-serif text-6xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(80px)' }}>
+            <h1 className="font-serif text-5xl font-bold leading-tight mb-3 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)', transform: 'translateY(80px)' }}>
               <span className="text-white block mb-6">FlashDate</span>
               <div className="space-y-0 text-white">
                 <div>
