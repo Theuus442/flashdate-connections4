@@ -649,29 +649,7 @@ export default function ClientDashboard() {
 
             {/* Matches Tab */}
             {activeTab === 'matches' && (
-              <div className="max-w-4xl">
-                <div className="mb-8">
-                  <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
-                  <p className="text-muted-foreground mt-2">Pessoas com quem você teve match</p>
-                </div>
-
-                <div className="bg-card border border-border rounded-2xl p-8 text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                      <User size={32} className="text-muted-foreground" />
-                    </div>
-                    <h3 className="font-serif text-xl font-bold text-foreground mb-2">
-                      Nenhum match ainda
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Participe do próximo evento para conhecer novas pessoas e encontrar seus matches!
-                    </p>
-                    <Button variant="gold" className="mt-6" asChild>
-                      <a href="/#proximo-evento">Ver Próximo Evento</a>
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <MatchesTab userId={clientUser?.id} />
             )}
           </div>
         </div>
