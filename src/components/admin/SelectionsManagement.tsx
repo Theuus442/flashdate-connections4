@@ -192,7 +192,7 @@ export const SelectionsManagement = () => {
           <div className="flex items-center gap-3 pb-4 border-b border-gold/20 mb-4">
             <div className="flex items-center gap-2 text-gold">
               <Zap size={24} className="animate-pulse-glow" />
-              <h2 className="font-serif text-2xl font-bold">Matches Mútuos Confirmados</h2>
+              <h2 className="font-serif text-2xl font-bold">Matches e Amizades Mútuos Confirmados</h2>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
@@ -202,22 +202,26 @@ export const SelectionsManagement = () => {
             {mutualMatches.map((match) => {
               const user1 = users.find(u => u.id === match.userId);
               const user2 = users.find(u => u.id === match.selectedUserId);
+              const isMatch = match.matchType === 'MATCH';
+              const borderColor = isMatch ? 'border-gold/30 hover:border-gold/50' : 'border-emerald/30 hover:border-emerald/50';
+              const bgColor = isMatch ? 'bg-gold/10' : 'bg-emerald/10';
+              const textColor = isMatch ? 'text-gold' : 'text-emerald';
               return (
                 <div
                   key={`${match.userId}-${match.selectedUserId}`}
-                  className="flex items-center justify-between p-3 rounded-lg bg-card border border-gold/30 hover:border-gold/50 transition-colors"
+                  className={`flex items-center justify-between p-3 rounded-lg bg-card border ${borderColor} transition-colors`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <span className="text-sm font-medium text-foreground truncate">
                       {user1?.name || 'Usuário desconhecido'}
                     </span>
-                    <ArrowRightLeft size={18} className="text-gold flex-shrink-0" />
+                    <ArrowRightLeft size={18} className={textColor} flex-shrink-0 />
                     <span className="text-sm font-medium text-foreground truncate">
                       {user2?.name || 'Usuário desconhecido'}
                     </span>
                   </div>
-                  <span className="ml-2 flex-shrink-0 text-xs font-semibold px-3 py-1 rounded-full bg-gold/10 text-gold">
-                    💕 Match
+                  <span className={`ml-2 flex-shrink-0 text-xs font-semibold px-3 py-1 rounded-full ${bgColor} ${textColor}`}>
+                    {isMatch ? '💕 Match' : '💫 Amizade'}
                   </span>
                 </div>
               );
