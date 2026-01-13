@@ -56,7 +56,8 @@ serve(async (req) => {
       await supabase.from("users").delete().eq("id", id)
     }
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
+      count: deletedCount,
       message: `Sucesso! ${deletedCount} usuarios removidos.`,
       role_afetada: role
     }), {
