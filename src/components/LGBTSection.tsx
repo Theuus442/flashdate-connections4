@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Phone, Mail, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { sendLGBTSignupEmail } from '@/lib/email.service';
 
 interface Estado {
   id: number;
