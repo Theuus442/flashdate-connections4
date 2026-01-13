@@ -1,4 +1,4 @@
-import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X } from 'lucide-react';
+import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X, DollarSign } from 'lucide-react';
 
 const steps = [
   {
