@@ -67,6 +67,8 @@ export const SelectionsManagement = () => {
     }
 
     return filtered.map(s => ({
+      id: s.id,
+      eventId: s.eventId,
       selectedUserId: s.selectedUserId,
       vote: s.vote,
       userId: s.userId,
