@@ -14,7 +14,7 @@ const faqData = [
         a: 'O Flash Date é um método otimizado de encontros, utilizando um evento presencial e estruturado onde a Inteligência Artificial (IA) cruza dados de compatibilidade fornecidos em pesquisas prévias para maximizar as chances de sucesso. O evento consiste em uma série de mini-encontros de 5 a 10 minutos, e os contatos são trocados somente entre aqueles que indicaram interesse mútuo (match).' 
       },
       { 
-        q: 'Qual a diferença entre aplicativos de namoro comuns e o Flash Date?', 
+        q: 'Qual a diferença entre aplicativos de namoro comuns e o FlashDate?', 
         a: 'O Flashdate usa Inteligência Artificial (IA) rigorosa para gerar matchs de alta compatibilidade, focando em encontrar o parceiro perfeito no menor tempo. Já os aplicativos comuns usam o modelo Freemium (gratuito, com recursos pagos), priorizando apenas conexão visual e proximidade. Eles dependem da sua permanência na plataforma para vender recursos premium e publicidade, em vez de focar ativamente no match de alta qualidade.' 
       },
       { 
