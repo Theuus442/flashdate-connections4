@@ -739,7 +739,7 @@ function MatchesTab({ userId }: { userId?: string }) {
     <div className="max-w-4xl">
       <div className="mb-8">
         <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
-        <p className="text-muted-foreground mt-2">Pessoas com quem você teve match mútuo</p>
+        <p className="text-muted-foreground mt-2">Pessoas com quem você teve match ou amizade mútua</p>
       </div>
 
       {matches.length > 0 ? (
