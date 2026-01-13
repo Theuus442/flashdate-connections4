@@ -268,10 +268,11 @@ export const EventsManagement = () => {
         );
 
         if (error) {
-          console.error('[EventsManagement] Error creating event:', error);
+          const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+          console.error('[EventsManagement] Error creating event:', errorMsg);
           toast({
             title: 'Erro',
-            description: 'Falha ao criar evento',
+            description: `Falha ao criar evento: ${errorMsg}`,
             variant: 'destructive',
           });
           return;
