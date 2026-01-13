@@ -144,7 +144,7 @@ export const LGBTSection = () => {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2Fcdf15e9fbd634b2b9f32103afe9bf383?format=webp&width=800"
                 alt="LGBT+ Pride"
-                className="h-24 w-auto"
+                className="h-48 w-auto"
               />
             </div>
             <span className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase mb-4">
