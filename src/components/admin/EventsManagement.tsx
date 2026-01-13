@@ -124,6 +124,59 @@ export const EventsManagement = () => {
     }));
   };
 
+  const handleCitySearch = async (value: string) => {
+    setCitySearchInput(value);
+    if (value.length >= 2) {
+      try {
+        const results = await searchCities(value);
+        setCities(results);
+        setShowCitySuggestions(true);
+      } catch (error) {
+        console.error('[EventsManagement] Error searching cities:', error);
+      }
+    } else {
+      setCities([]);
+      setShowCitySuggestions(false);
+    }
+  };
+
+  const handleCitySelect = (cityName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      city: cityName,
+    }));
+    setCitySearchInput(cityName);
+    setShowCitySuggestions(false);
+  };
+
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    try {
+      // Try parsing as DD/MM/YYYY
+      const date = parse(dateString, 'dd/MM/yyyy', new Date());
+      return format(date, 'yyyy-MM-dd');
+    } catch {
+      // If it's already in a different format, return as is
+      return dateString;
+    }
+  };
+
+  const formatDateToDisplay = (dateString: string): string => {
+    if (!dateString) return '';
+    try {
+      // Handle both YYYY-MM-DD and DD/MM/YYYY formats
+      let date: Date;
+      if (dateString.includes('-')) {
+        date = new Date(dateString);
+      } else {
+        date = parse(dateString, 'dd/MM/yyyy', new Date());
+      }
+      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+    } catch {
+      return dateString;
+    }
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
