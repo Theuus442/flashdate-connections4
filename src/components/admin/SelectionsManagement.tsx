@@ -232,8 +232,15 @@ export const SelectionsManagement = () => {
         </div>
       )}
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12 bg-card border border-border rounded-2xl">
+          <p className="text-muted-foreground">Carregando seleções...</p>
+        </div>
+      )}
+
       {/* Empty State */}
-      {totalSelections === 0 && (
+      {!isLoading && totalSelections === 0 && (
         <div className="text-center py-12 bg-card border border-border rounded-2xl">
           <p className="text-muted-foreground">Nenhuma seleção feita ainda</p>
         </div>
