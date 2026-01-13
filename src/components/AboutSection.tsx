@@ -35,7 +35,7 @@ export const AboutSection = () => {
                 <div className="space-y-3 text-left">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                     <Globe className="w-5 h-5 text-gold flex-shrink-0" />
-                    <span className="text-sm text-foreground/80">10 anos na Austrália</span>
+                    <span className="text-sm text-foreground/80">Por 10 anos de Austrália</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                     <GraduationCap className="w-5 h-5 text-gold flex-shrink-0" />
