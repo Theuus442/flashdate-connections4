@@ -34,7 +34,7 @@ const steps = [
   },
   {
     number: '04',
-    icon: CalendarCheck,
+    icon: DollarSign,
     title: 'O Evento',
     description: 'Compareça com 15 a 30 minutos de antecedência para o check-in. As mulheres ficam fixas nas mesas enquanto os homens rotacionam.',
     details: ['Conversas de 5 a 10 minutos por mesa', 'Sinal do sino indica rotação', 'Duração total: ~2 horas', 'Após evento: aproveite para comer, beber e conversar livremente'],
