@@ -286,7 +286,7 @@ export const FAQSection = () => {
               Veja Nossos Eventos em <span className="text-blue-600">Ação</span>
             </h3>
             <p className="text-muted-foreground text-lg">
-              Confira como são nossos eventos de speed dating em ambientes elegantes e acolhedores
+              Confira como são os exemplos em ação
             </p>
           </div>
 
