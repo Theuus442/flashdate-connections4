@@ -123,6 +123,17 @@ export const EventsManagement = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Validate that event ID exists
+    if (!eventData.id) {
+      toast({
+        title: 'Erro',
+        description: 'ID do evento não está disponível. Recarregue a página.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       if (supabaseConfigured) {
         const { data, error } = await eventsService.updateEvent(
@@ -132,6 +143,7 @@ export const EventsManagement = () => {
         );
 
         if (error) {
+          console.error('[EventsManagement] Error updating event:', error);
           toast({
             title: 'Erro',
             description: 'Falha ao atualizar evento',
@@ -166,7 +178,7 @@ export const EventsManagement = () => {
 
       setIsEditing(false);
     } catch (error) {
-      console.error('Error saving event:', error);
+      console.error('[EventsManagement] Error saving event:', error);
       toast({
         title: 'Erro',
         description: 'Erro ao salvar evento',
