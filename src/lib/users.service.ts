@@ -103,8 +103,10 @@ export const usersService = {
 
   /**
    * Get all users with retry logic
+   * @param retryCount - Current retry attempt
+   * @param maxRetries - Maximum number of retries (default: 1)
    */
-  async getUsers(retryCount = 0, maxRetries = 2): Promise<{ data: User[] | null; error: any }> {
+  async getUsers(retryCount = 0, maxRetries = 1): Promise<{ data: User[] | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
