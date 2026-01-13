@@ -145,6 +145,12 @@ export const EventsManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If creating a new event, use handleCreateSubmit instead
+    if (isCreating) {
+      return handleCreateSubmit(e);
+    }
+
     setIsLoading(true);
 
     // Validate that event ID exists
