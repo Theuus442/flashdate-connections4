@@ -1,10 +1,35 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { eventsService, EventData } from '@/lib/events.service';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [event, setEvent] = useState<EventData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabaseConfigured = isSupabaseConfigured();
+
+  useEffect(() => {
+    const loadEvent = async () => {
+      setIsLoading(true);
+      try {
+        if (supabaseConfigured) {
+          const { data, error } = await eventsService.getEvents();
+          if (data && data.length > 0) {
+            setEvent(data[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading event:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEvent();
+  }, [supabaseConfigured]);
 
   const cities = [
     { name: 'São Paulo', id: 'sp' },
