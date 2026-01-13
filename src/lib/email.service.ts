@@ -1,12 +1,12 @@
 import emailjs from '@emailjs/browser';
 
-// Credenciais emailJS
-const EMAILJS_SERVICE_ID = 'service_6uy9uzh';
-const EMAILJS_PUBLIC_KEY = 'XhoyJTnDjVfa2N392';
+// Credenciais emailJS (via variáveis de ambiente)
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 
 // IDs dos templates
-const TEMPLATE_LGBT_SIGNUP = 'template_0jjfojk';
-const TEMPLATE_CONTACT_MESSAGE = 'template_2c90s2n';
+const TEMPLATE_LGBT_SIGNUP = import.meta.env.VITE_EMAILJS_TEMPLATE_LGBT || '';
+const TEMPLATE_CONTACT_MESSAGE = import.meta.env.VITE_EMAILJS_TEMPLATE_CONTACT || '';
 
 // Inicializar emailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
