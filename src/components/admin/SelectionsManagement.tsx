@@ -325,7 +325,7 @@ export const SelectionsManagement = () => {
                 </h3>
                 <div className="space-y-2 ml-6">
                   {noInterests.map(noInterest => (
-                    <div key={noInterest.selectedUserId} className="text-sm text-foreground">
+                    <div key={`${noInterest.userId}-${noInterest.selectedUserId}-NÃO`} className="text-sm text-foreground">
                       ❌ <span className="font-medium">{getUserName(noInterest.selectedUserId)}</span>
                     </div>
                   ))}
