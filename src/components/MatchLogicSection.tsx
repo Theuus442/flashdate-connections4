@@ -42,7 +42,7 @@ const matchLogic = [
     description: 'Ambos abertos para amizade. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'NÃO FAZ MEU TIPO',
+    yourChoice: 'Sem interesse',
     theirChoice: 'Qualquer',
     result: 'NENHUM CONTATO',
     icon: X,
