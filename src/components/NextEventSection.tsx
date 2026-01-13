@@ -1,10 +1,35 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { eventsService, EventData } from '@/lib/events.service';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [event, setEvent] = useState<EventData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabaseConfigured = isSupabaseConfigured();
+
+  useEffect(() => {
+    const loadEvent = async () => {
+      setIsLoading(true);
+      try {
+        if (supabaseConfigured) {
+          const { data, error } = await eventsService.getEvents();
+          if (data && data.length > 0) {
+            setEvent(data[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading event:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEvent();
+  }, [supabaseConfigured]);
 
   const cities = [
     { name: 'São Paulo', id: 'sp' },
@@ -40,183 +65,190 @@ export const NextEventSection = () => {
 
         {/* Event Card */}
         <div className="max-w-5xl mx-auto mb-16">
-          <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant">
-            {/* Venue Image */}
-            <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
-              <img
-                src={venueImage}
-                alt="Armazém São Caetano"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+          {isLoading ? (
+            <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant p-12 text-center">
+              <p className="text-muted-foreground">Carregando próximo evento...</p>
             </div>
+          ) : event ? (
+            <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant">
+              {/* Venue Image */}
+              <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
+                <img
+                  src={event.eventImage || venueImage}
+                  alt={event.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('[NextEventSection] Error loading event image:', event.eventImage);
+                    // Fallback to default image
+                    (e.target as HTMLImageElement).src = venueImage;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+              </div>
 
-            {/* Header Banner */}
-            <div className="bg-gradient-to-r from-primary via-primary-light to-primary p-6 text-center">
-              <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
-                Armazém São Caetano
-              </h3>
-              <p className="text-white/80 text-sm">Encontros Presenciais com Inteligência Artificial</p>
+              {/* Header Banner */}
+              <div className="bg-gradient-to-r from-primary via-primary-light to-primary p-6 text-center">
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
+                  {event.title}
+                </h3>
+                <p className="text-white/80 text-sm">{event.description}</p>
+              </div>
+
+              {/* Content */}
+              <div className="p-8 md:p-12">
+                <div className="grid md:grid-cols-2 gap-8 mb-10">
+                  {/* Location & Date */}
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Local</h4>
+                        <p className="text-muted-foreground text-sm">{event.location}</p>
+                        {event.city && <p className="text-muted-foreground text-sm">{event.city}</p>}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Data</h4>
+                        <p className="text-muted-foreground text-sm">{event.date}</p>
+                        <p className="text-wine font-semibold text-xs mt-1">{event.nextDate}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Horário</h4>
+                        <p className="text-muted-foreground text-sm">{event.schedule}</p>
+                        <p className="text-wine font-semibold text-xs mt-1">Check-in: {event.checkIn}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <Music className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Ambiente</h4>
+                        <p className="text-muted-foreground text-sm">{event.environment}</p>
+                        {event.music && <p className="text-muted-foreground text-sm mt-1">{event.music}</p>}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <Shirt className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Dress Code</h4>
+                        <p className="text-muted-foreground text-sm">{event.dressCode}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <Users className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-1">Estacionamento</h4>
+                        <p className="text-muted-foreground text-sm">{event.parking}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Important Warnings */}
+                <div className="space-y-4 mb-10">
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                    <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-foreground mb-1">Valor: {event.price}</p>
+                      <p className="text-muted-foreground">Pagamento via Pix: {event.whatsapp}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                    <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {event.vagasLimitDate}</p>
+                      <p className="text-muted-foreground">Vagas limitadas</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                    <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-foreground mb-1">Após o pagamento</p>
+                      <p className="text-muted-foreground">Acesse a aba <a href="#como-funciona" className="text-wine font-semibold hover:underline">Como Funciona</a> para saber os próximos passos</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
+                    <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-foreground mb-1">Horário do Evento</p>
+                      <p className="text-muted-foreground">{event.schedule} (chegue com 15-30 min de antecedência para o check-in)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <a href={`mailto:${event.email}`} className="text-foreground font-semibold hover:text-wine transition-colors break-all">
+                        {event.email}
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">WhatsApp</p>
+                      <a href={`https://wa.me/${event.whatsapp.replace(/\D/g, '')}`} className="text-foreground font-semibold hover:text-wine transition-colors break-all">
+                        {event.whatsapp}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price & CTA */}
+                <div className="text-center border-t border-border pt-8">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <CreditCard className="w-5 h-5 text-secondary" />
+                    <span className="text-sm text-muted-foreground">Valor Promocional</span>
+                  </div>
+                  <div className="mb-6">
+                    <span className="font-serif text-5xl font-bold text-gradient-wine">{event.price}</span>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
+                      <a href={`https://wa.me/${event.whatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.`}>
+                        Garantir Minha Vaga
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            {/* Content */}
-            <div className="p-8 md:p-12">
-              <div className="grid md:grid-cols-2 gap-8 mb-10">
-                {/* Location & Date */}
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Local</h4>
-                      <p className="text-muted-foreground text-sm">
-                        Armazém São Caetano<br />
-                        Rua Piauí, 248 - Santa Paula<br />
-                        São Caetano do Sul - SP, 09541-150
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Data</h4>
-                      <p className="text-muted-foreground text-sm">Sábado</p>
-                      <p className="text-wine font-semibold text-xs mt-1">25/01/2026</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Horário</h4>
-                      <p className="text-muted-foreground text-sm">17:00hs às 19:00hs</p>
-                      <p className="text-wine font-semibold text-xs mt-1">Check-in: 15-30 min antes</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                    <Music className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Ambiente</h4>
-                      <p className="text-muted-foreground text-sm">
-                        Rústico e elegante<br />
-                        Música ao vivo a partir das 19h
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <Shirt className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Dress Code</h4>
-                      <p className="text-muted-foreground text-sm">Esporte Fino / Casual Elegante</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">Estacionamento</h4>
-                      <p className="text-muted-foreground text-sm">
-                        Zona Azul gratuita a partir das 13h<br />
-                        (aos sábados)
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Important Warnings */}
-              <div className="space-y-4 mb-10">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                  <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Valor: R$40,00</p>
-                    <p className="text-muted-foreground">Pagamento via Pix: (11) 97032-9710 - Nome: Sidnei</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
-                  <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: 25/01/2026</p>
-                    <p className="text-muted-foreground">Vagas limitadas</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                  <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Após o pagamento</p>
-                    <p className="text-muted-foreground">Acesse a aba <a href="#como-funciona" className="text-wine font-semibold hover:underline">Como Funciona</a> para saber os próximos passos</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                  <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-foreground mb-1">Horário do Evento</p>
-                    <p className="text-muted-foreground">17:00hs às 19:00hs (chegue com 15-30 min de antecedência para o check-in)</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
-                <div className="flex items-start gap-3 min-w-0">
-                  <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <a href="mailto:contato@flashdate.com.br" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
-                      contato@flashdate.com.br
-                    </a>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 min-w-0">
-                  <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">WhatsApp</p>
-                    <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-wine transition-colors break-all">
-                      (11) 97032-9710
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Price & CTA */}
-              <div className="text-center border-t border-border pt-8">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <CreditCard className="w-5 h-5 text-secondary" />
-                  <span className="text-sm text-muted-foreground">Valor Promocional</span>
-                </div>
-                <div className="mb-6">
-                  <span className="font-serif text-5xl font-bold text-gradient-wine">R$ 40</span>
-                </div>
-                <div className="flex justify-center">
-                  <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
-                    <a href="https://wa.me/5511970329710?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.">
-                      Garantir Minha Vaga
-                    </a>
-                  </Button>
-                </div>
-              </div>
+          ) : (
+            <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant p-12 text-center">
+              <p className="text-muted-foreground">Nenhum evento disponível no momento</p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Newsletter Section */}

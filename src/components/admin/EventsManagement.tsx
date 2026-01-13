@@ -185,6 +185,9 @@ export const EventsManagement = () => {
                     src={imagePreview}
                     alt="Event preview"
                     className="w-full h-64 object-cover rounded-lg border border-border"
+                    onError={(e) => {
+                      console.error('[EventsManagement] Error loading preview image');
+                    }}
                   />
                 </div>
                 <div className="md:w-64 flex flex-col justify-center">
@@ -448,6 +451,9 @@ export const EventsManagement = () => {
               src={eventData.eventImage}
               alt={eventData.title}
               className="w-full h-96 object-cover rounded-2xl border border-border"
+              onError={(e) => {
+                console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
+              }}
             />
           </div>
 

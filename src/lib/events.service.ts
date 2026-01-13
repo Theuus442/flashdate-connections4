@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { storageService } from './storage.service';
+import { getProxiedUrl } from './url-proxy';
 
 export interface EventData {
   id: string;
@@ -23,6 +24,33 @@ export interface EventData {
   vagasLimitDate: string;
 }
 
+/**
+ * Helper function to transform raw event data with proxied URLs
+ */
+function transformEventData(event: any): EventData {
+  return {
+    id: event.id,
+    title: event.title,
+    location: event.location,
+    city: event.city,
+    date: event.date,
+    nextDate: event.next_date,
+    schedule: event.schedule,
+    checkIn: event.check_in,
+    environment: event.environment,
+    music: event.music,
+    dressCode: event.dress_code,
+    parking: event.parking,
+    price: event.price,
+    description: event.description,
+    eventImage: getProxiedUrl(event.event_image_url), // Apply proxy transformation
+    email: event.email,
+    whatsapp: event.whatsapp,
+    vagas: event.vagas?.toString() || '',
+    vagasLimitDate: event.vagas_limit_date,
+  };
+}
+
 export const eventsService = {
   /**
    * Get all events
@@ -40,27 +68,7 @@ export const eventsService = {
 
       if (error) throw error;
 
-      const transformedData = data?.map((event: any) => ({
-        id: event.id,
-        title: event.title,
-        location: event.location,
-        city: event.city,
-        date: event.date,
-        nextDate: event.next_date,
-        schedule: event.schedule,
-        checkIn: event.check_in,
-        environment: event.environment,
-        music: event.music,
-        dressCode: event.dress_code,
-        parking: event.parking,
-        price: event.price,
-        description: event.description,
-        eventImage: event.event_image_url,
-        email: event.email,
-        whatsapp: event.whatsapp,
-        vagas: event.vagas?.toString() || '',
-        vagasLimitDate: event.vagas_limit_date,
-      }));
+      const transformedData = data?.map(transformEventData);
 
       return { data: transformedData || [], error: null };
     } catch (error) {
@@ -85,27 +93,7 @@ export const eventsService = {
 
       if (error) throw error;
 
-      const transformedData = data ? {
-        id: data.id,
-        title: data.title,
-        location: data.location,
-        city: data.city,
-        date: data.date,
-        nextDate: data.next_date,
-        schedule: data.schedule,
-        checkIn: data.check_in,
-        environment: data.environment,
-        music: data.music,
-        dressCode: data.dress_code,
-        parking: data.parking,
-        price: data.price,
-        description: data.description,
-        eventImage: data.event_image_url,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        vagas: data.vagas?.toString() || '',
-        vagasLimitDate: data.vagas_limit_date,
-      } : null;
+      const transformedData = data ? transformEventData(data) : null;
 
       return { data: transformedData, error: null };
     } catch (error) {
@@ -158,27 +146,7 @@ export const eventsService = {
 
       if (error) throw error;
 
-      const transformedData: EventData = {
-        id: data.id,
-        title: data.title,
-        location: data.location,
-        city: data.city,
-        date: data.date,
-        nextDate: data.next_date,
-        schedule: data.schedule,
-        checkIn: data.check_in,
-        environment: data.environment,
-        music: data.music,
-        dressCode: data.dress_code,
-        parking: data.parking,
-        price: data.price,
-        description: data.description,
-        eventImage: data.event_image_url,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        vagas: data.vagas?.toString() || '',
-        vagasLimitDate: data.vagas_limit_date,
-      };
+      const transformedData = transformEventData(data);
 
       return { data: transformedData, error: null };
     } catch (error) {
@@ -233,27 +201,7 @@ export const eventsService = {
 
       if (error) throw error;
 
-      const transformedData: EventData = {
-        id: data.id,
-        title: data.title,
-        location: data.location,
-        city: data.city,
-        date: data.date,
-        nextDate: data.next_date,
-        schedule: data.schedule,
-        checkIn: data.check_in,
-        environment: data.environment,
-        music: data.music,
-        dressCode: data.dress_code,
-        parking: data.parking,
-        price: data.price,
-        description: data.description,
-        eventImage: data.event_image_url,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        vagas: data.vagas?.toString() || '',
-        vagasLimitDate: data.vagas_limit_date,
-      };
+      const transformedData = transformEventData(data);
 
       return { data: transformedData, error: null };
     } catch (error) {

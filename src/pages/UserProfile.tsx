@@ -384,6 +384,10 @@ export default function UserProfile() {
                           <Phone size={14} />
                           <span>{user.whatsapp}</span>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Gênero:</span>
+                          <span>{user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}</span>
+                        </div>
                       </div>
                     </div>
                   );

@@ -2,6 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Install fetch interceptor for Supabase proxy in development
+import './lib/fetch-proxy';
+
 createRoot(document.getElementById("root")!).render(<App />);
 
 // Expose a global helper function to clear session in case of issues
