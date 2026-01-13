@@ -370,9 +370,6 @@ export default function EventUserSelection() {
                       <p className="text-sm text-gold font-medium mt-1">
                         {participant.username || 'apelido'}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {getGenderLabel(participant.gender)}
-                      </p>
                     </div>
 
                     {/* Action Buttons */}
