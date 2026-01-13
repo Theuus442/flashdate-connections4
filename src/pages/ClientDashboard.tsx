@@ -760,7 +760,7 @@ function MatchesTab({ userId }: { userId?: string }) {
                   <h3 className="font-serif text-xl font-bold text-foreground">
                     {match.name}
                   </h3>
-                  <p className="text-gold font-semibold text-sm">💕 Matched with you</p>
+                  <p className="text-gold font-semibold text-sm">💕 Você deu match</p>
                 </div>
               </div>
 
