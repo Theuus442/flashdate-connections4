@@ -5,7 +5,7 @@ const steps = [
     number: '01',
     icon: DollarSign,
     title: 'Pagamento',
-    description: 'Efetue o pagamento com o valor informado via Pix.',
+    description: 'Efetue o pagamento do valor informado do evento via Pix:',
     details: [
       'Chave Pix: 11 970329710',
       'Sidnei'
