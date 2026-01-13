@@ -30,13 +30,13 @@ export const HeroSection = () => {
       <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center pt-8 md:pt-16 lg:pt-20">
+      <div className="relative z-10 pt-6 md:pt-10 lg:pt-12">
         <div className="container mx-auto px-4 sm:px-6 text-center w-full">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-xl mx-auto">
             {/* Main Title */}
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 md:mb-6 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
-              <span className="text-white block mb-3 md:mb-6">FlashDate</span>
-              <div className="space-y-0 text-white text-2xl sm:text-3xl md:text-4xl">
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-snug mb-3 md:mb-4 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
+              <span className="text-white block mb-2 md:mb-3">FlashDate</span>
+              <div className="space-y-0 text-white text-lg sm:text-xl md:text-2xl lg:text-3xl">
                 <div>
                   <span style={{ color: '#ff3366' }}>Inteligência Artificial</span> para conexões verdadeiras
                 </div>
@@ -44,22 +44,25 @@ export const HeroSection = () => {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed animate-fade-up delay-200 mt-4 px-2" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
+            <p className="text-xs sm:text-sm md:text-base text-gray-200 max-w-lg mx-auto mb-6 md:mb-8 leading-relaxed animate-fade-up delay-200 mt-2 px-2" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>
               A plataforma pioneira de encontros presenciais que utiliza IA para identificar seu match com maior potencial. Acreditamos que há alguém procurando exatamente por você.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 animate-fade-up delay-300">
-              <Button variant="hero" size="xl" asChild>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-3 animate-fade-up delay-300">
+              <Button variant="hero" size="lg" asChild>
                 <a href="#proximo-evento">Garantir Meu Lugar</a>
               </Button>
-              <Button variant="wine" size="lg" asChild>
+              <Button variant="wine" size="md" asChild>
                 <a href="#como-funciona">Saiba Mais</a>
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Spacer to push image down */}
+      <div className="flex-1" />
 
     </section>
   );
