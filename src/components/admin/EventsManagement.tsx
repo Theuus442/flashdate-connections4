@@ -183,9 +183,12 @@ export const EventsManagement = () => {
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="flex-1">
                   <img
-                    src={imagePreview}
+                    src={getProxiedUrl(imagePreview) || imagePreview}
                     alt="Event preview"
                     className="w-full h-64 object-cover rounded-lg border border-border"
+                    onError={(e) => {
+                      console.error('[EventsManagement] Error loading preview image');
+                    }}
                   />
                 </div>
                 <div className="md:w-64 flex flex-col justify-center">
