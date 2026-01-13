@@ -33,17 +33,19 @@ function interceptedFetch(input: RequestInfo | URL, init?: RequestInit): Promise
     console.log('[FetchProxy] Intercepting Supabase request:', {
       original: url.substring(0, 100),
       method: init?.method || 'GET',
+      isStorageUrl: url.includes('/storage/'),
     });
 
     // Extract the path from the Supabase URL
     // E.g., https://kdwnptqxwnnzvdinhhin.supabase.co/rest/v1/users -> /rest/v1/users
+    // E.g., https://kdwnptqxwnnzvdinhhin.supabase.co/storage/v1/object/events/image.png -> /storage/v1/object/events/image.png
     const supabaseUrlObj = new URL(url);
     const path = supabaseUrlObj.pathname + supabaseUrlObj.search;
 
     // Reroute to local proxy
     const localUrl = window.location.origin + path;
 
-    console.log('[FetchProxy] Proxying to:', localUrl);
+    console.log('[FetchProxy] Proxying to:', localUrl.substring(0, 100));
 
     // Create a new Request object with the local URL to avoid modifying original
     const newInit = {
@@ -57,7 +59,7 @@ function interceptedFetch(input: RequestInfo | URL, init?: RequestInit): Promise
     // Use the local URL for the fetch
     return originalFetch(localUrl, newInit)
       .then(response => {
-        console.log('[FetchProxy] Response status:', response.status);
+        console.log('[FetchProxy] Response status:', response.status, 'for URL:', url.substring(0, 80));
         return response;
       })
       .catch(error => {
