@@ -151,6 +151,7 @@ export const selectionsService = {
 
   /**
    * Add selection (event_id can be null)
+   * First checks if selection already exists and removes it to avoid duplicates
    */
   async addSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
     // Return local selection object as fallback (always works, even without Supabase)
@@ -169,6 +170,27 @@ export const selectionsService = {
     try {
       console.log('[selectionsService] Adding selection:', { eventId, userId, selectedUserId, vote });
 
+      // First, remove any existing selection for this user->selectedUser pair to avoid duplicates when event_id is null
+      // Build query to find existing selections
+      let deleteQuery = supabase
+        .from('selections')
+        .delete()
+        .eq('user_id', userId)
+        .eq('selected_user_id', selectedUserId);
+
+      // Handle event_id filter
+      if (eventId) {
+        deleteQuery = deleteQuery.eq('event_id', eventId);
+      } else {
+        deleteQuery = deleteQuery.is('event_id', null);
+      }
+
+      const { error: deleteError } = await deleteQuery;
+      if (deleteError) {
+        console.warn('[selectionsService] Warning deleting old selection:', deleteError?.message);
+      }
+
+      // Now insert the new selection
       const { data, error } = await supabase
         .from('selections')
         .insert([{
