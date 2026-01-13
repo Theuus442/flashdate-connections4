@@ -111,9 +111,9 @@ export const SelectionsManagement = () => {
         </p>
       ) : (
         <div className="space-y-2">
-          {selections.map(selection => (
+          {selections.map((selection, index) => (
             <div
-              key={`${selection.userId}-${selection.selectedUserId}-${selection.vote}`}
+              key={selection.id || `${selection.eventId}-${selection.userId}-${selection.selectedUserId}-${index}`}
               className={`flex items-center justify-between p-3 rounded-lg border ${
                 title === 'SIM'
                   ? 'bg-gold/10 border-gold/20'
