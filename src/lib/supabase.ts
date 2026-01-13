@@ -1,8 +1,16 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Get credentials from environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// In development mode, use proxied URL to bypass CORS and network isolation
+if (import.meta.env.DEV && supabaseUrl) {
+  // Replace the origin with our local proxy path
+  // E.g., https://kdwnptqxwnnzvdinhhin.supabase.co -> /supabase
+  supabaseUrl = '/supabase';
+  console.log('[Supabase] Development mode: Using proxied URL for Supabase');
+}
 
 // Check if Supabase is configured
 const isConfigured = !!(supabaseUrl && supabaseAnonKey);
