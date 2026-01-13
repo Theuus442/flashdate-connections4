@@ -26,6 +26,10 @@ interface EmailParams {
  * Enviar email genérico
  */
 const sendEmail = async (templateId: string, params: EmailParams): Promise<boolean> => {
+  if (!EMAILJS_SERVICE_ID || !EMAILJS_PUBLIC_KEY || !templateId) {
+    throw new Error('Credenciais emailJS não configuradas. Verifique as variáveis de ambiente.');
+  }
+
   try {
     const response = await emailjs.send(
       EMAILJS_SERVICE_ID,
