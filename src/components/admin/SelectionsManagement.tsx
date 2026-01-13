@@ -165,7 +165,7 @@ export const SelectionsManagement = () => {
       </div>
 
       {/* Detailed View */}
-      {totalSelections > 0 && (
+      {!isLoading && totalSelections > 0 && (
         <div className="bg-card border border-border rounded-2xl p-8">
           <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
             Lista Completa de Seleções
