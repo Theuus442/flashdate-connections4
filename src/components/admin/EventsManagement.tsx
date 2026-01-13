@@ -58,6 +58,8 @@ export const EventsManagement = () => {
           setEventData(event);
           setFormData(event);
           setImagePreview(event.eventImage);
+          setImageLoadError(false);
+          setPreviewLoadError(false);
         }
       } catch (error) {
         console.error('Error loading event:', error);
