@@ -3,7 +3,7 @@ import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X, DollarSign 
 const steps = [
   {
     number: '01',
-    icon: CalendarCheck,
+    icon: DollarSign,
     title: 'Pagamento',
     description: 'Efetue o pagamento com o valor informado via Pix.',
     details: [
