@@ -259,24 +259,36 @@ export const selectionsService = {
   },
 
   /**
-   * Remove selection
+   * Remove selection (event_id can be null)
    */
-  async removeSelection(eventId: string, userId: string, selectedUserId: string): Promise<{ error: any }> {
-    if (!isSupabaseConfigured() || !isValidUUID(eventId)) {
+  async removeSelection(eventId: string | null, userId: string, selectedUserId: string): Promise<{ error: any }> {
+    if (!isSupabaseConfigured()) {
       // Return success for local state update
       return { error: null };
     }
 
     try {
-      const { error } = await supabase
+      console.log('[selectionsService] Removing selection:', { eventId, userId, selectedUserId });
+
+      // Build query
+      let query = supabase
         .from('selections')
         .delete()
-        .eq('event_id', eventId)
         .eq('user_id', userId)
         .eq('selected_user_id', selectedUserId);
 
+      // Only add event_id filter if it's not null
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      } else {
+        query = query.is('event_id', null);
+      }
+
+      const { error } = await query;
+
       if (error) throw error;
 
+      console.log('[selectionsService] Selection removed successfully');
       return { error: null };
     } catch (error: any) {
       console.error('Error removing selection from database:', error?.message || error);
