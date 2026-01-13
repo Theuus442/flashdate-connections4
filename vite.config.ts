@@ -32,8 +32,16 @@ export default defineConfig(({ mode }) => {
           secure: false,
           rewrite: (path) => path,
         },
-        // Proxy storage calls
+        // Proxy storage API calls (including images and files)
         '/storage/': {
+          target: supabaseUrl,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path,
+          ws: true,
+        },
+        // Proxy functions
+        '/functions/': {
           target: supabaseUrl,
           changeOrigin: true,
           secure: false,
