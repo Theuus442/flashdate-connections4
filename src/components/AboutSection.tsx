@@ -53,7 +53,7 @@ export const AboutSection = () => {
                 </p>
 
                 <p className="text-muted-foreground leading-relaxed">
-                  Nosso fundador, o empreendedor brasileiro <span className="font-semibold text-foreground">Sidnei Nunes</span>, trouxe uma visão inovadora após 10 anos na Austrália, onde completou um Mestrado em Análise de Negócios. Ele notou dois problemas cruciais no mercado:
+                  Nosso fundador, o empreendedor brasileiro <span className="font-semibold text-foreground">Sidnei Nunes</span>, trouxe uma visão inovadora por 10 anos de Austrália, onde completou um Mestrado em Análise de Negócios. Ele notou dois problemas cruciais no mercado:
                 </p>
 
                 <div className="space-y-3 pl-4 border-l-2 border-gold/50">
