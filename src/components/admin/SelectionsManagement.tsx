@@ -190,7 +190,7 @@ export const SelectionsManagement = () => {
       )}
 
       {/* Stats Overview */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-4 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
           <p className="text-xs text-muted-foreground mb-1">SIM</p>
           <p className="text-3xl font-bold text-gold">{matches.length}</p>
@@ -202,6 +202,10 @@ export const SelectionsManagement = () => {
         <div className="bg-card border border-border rounded-xl p-4">
           <p className="text-xs text-muted-foreground mb-1">NÃO</p>
           <p className="text-3xl font-bold text-destructive">{noInterests.length}</p>
+        </div>
+        <div className="bg-gradient-to-br from-gold/10 to-gold-dark/10 border border-gold/30 rounded-xl p-4">
+          <p className="text-xs text-gold font-semibold mb-1">✨ MATCHES MÚTUOS</p>
+          <p className="text-3xl font-bold text-gold">{mutualMatches.length}</p>
         </div>
       </div>
 
