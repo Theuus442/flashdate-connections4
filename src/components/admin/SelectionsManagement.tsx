@@ -302,7 +302,7 @@ export const SelectionsManagement = () => {
                 </h3>
                 <div className="space-y-2 ml-6">
                   {maybe.map(m => (
-                    <div key={m.selectedUserId} className="text-sm text-foreground">
+                    <div key={`${m.userId}-${m.selectedUserId}-TALVEZ`} className="text-sm text-foreground">
                       👥 <span className="font-medium">{getUserName(m.selectedUserId)}</span>
                     </div>
                   ))}
