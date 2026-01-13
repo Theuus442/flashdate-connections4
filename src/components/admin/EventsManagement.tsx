@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, AlertCircle } from 'lucide-react';
+import { Upload, AlertCircle, Search } from 'lucide-react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { searchCities } from '@/lib/cities.service';
+import { format, parse } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 // Placeholder SVG for when images fail to load
 const PLACEHOLDER_IMAGE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect fill='%23f5f5f5' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, sans-serif' font-size='16' fill='%23999'%3EImagem não pode ser carregada%3C/text%3E%3C/svg%3E`;
