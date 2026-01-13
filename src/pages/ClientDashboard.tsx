@@ -673,6 +673,7 @@ interface MatchUser {
   profileImage?: string;
   email?: string;
   whatsapp?: string;
+  matchType: 'MATCH' | 'AMIZADE';
 }
 
 function MatchesTab({ userId }: { userId?: string }) {
