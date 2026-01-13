@@ -46,6 +46,7 @@ if (!isConfigured) {
         headers: {
           'x-request-id': crypto.randomUUID(),
         },
+        fetch: globalThis.fetch, // Ensure we use the intercepted fetch
       },
     });
     console.log('[Supabase] ✅ Client initialized successfully');
