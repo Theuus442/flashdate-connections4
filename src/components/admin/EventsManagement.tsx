@@ -712,7 +712,13 @@ export const EventsManagement = () => {
                   type="text"
                   name="price"
                   value={formData.price}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    const formatted = formatPrice(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      price: formatted || e.target.value,
+                    }));
+                  }}
                   placeholder="R$ 40,00"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
