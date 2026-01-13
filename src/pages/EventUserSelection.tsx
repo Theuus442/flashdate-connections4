@@ -369,42 +369,48 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'match')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isMatched
-                            ? 'bg-rose-200 text-rose-900 hover:bg-rose-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <Heart className="w-4 h-4 mr-2" />
-                        Match
-                      </Button>
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'friendship')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isFriend
-                            ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <Users className="w-4 h-4 mr-2" />
-                        Amizade
-                      </Button>
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'no-interest')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isNoInterest
-                            ? 'bg-red-200 text-red-900 hover:bg-red-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Sem Interesse
-                      </Button>
+                      {selection ? (
+                        // If already selected, show locked state
+                        <>
+                          <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
+                            <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground text-center italic">
+                            Seu voto está bloqueado e não pode ser alterado
+                          </p>
+                        </>
+                      ) : (
+                        // If not selected, show voting buttons
+                        <>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'match')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-rose-100 text-rose-900 hover:bg-rose-200 active:bg-rose-300"
+                            variant="outline"
+                          >
+                            <Heart className="w-4 h-4 mr-2" />
+                            Match
+                          </Button>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'friendship')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-blue-100 text-blue-900 hover:bg-blue-200 active:bg-blue-300"
+                            variant="outline"
+                          >
+                            <Users className="w-4 h-4 mr-2" />
+                            Amizade
+                          </Button>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'no-interest')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-red-100 text-red-900 hover:bg-red-200 active:bg-red-300"
+                            variant="outline"
+                          >
+                            <X className="w-4 h-4 mr-2" />
+                            Sem Interesse
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
