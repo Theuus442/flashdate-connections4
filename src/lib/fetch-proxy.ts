@@ -79,7 +79,9 @@ if (import.meta.env.DEV) {
   globalThis.fetch = interceptedFetch as typeof fetch;
   console.log('[FetchProxy] 🔍 Global fetch interceptor installed for development');
   console.log('[FetchProxy] Supabase URL:', SUPABASE_URL);
-  console.log('[FetchProxy] Localhost URL:', LOCALHOST_URL);
+  if (SUPABASE_URL) {
+    console.log('[FetchProxy] Will proxy requests from:', SUPABASE_URL);
+  }
 }
 
 export { interceptedFetch };
