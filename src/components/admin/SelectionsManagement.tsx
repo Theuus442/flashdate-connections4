@@ -142,18 +142,44 @@ export const SelectionsManagement = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">
-            Seleções de Usuários
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Visualize todos os matches, amizades e desinteresses
-          </p>
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-foreground">
+              Seleções de Usuários
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Visualize todos os matches, amizades e desinteresses
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground mb-1">Total de Seleções</p>
+            <p className="text-3xl font-bold text-gold">{totalSelections}</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground mb-1">Total de Seleções</p>
-          <p className="text-3xl font-bold text-gold">{totalSelections}</p>
+
+        {/* User Filter */}
+        <div className="bg-card border border-border rounded-xl p-4">
+          <label className="block text-sm font-medium text-foreground mb-3">
+            Filtrar por Usuário
+          </label>
+          <select
+            value={selectedUserId || ''}
+            onChange={(e) => setSelectedUserId(e.target.value || null)}
+            className="w-full max-w-md px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+          >
+            <option value="">Todos os usuários</option>
+            {users.map(user => (
+              <option key={user.id} value={user.id}>
+                {user.name} ({user.email})
+              </option>
+            ))}
+          </select>
+          {selectedUserId && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Mostrando seleções de: <span className="font-semibold text-foreground">{getUserName(selectedUserId)}</span>
+            </p>
+          )}
         </div>
       </div>
 
