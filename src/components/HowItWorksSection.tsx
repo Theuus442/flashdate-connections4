@@ -1,11 +1,11 @@
-import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X } from 'lucide-react';
+import { UserPlus, Brain, CalendarCheck, Smartphone, Mail, Check, X, DollarSign } from 'lucide-react';
 
 const steps = [
   {
     number: '01',
-    icon: CalendarCheck,
+    icon: DollarSign,
     title: 'Pagamento',
-    description: 'Efetue o pagamento com o valor informado via Pix.',
+    description: 'Efetue o pagamento do valor informado do evento via Pix:',
     details: [
       'Chave Pix: 11 970329710',
       'Sidnei'
@@ -15,8 +15,15 @@ const steps = [
     number: '02',
     icon: UserPlus,
     title: 'Inscrição',
-    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp 11 970327910:',
-    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
+    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp\u00A011\u00A0970327910:',
+    details: [
+      'Comprovante de pagamento',
+      'Data de Nascimento',
+      'Sexo',
+      'E-mail de contato',
+      'Celular com DDD',
+      'Data do Evento desejado'
+    ],
   },
   {
     number: '03',
@@ -29,15 +36,15 @@ const steps = [
     number: '04',
     icon: CalendarCheck,
     title: 'O Evento',
-    description: 'Compareça com 15 a 30 minutos de antecedência para o check-in. As mulheres ficam fixas nas mesas enquanto os homens rotacionam.',
-    details: ['Conversas de 5 a 10 minutos por mesa', 'Sinal do sino indica rotação', 'Duração total: ~2 horas', 'Após evento: aproveite para comer, beber e conversar livremente'],
+    description: 'Compareça na data com 15 a 30 minutos de antecedência para o check-in. As mulheres permanecem nas mesas enquanto os homens trocam de lugar.',
+    details: ['Conversas de 5 a 10 minutos por mesa', 'Sinal do sino indica rotação', 'Duração total: ~2 horas', 'Após evento: aproveite para comer, beber e conversar livremente. (Consumo à parte)'],
   },
   {
     number: '05',
     icon: Smartphone,
     title: 'Seleção Digital',
     description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante avaliar todos e enviar sua seleção.',
-    details: ['Opções: Match, Amizade, Não faz meu tipo', 'Ambos devem selecionar Match ou Amizade para a troca de contatos'],
+    details: ['Opções: Match, Amizade, Sem interesse', 'Ambos devem selecionar Match ou Amizade para a troca de contatos'],
   },
   {
     number: '06',

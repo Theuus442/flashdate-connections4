@@ -35,7 +35,7 @@ export const AboutSection = () => {
                 <div className="space-y-3 text-left">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                     <Globe className="w-5 h-5 text-gold flex-shrink-0" />
-                    <span className="text-sm text-foreground/80">10 anos na Austrália</span>
+                    <span className="text-sm text-foreground/80">Por 10 anos de Austrália</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                     <GraduationCap className="w-5 h-5 text-gold flex-shrink-0" />
@@ -53,7 +53,7 @@ export const AboutSection = () => {
                 </p>
 
                 <p className="text-muted-foreground leading-relaxed">
-                  Nosso fundador, o empreendedor brasileiro <span className="font-semibold text-foreground">Sidnei Nunes</span>, trouxe uma visão inovadora após 10 anos na Austrália, onde completou um Mestrado em Análise de Negócios. Ele notou dois problemas cruciais no mercado:
+                  Nosso fundador, o empreendedor brasileiro <span className="font-semibold text-foreground">Sidnei Nunes</span>, trouxe uma visão inovadora por 10 anos de Austrália, onde completou um Mestrado em Análise de Negócios. Ele notou dois problemas cruciais no mercado:
                 </p>
 
                 <div className="space-y-3 pl-4 border-l-2 border-gold/50">

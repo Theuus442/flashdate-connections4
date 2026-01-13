@@ -42,7 +42,7 @@ const matchLogic = [
     description: 'Ambos abertos para amizade. Contatos trocados para explorar.',
   },
   {
-    yourChoice: 'NÃO FAZ MEU TIPO',
+    yourChoice: 'Sem interesse',
     theirChoice: 'Qualquer',
     result: 'NENHUM CONTATO',
     icon: X,
@@ -172,7 +172,7 @@ export const MatchLogicSection = () => {
           <div className="mt-8 p-6 rounded-xl bg-secondary/5 border border-secondary/20 text-center">
             <p className="text-foreground/80 text-sm">
               <strong className="text-secondary">Nota Importante:</strong> O contato só é liberado se houver Match ou Amizade mútua.
-              Qualquer escolha com "Não faz meu tipo" resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
+              Qualquer escolha com "Sem interesse" resulta em nenhum contato trocado. Sua privacidade é nossa prioridade.
             </p>
           </div>
         </div>

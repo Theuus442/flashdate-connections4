@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Estado {
@@ -144,7 +144,7 @@ export const LGBTSection = () => {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F8f3ace03e7c74437bf1e2c3a827303bb%2Fcdf15e9fbd634b2b9f32103afe9bf383?format=webp&width=800"
                 alt="LGBT+ Pride"
-                className="h-24 w-auto"
+                className="h-48 w-auto"
               />
             </div>
             <span className="inline-flex items-center gap-2 text-sm font-medium tracking-widest uppercase mb-4">
@@ -200,7 +200,7 @@ export const LGBTSection = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">WhatsApp <span className="text-xs text-muted-foreground">(opcional para contato via mensagem)</span></label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Whatsapp<span className="text-xs text-muted-foreground">(opcional, via whatsapp)</span></label>
                     <Input
                       type="tel"
                       placeholder="(11) 99999-9999"
@@ -285,7 +285,10 @@ export const LGBTSection = () => {
                 <h3 className="font-serif text-xl font-bold text-foreground mb-4">4. Localização (Onde pretende participar) <span className="text-sm font-normal text-gold">*</span></h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Estado</label>
+                    <label className="flex items-center justify-between text-sm font-medium text-foreground mb-2">
+                      <span>Estado</span>
+                      <Search className="w-4 h-4 text-muted-foreground" />
+                    </label>
                     <Select value={formData.estado} onValueChange={handleEstadoChange} disabled={loadingEstados}>
                       <SelectTrigger>
                         <SelectValue placeholder={loadingEstados ? "Carregando..." : "Selecione o estado"} />
@@ -300,7 +303,10 @@ export const LGBTSection = () => {
                     </Select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Cidade</label>
+                    <label className="flex items-center justify-between text-sm font-medium text-foreground mb-2">
+                      <span>Cidade</span>
+                      <Search className="w-4 h-4 text-muted-foreground" />
+                    </label>
                     <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })} disabled={!formData.estado || loadingMunicipios}>
                       <SelectTrigger>
                         <SelectValue placeholder={!formData.estado ? "Selecione um estado primeiro" : loadingMunicipios ? "Carregando..." : "Selecione a cidade"} />
