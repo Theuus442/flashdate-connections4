@@ -290,6 +290,15 @@ export default function EventUserSelection() {
           {/* Filters Section */}
           <div className="bg-muted/30 rounded-xl p-6 mb-8 border border-border">
             <h3 className="text-sm font-semibold text-foreground mb-4">Filtros</h3>
+
+            {/* Auto Gender Filter Info */}
+            <div className="mb-6 p-4 rounded-lg bg-gold/10 border border-gold/30">
+              <p className="text-sm text-foreground font-medium mb-2">🔒 Filtro de Gênero Automático</p>
+              <p className="text-xs text-muted-foreground">
+                Você está vendo apenas participantes do gênero <span className="font-semibold text-foreground">{getGenderLabel(currentUser?.gender || 'Outro')}</span>
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Sort By */}
               <div className="flex flex-col gap-2">
@@ -304,13 +313,11 @@ export default function EventUserSelection() {
                 </select>
               </div>
 
-              {/* Gender Filter */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-foreground">Filtrar por Gênero</label>
+              {/* Gender Filter - Hidden but kept for component state */}
+              <div className="hidden">
                 <select
                   value={genderFilter}
                   onChange={(e) => setGenderFilter(e.target.value as 'all' | 'M' | 'F' | 'Outro')}
-                  className="px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
                 >
                   <option value="all">Todos os Gêneros</option>
                   <option value="M">Masculino</option>
@@ -321,18 +328,11 @@ export default function EventUserSelection() {
             </div>
 
             {/* Active Filters Badge */}
-            {(sortBy !== 'original' || genderFilter !== 'all') && (
+            {sortBy !== 'original' && (
               <div className="mt-4 flex flex-wrap gap-2">
-                {sortBy !== 'original' && (
-                  <div className="bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-medium">
-                    Ordenado alfabeticamente
-                  </div>
-                )}
-                {genderFilter !== 'all' && (
-                  <div className="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-xs font-medium">
-                    {genderFilter === 'M' ? 'Masculino' : genderFilter === 'F' ? 'Feminino' : 'Outro'}
-                  </div>
-                )}
+                <div className="bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-medium">
+                  Ordenado alfabeticamente
+                </div>
               </div>
             )}
           </div>
