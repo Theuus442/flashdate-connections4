@@ -75,9 +75,14 @@ export const NextEventSection = () => {
               {/* Venue Image */}
               <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
                 <img
-                  src={event.eventImage || venueImage}
+                  src={getProxiedUrl(event.eventImage) || venueImage}
                   alt={event.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('[NextEventSection] Error loading event image:', event.eventImage);
+                    // Fallback to default image
+                    (e.target as HTMLImageElement).src = venueImage;
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
               </div>
