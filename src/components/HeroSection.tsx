@@ -31,9 +31,12 @@ export const HeroSection = () => {
       <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-muted/10 rounded-full blur-3xl animate-float delay-300" />
 
       {/* Content */}
-      <div className="relative z-10 pt-20 md:pt-24 lg:pt-32">
-        <div className="container mx-auto px-4 sm:px-6 text-center w-full">
-          <div className="max-w-2xl mx-auto">
+      <div className="relative z-10 flex flex-col flex-1">
+        {/* Large spacer to show cupid at top */}
+        <div className="h-48 sm:h-56 md:h-64 lg:h-80" />
+
+        <div className="container mx-auto px-4 sm:px-6 text-center w-full flex-1 flex items-center">
+          <div className="max-w-2xl mx-auto w-full">
             {/* Main Title */}
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4 md:mb-6 animate-fade-up delay-100" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)' }}>
               <span className="text-white block mb-3 md:mb-4">FlashDate</span>
@@ -60,10 +63,10 @@ export const HeroSection = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Large spacer to show the cupid image below */}
-      <div className="flex-1 min-h-40 md:min-h-60" />
+        {/* Bottom spacer */}
+        <div className="h-32 sm:h-40 md:h-48" />
+      </div>
 
     </section>
   );
