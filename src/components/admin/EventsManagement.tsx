@@ -8,8 +8,31 @@ import { useToast } from '@/hooks/use-toast';
 // Placeholder SVG for when images fail to load
 const PLACEHOLDER_IMAGE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect fill='%23f5f5f5' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, sans-serif' font-size='16' fill='%23999'%3EImagem não pode ser carregada%3C/text%3E%3C/svg%3E`;
 
-// Empty default event - will be populated from database
+// Default event data with template values
 const defaultEventData: EventData = {
+  id: '1',
+  title: 'Armazém São Caetano',
+  location: 'Armazém São Caetano',
+  city: 'São Caetano do Sul, SP',
+  date: 'Sábados com eventos regulares',
+  nextDate: '25/01/2026',
+  schedule: 'Conforme agendado',
+  checkIn: '15-30 min antes',
+  environment: 'Rústico e elegante',
+  music: 'Música ao vivo a partir das 19h',
+  dressCode: 'Esporte Fino / Casual Elegante',
+  parking: 'Zona Azul gratuita a partir das 13h (aos sábados)',
+  price: 'R$ 40,00',
+  description: 'Encontros Presenciais com Inteligência Artificial',
+  eventImage: 'https://kdwnptqxwnnzvdinhhin.supabase.co/storage/v1/object/public/events/placeholder.png',
+  email: 'contato@flashdate.com.br',
+  whatsapp: '(11) 97032-9710',
+  vagas: '1',
+  vagasLimitDate: '25/01/2026',
+};
+
+// Empty form for creating new events
+const emptyEventForm: EventData = {
   id: '',
   title: '',
   location: '',
