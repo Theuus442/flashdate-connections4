@@ -3,7 +3,6 @@ import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, 
 import { useState, useEffect } from 'react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { getProxiedUrl } from '@/lib/url-proxy';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
 
 export const NextEventSection = () => {
