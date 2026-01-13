@@ -50,10 +50,18 @@ export const SelectionsManagement = () => {
     loadSelections();
   }, []);
 
+  const isMutualMatch = (userId: string, selectedUserId: string): boolean => {
+    return mutualMatches.some(
+      m => (m.userId === userId && m.selectedUserId === selectedUserId) ||
+           (m.userId === selectedUserId && m.selectedUserId === userId)
+    );
+  };
+
   const getSelectionsByVote = (vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     return selections.filter(s => s.vote === vote).map(s => ({
       selectedUserId: s.selectedUserId,
       vote: s.vote,
+      userId: s.userId,
     }));
   };
 
