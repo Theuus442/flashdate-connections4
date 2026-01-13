@@ -762,7 +762,9 @@ function MatchesTab({ userId }: { userId?: string }) {
                   <h3 className="font-serif text-xl font-bold text-foreground">
                     {match.name}
                   </h3>
-                  <p className="text-gold font-semibold text-sm">💕 Você deu match</p>
+                  <p className={`font-semibold text-sm ${match.matchType === 'MATCH' ? 'text-gold' : 'text-emerald'}`}>
+                    {match.matchType === 'MATCH' ? '💕 Você deu match' : '💫 Vocês são amigos'}
+                  </p>
                 </div>
               </div>
 
