@@ -468,15 +468,22 @@ export const EventsManagement = () => {
       ) : (
         <div className="grid md:grid-cols-2 gap-8">
           {/* Image */}
-          <div>
+          <div className="relative">
             <img
-              src={eventData.eventImage}
+              src={imageLoadError ? PLACEHOLDER_IMAGE : eventData.eventImage}
               alt={eventData.title}
               className="w-full h-96 object-cover rounded-2xl border border-border"
-              onError={(e) => {
-                console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
-              }}
+              onError={handleImageLoadError}
             />
+            {imageLoadError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-2xl">
+                <div className="text-center text-white">
+                  <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm font-medium">Erro ao carregar imagem</p>
+                  <p className="text-xs mt-1">Carregue uma nova imagem para continuar</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Event Info */}
