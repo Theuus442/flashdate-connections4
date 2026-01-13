@@ -177,6 +177,49 @@ export const EventsManagement = () => {
     }
   };
 
+  const formatTime = (timeString: string): string => {
+    if (!timeString) return '';
+    // If it's already in HH:mm format, return as is
+    if (timeString.match(/^\d{2}:\d{2}$/)) {
+      return timeString;
+    }
+    // If it contains a time pattern like "19h" or "19:00", try to extract it
+    const timeMatch = timeString.match(/(\d{1,2}):?(\d{0,2})/);
+    if (timeMatch) {
+      const hours = timeMatch[1].padStart(2, '0');
+      const minutes = timeMatch[2] ? timeMatch[2].padStart(2, '0') : '00';
+      return `${hours}:${minutes}`;
+    }
+    return timeString;
+  };
+
+  const formatPrice = (priceString: string): string => {
+    if (!priceString) return '';
+    // Remove non-numeric characters except decimal point
+    const numericValue = priceString.replace(/[^0-9.,]/g, '');
+    // Replace comma with dot for parsing
+    const value = parseFloat(numericValue.replace(',', '.'));
+    if (isNaN(value)) return priceString;
+    // Format as Brazilian currency
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  const formatWhatsApp = (phone: string): string => {
+    if (!phone) return '';
+    // Remove all non-numeric characters
+    const cleaned = phone.replace(/\D/g, '');
+    // Format as (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+    if (cleaned.length === 11) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
