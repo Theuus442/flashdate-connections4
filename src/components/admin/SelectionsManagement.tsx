@@ -7,6 +7,7 @@ import { Selection } from '@/context/SelectionsContext';
 interface MutualMatch {
   userId: string;
   selectedUserId: string;
+  matchType: 'MATCH' | 'AMIZADE';
   createdAt: string;
 }
 
