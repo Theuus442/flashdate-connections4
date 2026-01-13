@@ -200,7 +200,7 @@ export const LGBTSection = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">WhatsApp <span className="text-xs text-muted-foreground">(opcional para contato via mensagem)</span></label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Whatsapp<span className="text-xs text-muted-foreground">(opcional, via whatsapp)</span></label>
                     <Input
                       type="tel"
                       placeholder="(11) 99999-9999"
