@@ -33,7 +33,7 @@ export const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
         {/* Spacer to show cupid at top */}
-        <div className="h-24 sm:h-32 md:h-40 lg:h-52" />
+        <div className="h-32 sm:h-40 md:h-52 lg:h-64" />
 
         <div className="container mx-auto px-4 sm:px-6 text-center w-full flex-1 flex items-center">
           <div className="max-w-2xl mx-auto w-full">
