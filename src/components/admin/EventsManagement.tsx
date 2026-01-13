@@ -206,6 +206,31 @@ export const EventsManagement = () => {
     );
   }
 
+  // Show message if no event is loaded and not in loading state
+  if (!isLoading && !eventData.id) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-foreground">Gerenciar Eventos</h1>
+            <p className="text-muted-foreground mt-2">Edite as informações do próximo evento</p>
+          </div>
+        </div>
+        <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-8">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">Nenhum evento encontrado</h3>
+              <p className="text-yellow-800 dark:text-yellow-200">
+                Não há eventos no banco de dados. {!supabaseConfigured ? 'Supabase não está configurado.' : 'Verifique se há eventos criados.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
