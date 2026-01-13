@@ -29,9 +29,9 @@ const faqData = [
         q: 'Quantos encontros terei num evento Speed Dating?', 
         a: 'O número de encontros e com quem você conversará são definidos por Inteligência Artificial (IA), que determina o tempo de interação com base na compatibilidade. Os fatores que influenciam são: Número de Participantes (mínimo 10 homens e 10 mulheres) e Grau de Compatibilidade (definido por IA). Portanto, você não conversará necessariamente com todos os participantes do sexo oposto, mas sim com aqueles que a IA identificou como seus pares mais compatíveis.' 
       },
-      { 
-        q: 'O speed dating é eficaz?', 
-        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No FlashDate, todos são solteiros verificados e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.' 
+      {
+        q: 'O speed dating é eficaz?',
+        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No Flashdate, todos são solteiros e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.'
       },
       { 
         q: 'As pessoas realmente encontram relacionamentos sérios através do speed dating?', 
@@ -286,14 +286,14 @@ export const FAQSection = () => {
               Veja Nossos Eventos em <span className="text-blue-600">Ação</span>
             </h3>
             <p className="text-muted-foreground text-lg">
-              Confira como são nossos eventos de speed dating em ambientes elegantes e acolhedores
+              Confira como são os exemplos em ação
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F4c6a42da1a654661a002b9df6c0a40a4?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2Fe00265569f15418587d07e0eb2028b63%2Fed68dc4ae3de429caa69f0910855b4d7?format=webp&width=800"
                 alt="Evento Flashdate - Participantes em speed dating"
                 className="w-full h-full object-cover"
               />
@@ -301,7 +301,7 @@ export const FAQSection = () => {
 
             <div className="rounded-2xl overflow-hidden border border-border shadow-elegant hover:shadow-lg transition-shadow">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F1eb056757fdd408fb16c0434aacb3dcd%2F308f5dc2d9da4ceda9523eb08cf3ba9c?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2Fe00265569f15418587d07e0eb2028b63%2Fcd3af54682ee48ceb934c79ebd38e6b8?format=webp&width=800"
                 alt="Evento Flashdate - Ambiente de encontros com mascote"
                 className="w-full h-full object-cover"
               />

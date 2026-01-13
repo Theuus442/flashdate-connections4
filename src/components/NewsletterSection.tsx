@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { sendContactEmail } from '@/lib/email.service';
 
 export const NewsletterSection = () => {
   const [formData, setFormData] = useState({
@@ -21,15 +22,23 @@ export const NewsletterSection = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Obrigado! Sua mensagem foi enviada com sucesso.');
-    setFormData({
-      assunto: '',
-      nome: '',
-      email: '',
-      mensagem: '',
-    });
+
+    try {
+      await sendContactEmail(formData);
+
+      toast.success('Obrigado! Sua mensagem foi enviada com sucesso.');
+      setFormData({
+        assunto: '',
+        nome: '',
+        email: '',
+        mensagem: '',
+      });
+    } catch (error) {
+      toast.error('Erro ao enviar mensagem. Tente novamente.');
+      console.error('Erro:', error);
+    }
   };
 
   return (
