@@ -303,9 +303,9 @@ export const LGBTSection = () => {
                     </Select>
                   </div>
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-                      <Search className="w-4 h-4" />
-                      Cidade
+                    <label className="flex items-center justify-between text-sm font-medium text-foreground mb-2">
+                      <span>Cidade</span>
+                      <Search className="w-4 h-4 text-muted-foreground" />
                     </label>
                     <Select value={formData.cidade} onValueChange={(value) => setFormData({ ...formData, cidade: value })} disabled={!formData.estado || loadingMunicipios}>
                       <SelectTrigger>
