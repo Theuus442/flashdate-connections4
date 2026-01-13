@@ -81,6 +81,7 @@ export const EventsManagement = () => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImageFile(file);
+      setPreviewLoadError(false);
       // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -89,6 +90,16 @@ export const EventsManagement = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleImageLoadError = () => {
+    console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
+    setImageLoadError(true);
+  };
+
+  const handlePreviewLoadError = () => {
+    console.error('[EventsManagement] Error loading preview image');
+    setPreviewLoadError(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
