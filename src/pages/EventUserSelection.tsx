@@ -168,34 +168,58 @@ export default function EventUserSelection() {
     );
   }
 
-  const handleSelection = (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
+  const handleSelection = async (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
+    if (!authUser) return;
+
     const existingSelection = selections.find(s => s.userId === participantId);
-    
+
+    // Convert type to vote format for database
+    const voteMap = {
+      'match': 'SIM',
+      'friendship': 'TALVEZ',
+      'no-interest': 'NÃO'
+    } as const;
+    const vote = voteMap[type];
+
+    // Use a placeholder event_id since we're not in a specific event yet
+    const eventId = 'default-event';
+
     if (existingSelection) {
       if (existingSelection.type === type) {
         // Remove if clicking same button
         setSelections(selections.filter(s => s.userId !== participantId));
+        await selectionsService.removeSelection(eventId, authUser.id, participantId);
       } else {
         // Update if clicking different button
         setSelections(selections.map(s =>
           s.userId === participantId ? { ...s, type } : s
         ));
+        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
       }
     } else {
       // Add new selection
       setSelections([...selections, { userId: participantId, type }]);
+      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
     }
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (selections.length === 0) {
       toast.error('Faça pelo menos uma seleção antes de finalizar');
       return;
     }
-    const matchCount = selections.filter(s => s.type === 'match').length;
-    const friendshipCount = selections.filter(s => s.type === 'friendship').length;
-    toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
-    navigate('/dashboard');
+
+    try {
+      const matchCount = selections.filter(s => s.type === 'match').length;
+      const friendshipCount = selections.filter(s => s.type === 'friendship').length;
+
+      toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
+      navigate('/dashboard');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('Error finishing selections:', errorMsg);
+      toast.error('Erro ao finalizar seleções');
+    }
   };
 
   const getGenderLabel = (gender: string) => {
