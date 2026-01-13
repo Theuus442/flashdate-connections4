@@ -149,6 +149,46 @@ export const SelectionsManagement = () => {
         </div>
       </div>
 
+      {/* Mutual Matches Highlight */}
+      {!isLoading && mutualMatches.length > 0 && (
+        <div className="bg-gradient-to-r from-gold/10 to-gold-dark/10 border border-gold/20 rounded-2xl p-6">
+          <div className="flex items-center gap-3 pb-4 border-b border-gold/20 mb-4">
+            <div className="flex items-center gap-2 text-gold">
+              <Zap size={24} className="animate-pulse-glow" />
+              <h2 className="font-serif text-2xl font-bold">Matches Mútuos Confirmados</h2>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            {mutualMatches.length} par{mutualMatches.length !== 1 ? 'es de' : ''} pessoas encontraram um ao outro! 💕
+          </p>
+          <div className="grid md:grid-cols-2 gap-3">
+            {mutualMatches.map((match, idx) => {
+              const user1 = users.find(u => u.id === match.userId);
+              const user2 = users.find(u => u.id === match.selectedUserId);
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-lg bg-card border border-gold/30 hover:border-gold/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-sm font-medium text-foreground truncate">
+                      {user1?.name || 'Usuário desconhecido'}
+                    </span>
+                    <span className="text-gold font-bold">↔️</span>
+                    <span className="text-sm font-medium text-foreground truncate">
+                      {user2?.name || 'Usuário desconhecido'}
+                    </span>
+                  </div>
+                  <span className="ml-2 flex-shrink-0 text-xs font-semibold px-3 py-1 rounded-full bg-gold/10 text-gold">
+                    💕 Match
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Stats Overview */}
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
