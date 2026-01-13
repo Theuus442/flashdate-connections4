@@ -22,15 +22,23 @@ export const NewsletterSection = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Obrigado! Sua mensagem foi enviada com sucesso.');
-    setFormData({
-      assunto: '',
-      nome: '',
-      email: '',
-      mensagem: '',
-    });
+
+    try {
+      await sendContactEmail(formData);
+
+      toast.success('Obrigado! Sua mensagem foi enviada com sucesso.');
+      setFormData({
+        assunto: '',
+        nome: '',
+        email: '',
+        mensagem: '',
+      });
+    } catch (error) {
+      toast.error('Erro ao enviar mensagem. Tente novamente.');
+      console.error('Erro:', error);
+    }
   };
 
   return (
