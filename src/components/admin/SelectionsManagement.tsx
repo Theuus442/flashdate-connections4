@@ -1,10 +1,43 @@
-import { useSelections } from '@/context/SelectionsContext';
+import { useEffect, useState } from 'react';
 import { useUsers } from '@/context/UsersContext';
 import { Heart, Users, X } from 'lucide-react';
+import { selectionsService } from '@/lib/selections.service';
+import { Selection } from '@/context/SelectionsContext';
 
 export const SelectionsManagement = () => {
-  const { getSelectionsByVote } = useSelections();
   const { users } = useUsers();
+  const [selections, setSelections] = useState<Selection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load all selections from database on mount
+  useEffect(() => {
+    const loadSelections = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await selectionsService.getSelections();
+        if (error) {
+          console.error('Error loading selections:', error);
+          setSelections([]);
+        } else if (data) {
+          setSelections(data);
+        }
+      } catch (error) {
+        console.error('Error loading selections:', error);
+        setSelections([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSelections();
+  }, []);
+
+  const getSelectionsByVote = (vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
+    return selections.filter(s => s.vote === vote).map(s => ({
+      selectedUserId: s.selectedUserId,
+      vote: s.vote,
+    }));
+  };
 
   const matches = getSelectionsByVote('SIM');
   const maybe = getSelectionsByVote('TALVEZ');
