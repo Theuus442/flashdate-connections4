@@ -181,6 +181,12 @@ export default function EventUserSelection() {
 
     const existingSelection = selections.find(s => s.userId === participantId);
 
+    // If already selected, don't allow changes (vote is locked)
+    if (existingSelection) {
+      toast.info('Seu voto já foi registrado e não pode ser alterado');
+      return;
+    }
+
     // Convert type to vote format for database
     const voteMap = {
       'match': 'SIM',
@@ -192,23 +198,9 @@ export default function EventUserSelection() {
     // Use null for event_id since we're not in a specific event yet
     const eventId = null;
 
-    if (existingSelection) {
-      if (existingSelection.type === type) {
-        // Remove if clicking same button
-        setSelections(selections.filter(s => s.userId !== participantId));
-        await selectionsService.removeSelection(eventId, authUser.id, participantId);
-      } else {
-        // Update if clicking different button
-        setSelections(selections.map(s =>
-          s.userId === participantId ? { ...s, type } : s
-        ));
-        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
-      }
-    } else {
-      // Add new selection
-      setSelections([...selections, { userId: participantId, type }]);
-      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
-    }
+    // Add new selection (only option when no existing selection)
+    setSelections([...selections, { userId: participantId, type }]);
+    await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
   };
 
   const handleFinish = async () => {
