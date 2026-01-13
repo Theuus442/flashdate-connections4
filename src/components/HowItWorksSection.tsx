@@ -16,7 +16,14 @@ const steps = [
     icon: UserPlus,
     title: 'Inscrição',
     description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp 11 970327910:',
-    details: ['Comprovante de pagamento', 'Data de Nascimento', 'Sexo', 'E-mail de contato', 'Celular com DDD', 'Data do Evento desejado'],
+    details: [
+      'Comprovante de pagamento',
+      'Data de Nascimento',
+      'Sexo',
+      'E-mail de contato',
+      'Celular com DDD',
+      'Data do Evento desejado'
+    ],
   },
   {
     number: '03',
