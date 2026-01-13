@@ -106,9 +106,12 @@ export default function EventUserSelection() {
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
 
-    // Auto-filter by current user's gender (women see women, men see men)
+    // Auto-filter by opposite gender (women see men, men see women)
     if (currentUser?.gender && currentUser.gender !== 'Outro') {
-      filtered = filtered.filter(u => u.gender === currentUser.gender);
+      // If user is Female (F), show only Male (M) participants
+      // If user is Male (M), show only Female (F) participants
+      const oppositeGender = currentUser.gender === 'F' ? 'M' : 'F';
+      filtered = filtered.filter(u => u.gender === oppositeGender);
     }
 
     // Apply additional gender filter (only if selecting something different from auto-filter)
