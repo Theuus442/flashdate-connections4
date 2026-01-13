@@ -44,7 +44,7 @@ const steps = [
     icon: Smartphone,
     title: 'Seleção Digital',
     description: 'No dia do evento, você fará login no nosso app para selecionar seus parceiros preferidos. É importante avaliar todos e enviar sua seleção.',
-    details: ['Opções: Match, Amizade, Não faz meu tipo', 'Ambos devem selecionar Match ou Amizade para a troca de contatos'],
+    details: ['Opções: Match, Amizade, Sem interesse', 'Ambos devem selecionar Match ou Amizade para a troca de contatos'],
   },
   {
     number: '06',
