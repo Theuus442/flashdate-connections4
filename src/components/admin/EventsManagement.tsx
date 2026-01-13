@@ -196,15 +196,21 @@ export const EventsManagement = () => {
             <div className="space-y-4">
               <label className="block text-sm font-medium text-foreground">Imagem do Estabelecimento</label>
               <div className="flex flex-col gap-4 md:flex-row">
-                <div className="flex-1">
+                <div className="flex-1 relative">
                   <img
-                    src={imagePreview}
+                    src={previewLoadError ? PLACEHOLDER_IMAGE : imagePreview}
                     alt="Event preview"
                     className="w-full h-64 object-cover rounded-lg border border-border"
-                    onError={(e) => {
-                      console.error('[EventsManagement] Error loading preview image');
-                    }}
+                    onError={handlePreviewLoadError}
                   />
+                  {previewLoadError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                      <div className="text-center text-white">
+                        <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+                        <p className="text-sm font-medium">Erro ao carregar imagem</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="md:w-64 flex flex-col justify-center">
                   <label className="flex items-center justify-center w-full h-32 px-4 py-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
