@@ -47,6 +47,7 @@ export const EventsManagement = () => {
   useEffect(() => {
     const loadEvent = async () => {
       if (!supabaseConfigured) {
+        console.log('[EventsManagement] Supabase not configured, using offline mode');
         return;
       }
 
@@ -56,21 +57,34 @@ export const EventsManagement = () => {
         if (events.data && events.data.length > 0) {
           // Get the first event (or latest)
           const event = events.data[0];
+          console.log('[EventsManagement] Loaded event:', event);
           setEventData(event);
           setFormData(event);
           setImagePreview(event.eventImage);
           setImageLoadError(false);
           setPreviewLoadError(false);
+        } else {
+          console.warn('[EventsManagement] No events found in database');
+          toast({
+            title: 'Aviso',
+            description: 'Nenhum evento encontrado no banco de dados',
+            variant: 'default',
+          });
         }
       } catch (error) {
-        console.error('Error loading event:', error);
+        console.error('[EventsManagement] Error loading event:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao carregar evento do banco de dados',
+          variant: 'destructive',
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadEvent();
-  }, [supabaseConfigured]);
+  }, [supabaseConfigured, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
