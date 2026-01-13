@@ -69,6 +69,9 @@ export const EventsManagement = () => {
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imageLoadError, setImageLoadError] = useState(false);
   const [previewLoadError, setPreviewLoadError] = useState(false);
+  const [cities, setCities] = useState<Array<{ id: number; nome: string }>>([]);
+  const [citySearchInput, setCitySearchInput] = useState('');
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
 
   // Load event from Supabase on mount
   useEffect(() => {
