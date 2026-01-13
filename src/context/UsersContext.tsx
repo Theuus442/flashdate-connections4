@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { usersService } from '@/lib/users.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -62,44 +62,54 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       try {
         console.log('[UsersContext] Attempting to load users from Supabase...');
 
-        // Set a timeout to prevent infinite loading
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('User load timeout after 10 seconds')), 10000)
-        );
-
+        // Set a longer timeout to account for retries (1s + 2s + 4s = 7s base, plus network latency)
         const loadPromise = (async () => {
-          const { data, error } = await usersService.getUsers();
+          try {
+            const { data, error } = await usersService.getUsers();
 
-          if (error) {
-            const errorMessage = error instanceof Error
-              ? error.message
-              : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+            if (error) {
+              const errorMessage = error instanceof Error
+                ? error.message
+                : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-            const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+              const isNetworkError =
+                (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+                errorMessage.includes('Failed to fetch') ||
+                errorMessage.includes('Network') ||
+                (error instanceof TypeError && errorMessage.includes('fetch'));
 
-            console.error('[UsersContext] ⚠️ Error loading users:', {
-              message: errorMessage,
-              isNetworkError,
-              error,
-            });
+              console.error('[UsersContext] ⚠️ Error loading users:', {
+                message: errorMessage,
+                isNetworkError,
+                error,
+              });
 
-            // If it's a network error, log helpful info but don't fail
-            if (isNetworkError) {
-              console.error('[UsersContext] 🌐 NETWORK ERROR: Cannot reach Supabase');
-              console.error('[UsersContext] This may be a temporary connectivity issue or environment isolation problem.');
-              console.error('[UsersContext] App will continue with empty user list.');
+              // If it's a network error, log helpful info but don't fail
+              if (isNetworkError) {
+                console.error('[UsersContext] 🌐 NETWORK ERROR: Cannot reach Supabase');
+                console.error('[UsersContext] This may be a temporary connectivity issue or environment isolation problem.');
+                console.error('[UsersContext] App will continue with empty user list.');
+              }
+
+              // In case of network error or any error, return empty array (not an error)
+              // This prevents the app from breaking completely
+              console.log('[UsersContext] Setting empty user list as fallback');
+              setUsers([]);
+            } else if (data) {
+              console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
+              setUsers(data);
+            } else {
+              console.log('[UsersContext] No data returned, setting empty list');
+              setUsers([]);
             }
-
-            // In case of network error, return empty array (not an error)
-            // This prevents the app from breaking completely
+          } catch (innerError) {
+            console.error('[UsersContext] Unexpected error in load promise:', innerError);
+            // Don't re-throw - just continue with empty users
             setUsers([]);
-          } else if (data) {
-            console.log('[UsersContext] ✅ Successfully loaded users:', data.length);
-            setUsers(data);
           }
         })();
 
-        await Promise.race([loadPromise, timeoutPromise]);
+        await loadPromise;
       } catch (error) {
         const errorMessage = error instanceof Error
           ? error.message
@@ -244,7 +254,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return users.find(user => user.id === id);
   };
 
-  const refreshUsers = async () => {
+  const refreshUsers = useCallback(async () => {
     if (!supabaseConfigured) {
       console.log('[UsersContext] Supabase not configured, skipping refresh');
       return;
@@ -252,15 +262,31 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     try {
       console.log('[UsersContext] Refreshing users from Supabase...');
+
+      // Set a timeout but don't use Promise.race (it can cause issues)
       const { data, error } = await usersService.getUsers();
 
       if (error) {
         const errorMessage = error instanceof Error
           ? error.message
           : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
+
+        const isNetworkError =
+          (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+          errorMessage.includes('Failed to fetch') ||
+          errorMessage.includes('Network') ||
+          (error instanceof TypeError && errorMessage.includes('fetch'));
+
         console.error('[UsersContext] ⚠️ Error refreshing users:');
         console.error('[UsersContext]   Message:', errorMessage);
         console.error('[UsersContext]   Type:', typeof error);
+        console.error('[UsersContext]   IsNetworkError:', isNetworkError);
+
+        // On network error, keep existing users instead of clearing them
+        if (isNetworkError) {
+          console.log('[UsersContext] Network error detected, keeping existing users');
+        }
+        return; // Don't throw - just exit gracefully
       } else if (data) {
         console.log('[UsersContext] ✅ Successfully refreshed users:', data.length);
         setUsers(data);
@@ -269,12 +295,16 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const errorMessage = error instanceof Error
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
-      console.error('[UsersContext] ❌ Unexpected error refreshing users:', {
+
+      console.error('[UsersContext] ⚠️ Unexpected error during refresh:', {
         message: errorMessage,
         error,
       });
+
+      // Don't clear users on error - keep the existing list
+      console.log('[UsersContext] Keeping existing user list despite error');
     }
-  };
+  }, [supabaseConfigured]);
 
   const deleteAllByRole = async (role: 'admin' | 'client') => {
     if (!supabaseConfigured) {

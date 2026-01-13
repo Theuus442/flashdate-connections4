@@ -70,7 +70,7 @@ export const SelectionsManagement = () => {
     </div>
   );
 
-  const totalSelections = matches.length + friendships.length + noInterests.length;
+  const totalSelections = matches.length + maybe.length + noInterests.length;
 
   return (
     <div className="space-y-8">

@@ -102,19 +102,30 @@ export const usersService = {
   },
 
   /**
-   * Get all users
+   * Get all users with retry logic
+   * @param retryCount - Current retry attempt
+   * @param maxRetries - Maximum number of retries (default: 1)
    */
-  async getUsers(): Promise<{ data: User[] | null; error: any }> {
+  async getUsers(retryCount = 0, maxRetries = 1): Promise<{ data: User[] | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
-      console.log('[usersService] Fetching users from Supabase...');
-      const { data, error } = await supabase
+      console.log(`[usersService] Fetching users from Supabase (attempt ${retryCount + 1}/${maxRetries + 1})...`);
+
+      // Add timeout to prevent hanging (8 seconds per attempt to account for network latency)
+      const timeoutMs = 8000;
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+      );
+
+      const fetchPromise = supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
+
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
       if (error) {
         const errorMessage = error instanceof Error
@@ -153,20 +164,28 @@ export const usersService = {
         ? error.message
         : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error));
 
-      const isNetworkError = error instanceof TypeError && errorMessage.includes('Failed to fetch');
+      // Check for network error - look for "Failed to fetch" in various formats
+      const isNetworkError =
+        (error instanceof TypeError && errorMessage.includes('Failed to fetch')) ||
+        errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('Network') ||
+        (error instanceof TypeError && errorMessage.includes('fetch'));
+
       const isJSONError = error instanceof SyntaxError;
-      const errorType = error instanceof TypeError
+      const isTimeoutError = errorMessage.includes('timeout');
+      const errorType = isNetworkError
         ? 'Network/Fetch Error'
-        : (isJSONError ? 'JSON Parse Error' : 'Other Error');
+        : (isTimeoutError ? 'Timeout Error' : (isJSONError ? 'JSON Parse Error' : 'Other Error'));
 
       console.error('[usersService] ❌ Error fetching users:');
       console.error('[usersService]   Message:', errorMessage);
       console.error('[usersService]   Type:', errorType);
       console.error('[usersService]   IsNetworkError:', isNetworkError);
+      console.error('[usersService]   IsTimeoutError:', isTimeoutError);
       console.error('[usersService]   Supabase configured:', isSupabaseConfigured());
 
-      // Check if it's a network error
-      if (isNetworkError) {
+      // Check if it's a network or timeout error and retry if we haven't exhausted retries
+      if (isNetworkError || isTimeoutError) {
         console.error('[usersService] 🌐 NETWORK ERROR: Cannot reach Supabase');
         console.error('[usersService] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
         console.error('[usersService] Possible causes:');
@@ -176,8 +195,16 @@ export const usersService = {
         console.error('[usersService]   4. Firewall or corporate proxy blocking');
         console.error('[usersService]   5. Supabase service is temporarily unavailable');
 
-        // Return empty array instead of error for better UX
-        console.log('[usersService] Returning empty users array due to network error');
+        // Retry with exponential backoff
+        if (retryCount < maxRetries) {
+          const delayMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+          console.log(`[usersService] Retrying in ${delayMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          return this.getUsers(retryCount + 1, maxRetries);
+        }
+
+        // After all retries exhausted, return empty array for better UX
+        console.log('[usersService] Returning empty users array due to network error (retries exhausted)');
         return { data: [], error: null };
       }
 
@@ -324,30 +351,22 @@ export const usersService = {
       let profileImageUrl: string | undefined;
       let userId = crypto.randomUUID();
 
-      // Pre-check for duplicate email or username to provide better error message
-      console.log('[usersService] Checking for duplicate email or username...');
+      // Pre-check for duplicate email only (username and name can be duplicated now)
+      console.log('[usersService] Checking for duplicate email...');
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
-        .select('id, email, username')
-        .or(`email.eq.${user.email},username.eq.${user.username}`)
+        .select('id, email')
+        .eq('email', user.email)
         .maybeSingle();
 
       if (checkError) {
         const errorStr = serializeError(checkError);
-        console.warn('[usersService] Error checking for duplicates:', errorStr);
-        // Continue anyway - the insert will fail if there are duplicates
+        console.warn('[usersService] Error checking for duplicate email:', errorStr);
+        // Continue anyway - the insert will fail if there's a duplicate
       } else if (existingUser) {
-        // Found a duplicate
-        let duplicateField = 'dados';
-        if (existingUser.email === user.email && existingUser.username === user.username) {
-          duplicateField = 'email e apelido';
-        } else if (existingUser.email === user.email) {
-          duplicateField = 'email';
-        } else if (existingUser.username === user.username) {
-          duplicateField = 'apelido';
-        }
-        const errorMsg = `Este ${duplicateField} já está registrado no sistema. Escolha um ${duplicateField === 'email e apelido' ? 'email e apelido' : duplicateField} único.`;
-        console.warn('[usersService] Duplicate found:', { duplicateField, existingId: existingUser.id });
+        // Found a duplicate email
+        const errorMsg = 'Este email já está registrado no sistema. Escolha um email único.';
+        console.warn('[usersService] Duplicate email found:', { existingId: existingUser.id });
         throw new Error(errorMsg);
       }
 
@@ -396,55 +415,50 @@ export const usersService = {
         hasImage: !!profileImageUrl,
       });
 
-      // Create user in database
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{
-          id: userId,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          whatsapp: user.whatsapp,
-          gender: user.gender,
-          role: user.role || 'client',
-          profile_image_url: profileImageUrl,
-          created_at: new Date().toISOString(),
-        }])
-        .select();
+      // NOTE: User is already created in database by the Edge Function, no need to insert again
+      // If we have a profile image, we need to update it in the database
+      if (profileImageUrl) {
+        console.log('[usersService] Updating profile image URL in database...');
+        const { data: updateData, error: updateError } = await supabase
+          .from('users')
+          .update({ profile_image_url: profileImageUrl })
+          .eq('id', userId)
+          .select();
 
-      if (error) {
-        let errorMsg = error instanceof Error
-          ? error.message
-          : (error?.message || 'Unknown database error');
-
-        // Provide better error messages for common issues
-        if (error?.code === '23505') {
-          if (errorMsg.includes('username')) {
-            errorMsg = 'Este apelido (username) já existe. Escolha outro apelido único.';
-          } else if (errorMsg.includes('email')) {
-            errorMsg = 'Este email já está cadastrado.';
-          } else {
-            errorMsg = 'Dados duplicados. Verifique se apelido ou email já existem.';
-          }
+        if (updateError) {
+          const errorStr = serializeError(updateError);
+          console.error('[usersService] Error updating profile image:', {
+            code: updateError?.code,
+            details: updateError?.details,
+            dbError: errorStr,
+          });
+          throw new Error('Falha ao atualizar imagem de perfil');
         }
 
-        const errorStr = serializeError(error);
-        console.error('[usersService] Database insert error:', {
-          message: errorMsg,
-          code: error?.code,
-          details: error?.details,
+        console.log('[usersService] Profile image updated successfully');
+      }
+
+      // Fetch the created user from database
+      console.log('[usersService] Fetching created user from database...');
+      const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (fetchError) {
+        const errorStr = serializeError(fetchError);
+        console.error('[usersService] Error fetching created user:', {
+          code: fetchError?.code,
+          details: fetchError?.details,
           dbError: errorStr,
         });
-        throw new Error(errorMsg);
+        throw new Error('Falha ao buscar usuário criado');
       }
 
-      console.log('[usersService] Insert result:', { hasData: !!data, dataLength: data?.length });
-
-      if (!data || data.length === 0) {
-        throw new Error('Failed to insert user - no data returned');
+      if (!userData) {
+        throw new Error('Failed to fetch created user - no data returned');
       }
-
-      const userData = data[0];
       const transformedData: User = {
         id: userData.id,
         name: userData.name,

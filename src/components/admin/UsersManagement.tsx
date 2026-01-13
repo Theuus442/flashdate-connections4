@@ -5,19 +5,16 @@ import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
 
 /**
- * Helper to check if email or username already exists
+ * Helper to check if email already exists
+ * Note: username and name can now be duplicated
  */
-function checkDuplicateField(users: User[], email: string, username: string, excludeId?: string): { isDuplicate: boolean; field: string; existingUser?: User } {
+function checkDuplicateField(users: User[], email: string, excludeId?: string): { isDuplicate: boolean; field: string; existingUser?: User } {
   for (const user of users) {
     // If we're editing, exclude the current user
     if (excludeId && user.id === excludeId) continue;
 
-    if (user.email === email && user.username === username) {
-      return { isDuplicate: true, field: 'email e apelido', existingUser: user };
-    } else if (user.email === email) {
+    if (user.email === email) {
       return { isDuplicate: true, field: 'email', existingUser: user };
-    } else if (user.username === username) {
-      return { isDuplicate: true, field: 'apelido', existingUser: user };
     }
   }
   return { isDuplicate: false, field: '' };
@@ -115,13 +112,13 @@ export const UsersManagement = () => {
       return;
     }
 
-    // Validate no duplicates in email or username
-    const duplicateCheck = checkDuplicateField(users, formData.email, formData.username, editingId);
+    // Validate no duplicates in email (username and name can be duplicated now)
+    const duplicateCheck = checkDuplicateField(users, formData.email, editingId);
     if (duplicateCheck.isDuplicate) {
-      console.warn('[UsersManagement] Duplicate field detected:', duplicateCheck);
+      console.warn('[UsersManagement] Duplicate email detected:', duplicateCheck);
       toast({
         title: 'Erro',
-        description: `Este ${duplicateCheck.field} já está registrado no sistema. Escolha um ${duplicateCheck.field} único.`,
+        description: 'Este email já está registrado no sistema. Escolha um email único.',
         variant: 'destructive',
       });
       setIsLoading(false);
