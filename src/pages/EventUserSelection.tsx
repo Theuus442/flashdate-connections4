@@ -181,8 +181,8 @@ export default function EventUserSelection() {
     } as const;
     const vote = voteMap[type];
 
-    // Use a placeholder event_id since we're not in a specific event yet
-    const eventId = 'default-event';
+    // Use null for event_id since we're not in a specific event yet
+    const eventId = null;
 
     if (existingSelection) {
       if (existingSelection.type === type) {
