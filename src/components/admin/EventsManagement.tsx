@@ -374,7 +374,9 @@ export const EventsManagement = () => {
       {/* Event Form or Display */}
       {isEditing ? (
         <div className="bg-card border border-border rounded-2xl p-8">
-          <h2 className="font-serif text-2xl font-bold text-foreground mb-6">Editar Próximo Evento</h2>
+          <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
+            {isCreating ? 'Criar Novo Evento' : 'Editar Próximo Evento'}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Image Upload Section */}
