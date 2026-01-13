@@ -31,7 +31,7 @@ const faqData = [
       },
       { 
         q: 'O speed dating é eficaz?', 
-        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No Flash Date, todos são solteiros verificados e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.' 
+        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No FlashDate, todos são solteiros verificados e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.' 
       },
       { 
         q: 'As pessoas realmente encontram relacionamentos sérios através do speed dating?', 
