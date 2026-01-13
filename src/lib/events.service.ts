@@ -201,27 +201,7 @@ export const eventsService = {
 
       if (error) throw error;
 
-      const transformedData: EventData = {
-        id: data.id,
-        title: data.title,
-        location: data.location,
-        city: data.city,
-        date: data.date,
-        nextDate: data.next_date,
-        schedule: data.schedule,
-        checkIn: data.check_in,
-        environment: data.environment,
-        music: data.music,
-        dressCode: data.dress_code,
-        parking: data.parking,
-        price: data.price,
-        description: data.description,
-        eventImage: data.event_image_url,
-        email: data.email,
-        whatsapp: data.whatsapp,
-        vagas: data.vagas?.toString() || '',
-        vagasLimitDate: data.vagas_limit_date,
-      };
+      const transformedData = transformEventData(data);
 
       return { data: transformedData, error: null };
     } catch (error) {
