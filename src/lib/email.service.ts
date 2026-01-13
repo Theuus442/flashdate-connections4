@@ -8,8 +8,15 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 const TEMPLATE_LGBT_SIGNUP = import.meta.env.VITE_EMAILJS_TEMPLATE_LGBT || '';
 const TEMPLATE_CONTACT_MESSAGE = import.meta.env.VITE_EMAILJS_TEMPLATE_CONTACT || '';
 
+// Validar credenciais
+if (!EMAILJS_SERVICE_ID || !EMAILJS_PUBLIC_KEY) {
+  console.warn('⚠️ Credenciais emailJS não configuradas. Por favor, adicione as variáveis de ambiente VITE_EMAILJS_SERVICE_ID e VITE_EMAILJS_PUBLIC_KEY');
+}
+
 // Inicializar emailJS
-emailjs.init(EMAILJS_PUBLIC_KEY);
+if (EMAILJS_PUBLIC_KEY) {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+}
 
 interface EmailParams {
   [key: string]: string | string[];
