@@ -133,13 +133,19 @@ export const EventsManagement = () => {
     }
   };
 
-  const handleImageLoadError = () => {
-    console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
+  const handleImageLoadError = (e: any) => {
+    console.error('[EventsManagement] Error loading event image:', {
+      url: eventData.eventImage,
+      error: e,
+    });
     setImageLoadError(true);
   };
 
-  const handlePreviewLoadError = () => {
-    console.error('[EventsManagement] Error loading preview image');
+  const handlePreviewLoadError = (e: any) => {
+    console.error('[EventsManagement] Error loading preview image:', {
+      url: imagePreview,
+      error: e,
+    });
     setPreviewLoadError(true);
   };
 
