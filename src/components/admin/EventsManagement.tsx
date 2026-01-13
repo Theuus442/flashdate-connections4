@@ -357,12 +357,17 @@ export const EventsManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-serif text-3xl font-bold text-foreground">Gerenciar Eventos</h1>
-          <p className="text-muted-foreground mt-2">Edite as informações do próximo evento</p>
+          <p className="text-muted-foreground mt-2">Crie e edite os eventos</p>
         </div>
         {!isEditing && (
-          <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
-            Editar Evento
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={handleCreateNew} disabled={isLoading}>
+              + Adicionar Evento
+            </Button>
+            <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
+              Editar Evento
+            </Button>
+          </div>
         )}
       </div>
 
