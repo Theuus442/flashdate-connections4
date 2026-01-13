@@ -673,6 +673,7 @@ interface MatchUser {
   profileImage?: string;
   email?: string;
   whatsapp?: string;
+  matchType: 'MATCH' | 'AMIZADE';
 }
 
 function MatchesTab({ userId }: { userId?: string }) {
@@ -702,6 +703,7 @@ function MatchesTab({ userId }: { userId?: string }) {
                 profileImage: matchedUser?.profileImage,
                 email: matchedUser?.email,
                 whatsapp: matchedUser?.whatsapp,
+                matchType: m.matchType,
               };
             });
 
@@ -737,7 +739,7 @@ function MatchesTab({ userId }: { userId?: string }) {
     <div className="max-w-4xl">
       <div className="mb-8">
         <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
-        <p className="text-muted-foreground mt-2">Pessoas com quem você teve match mútuo</p>
+        <p className="text-muted-foreground mt-2">Pessoas com quem você teve match ou amizade mútua</p>
       </div>
 
       {matches.length > 0 ? (
@@ -760,7 +762,9 @@ function MatchesTab({ userId }: { userId?: string }) {
                   <h3 className="font-serif text-xl font-bold text-foreground">
                     {match.name}
                   </h3>
-                  <p className="text-gold font-semibold text-sm">💕 Você deu match</p>
+                  <p className={`font-semibold text-sm ${match.matchType === 'MATCH' ? 'text-gold' : 'text-emerald'}`}>
+                    {match.matchType === 'MATCH' ? '💕 Você deu match' : '💫 Vocês são amigos'}
+                  </p>
                 </div>
               </div>
 

@@ -102,6 +102,43 @@ export default function EventUserSelection() {
     }
   }, [authUser, users]);
 
+  // Load existing selections from database on mount
+  useEffect(() => {
+    if (!authUser) return;
+
+    const loadSelections = async () => {
+      try {
+        console.log('[EventUserSelection] Loading existing selections from database...');
+        // Fetch all selections to check what the user already voted on
+        const { data: allSelections } = await selectionsService.getSelections();
+
+        if (allSelections) {
+          // Filter to only selections made by current user
+          const userSelections = allSelections.filter(s => s.userId === authUser.id);
+
+          // Convert database format to local format
+          const voteTypeMap: Record<string, 'match' | 'friendship' | 'no-interest'> = {
+            'SIM': 'match',
+            'TALVEZ': 'friendship',
+            'NÃO': 'no-interest'
+          };
+
+          const convertedSelections = userSelections.map(s => ({
+            userId: s.selectedUserId,
+            type: voteTypeMap[s.vote] as 'match' | 'friendship' | 'no-interest'
+          }));
+
+          console.log('[EventUserSelection] Found existing selections:', convertedSelections);
+          setSelections(convertedSelections);
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Error loading selections:', error);
+      }
+    };
+
+    loadSelections();
+  }, [authUser]);
+
   // Filter and sort participants based on current filters
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
@@ -181,6 +218,12 @@ export default function EventUserSelection() {
 
     const existingSelection = selections.find(s => s.userId === participantId);
 
+    // If already selected, don't allow changes (vote is locked)
+    if (existingSelection) {
+      toast.info('Seu voto já foi registrado e não pode ser alterado');
+      return;
+    }
+
     // Convert type to vote format for database
     const voteMap = {
       'match': 'SIM',
@@ -192,23 +235,9 @@ export default function EventUserSelection() {
     // Use null for event_id since we're not in a specific event yet
     const eventId = null;
 
-    if (existingSelection) {
-      if (existingSelection.type === type) {
-        // Remove if clicking same button
-        setSelections(selections.filter(s => s.userId !== participantId));
-        await selectionsService.removeSelection(eventId, authUser.id, participantId);
-      } else {
-        // Update if clicking different button
-        setSelections(selections.map(s =>
-          s.userId === participantId ? { ...s, type } : s
-        ));
-        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
-      }
-    } else {
-      // Add new selection
-      setSelections([...selections, { userId: participantId, type }]);
-      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
-    }
+    // Add new selection (only option when no existing selection)
+    setSelections([...selections, { userId: participantId, type }]);
+    await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
   };
 
   const handleFinish = async () => {
@@ -377,42 +406,48 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'match')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isMatched
-                            ? 'bg-rose-200 text-rose-900 hover:bg-rose-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <Heart className="w-4 h-4 mr-2" />
-                        Match
-                      </Button>
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'friendship')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isFriend
-                            ? 'bg-blue-200 text-blue-900 hover:bg-blue-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <Users className="w-4 h-4 mr-2" />
-                        Amizade
-                      </Button>
-                      <Button
-                        onClick={() => handleSelection(participant.id, 'no-interest')}
-                        className={`w-full py-2 text-sm font-medium transition-all ${
-                          isNoInterest
-                            ? 'bg-red-200 text-red-900 hover:bg-red-300'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                        variant="outline"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Sem Interesse
-                      </Button>
+                      {selection ? (
+                        // If already selected, show locked state
+                        <>
+                          <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
+                            <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground text-center italic">
+                            Seu voto está bloqueado e não pode ser alterado
+                          </p>
+                        </>
+                      ) : (
+                        // If not selected, show voting buttons
+                        <>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'match')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-rose-100 text-rose-900 hover:bg-rose-200 active:bg-rose-300"
+                            variant="outline"
+                          >
+                            <Heart className="w-4 h-4 mr-2" />
+                            Match
+                          </Button>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'friendship')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-blue-100 text-blue-900 hover:bg-blue-200 active:bg-blue-300"
+                            variant="outline"
+                          >
+                            <Users className="w-4 h-4 mr-2" />
+                            Amizade
+                          </Button>
+                          <Button
+                            onClick={() => handleSelection(participant.id, 'no-interest')}
+                            className="w-full py-2 text-sm font-medium transition-all bg-red-100 text-red-900 hover:bg-red-200 active:bg-red-300"
+                            variant="outline"
+                          >
+                            <X className="w-4 h-4 mr-2" />
+                            Sem Interesse
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
