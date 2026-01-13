@@ -298,49 +298,83 @@ export const selectionsService = {
   },
 
   /**
-   * Get mutual matches (where both users selected each other with SIM)
+   * Get mutual matches with priority rule:
+   * - SIM + SIM = MATCH
+   * - SIM + TALVEZ = AMIZADE (friendship has priority)
+   * - TALVEZ + SIM = AMIZADE
+   * - TALVEZ + TALVEZ = AMIZADE
+   * - Anything with NÃO = no match
    */
-  async getMutualMatches(): Promise<{ data: Array<{ userId: string; selectedUserId: string; createdAt: string }> | null; error: any }> {
+  async getMutualMatches(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
-      // Fetch all SIM selections
-      const { data: allSimSelections, error: queryError } = await supabase
+      // Fetch all selections (not just SIM)
+      const { data: allSelections, error: queryError } = await supabase
         .from('selections')
-        .select('id, user_id, selected_user_id, created_at')
-        .eq('vote', 'SIM')
+        .select('id, user_id, selected_user_id, vote, created_at')
+        .in('vote', ['SIM', 'TALVEZ'])
         .order('created_at', { ascending: false });
 
       if (queryError) throw queryError;
 
-      if (!allSimSelections || allSimSelections.length === 0) {
+      if (!allSelections || allSelections.length === 0) {
         return { data: [], error: null };
       }
 
-      // Find mutual matches: where A->B exists AND B->A exists
-      const mutualMatches: Array<{ userId: string; selectedUserId: string; createdAt: string }> = [];
+      // Build a map of votes: votesMap[userA][userB] = vote
+      type VotesMap = Record<string, Record<string, 'SIM' | 'TALVEZ'>>;
+      const votesMap: VotesMap = {};
+
+      for (const selection of allSelections) {
+        if (!votesMap[selection.user_id]) {
+          votesMap[selection.user_id] = {};
+        }
+        votesMap[selection.user_id][selection.selected_user_id] = selection.vote;
+      }
+
+      // Find mutual connections and apply priority rule
+      const mutualMatches: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> = [];
       const seen = new Set<string>();
 
-      for (const selection of allSimSelections) {
-        const pair = [selection.user_id, selection.selected_user_id].sort().join('|');
+      for (const selection of allSelections) {
+        const userA = selection.user_id;
+        const userB = selection.selected_user_id;
+        const pair = [userA, userB].sort().join('|');
 
+        // Skip if we already processed this pair
         if (seen.has(pair)) continue;
 
-        // Check if the reverse selection exists
-        const reverseExists = allSimSelections.some(
-          s => s.user_id === selection.selected_user_id && s.selected_user_id === selection.user_id
-        );
+        // Check if reverse selection exists
+        const voteAtoB = votesMap[userA]?.[userB];
+        const voteBtoA = votesMap[userB]?.[userA];
 
-        if (reverseExists) {
-          mutualMatches.push({
-            userId: selection.user_id,
-            selectedUserId: selection.selected_user_id,
-            createdAt: selection.created_at,
-          });
-          seen.add(pair);
+        if (!voteAtoB || !voteBtoA) {
+          // No mutual selection
+          continue;
         }
+
+        // Apply priority rule
+        let matchType: 'MATCH' | 'AMIZADE';
+
+        if (voteAtoB === 'SIM' && voteBtoA === 'SIM') {
+          // Both said SIM = MATCH
+          matchType = 'MATCH';
+        } else {
+          // One or both said TALVEZ = AMIZADE (friendship has priority)
+          matchType = 'AMIZADE';
+        }
+
+        mutualMatches.push({
+          userId: userA,
+          selectedUserId: userB,
+          matchType,
+          createdAt: selection.created_at,
+        });
+
+        seen.add(pair);
       }
 
       return { data: mutualMatches, error: null };
