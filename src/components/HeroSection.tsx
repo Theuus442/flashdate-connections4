@@ -32,8 +32,8 @@ export const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
-        {/* Large spacer to show cupid at top */}
-        <div className="h-48 sm:h-56 md:h-64 lg:h-80" />
+        {/* Spacer to show cupid at top */}
+        <div className="h-24 sm:h-32 md:h-40 lg:h-52" />
 
         <div className="container mx-auto px-4 sm:px-6 text-center w-full flex-1 flex items-center">
           <div className="max-w-2xl mx-auto w-full">
