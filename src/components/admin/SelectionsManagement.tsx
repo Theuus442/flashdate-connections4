@@ -208,7 +208,7 @@ export const SelectionsManagement = () => {
                     <span className="text-sm font-medium text-foreground truncate">
                       {user1?.name || 'Usuário desconhecido'}
                     </span>
-                    <span className="text-gold font-bold">↔️</span>
+                    <ArrowRightLeft size={18} className="text-gold flex-shrink-0" />
                     <span className="text-sm font-medium text-foreground truncate">
                       {user2?.name || 'Usuário desconhecido'}
                     </span>
