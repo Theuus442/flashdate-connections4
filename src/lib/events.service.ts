@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { storageService } from './storage.service';
+import { getProxiedUrl } from './url-proxy';
 
 export interface EventData {
   id: string;
