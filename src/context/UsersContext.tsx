@@ -63,10 +63,6 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         console.log('[UsersContext] Attempting to load users from Supabase...');
 
         // Set a longer timeout to account for retries (1s + 2s + 4s = 7s base, plus network latency)
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('User load timeout after 20 seconds')), 20000)
-        );
-
         const loadPromise = (async () => {
           try {
             const { data, error } = await usersService.getUsers();
