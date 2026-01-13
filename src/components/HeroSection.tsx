@@ -14,10 +14,15 @@ export const HeroSection = () => {
           className="w-full h-full object-cover"
           style={{
             objectPosition: 'center top',
-            filter: 'brightness(1.1) contrast(1.15)',
+            filter: 'brightness(1.25) contrast(1.2) saturate(1.1)',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/3 via-transparent to-black/15" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.15) 100%)'
+          }}
+        />
       </div>
 
       {/* Decorative Elements */}
