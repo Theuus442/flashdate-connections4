@@ -285,7 +285,10 @@ export const LGBTSection = () => {
                 <h3 className="font-serif text-xl font-bold text-foreground mb-4">4. Localização (Onde pretende participar) <span className="text-sm font-normal text-gold">*</span></h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Estado</label>
+                    <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                      <Search className="w-4 h-4" />
+                      Estado
+                    </label>
                     <Select value={formData.estado} onValueChange={handleEstadoChange} disabled={loadingEstados}>
                       <SelectTrigger>
                         <SelectValue placeholder={loadingEstados ? "Carregando..." : "Selecione o estado"} />
