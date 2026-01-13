@@ -179,10 +179,11 @@ export const EventsManagement = () => {
         );
 
         if (error) {
-          console.error('[EventsManagement] Error updating event:', error);
+          const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+          console.error('[EventsManagement] Error updating event:', errorMsg);
           toast({
             title: 'Erro',
-            description: 'Falha ao atualizar evento',
+            description: `Falha ao atualizar evento: ${errorMsg}`,
             variant: 'destructive',
           });
           return;
