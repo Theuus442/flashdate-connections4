@@ -29,9 +29,9 @@ const faqData = [
         q: 'Quantos encontros terei num evento Speed Dating?', 
         a: 'O número de encontros e com quem você conversará são definidos por Inteligência Artificial (IA), que determina o tempo de interação com base na compatibilidade. Os fatores que influenciam são: Número de Participantes (mínimo 10 homens e 10 mulheres) e Grau de Compatibilidade (definido por IA). Portanto, você não conversará necessariamente com todos os participantes do sexo oposto, mas sim com aqueles que a IA identificou como seus pares mais compatíveis.' 
       },
-      { 
-        q: 'O speed dating é eficaz?', 
-        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No FlashDate, todos são solteiros verificados e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.' 
+      {
+        q: 'O speed dating é eficaz?',
+        a: 'Sim, o Speed Dating é altamente eficaz e superior às alternativas. Diferente dos aplicativos, que visam o lucro e se baseiam na aparência, o Flashdate foca na compatibilidade e conexão real, usando IA para triagem e garantindo perfis com alto potencial de afinidade. Em baladas e bares, o alto ruído e a dificuldade de iniciar conversas atrapalham, além do risco de se aproximar de alguém já comprometido, gerando desconforto. No Flashdate, todos são solteiros e prontos para conversar, permitindo que você conheça várias pessoas compatíveis em um ambiente tranquilo e seguro em uma única noite.'
       },
       { 
         q: 'As pessoas realmente encontram relacionamentos sérios através do speed dating?', 
