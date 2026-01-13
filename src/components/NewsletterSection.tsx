@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { sendContactEmail } from '@/lib/email.service';
 
 export const NewsletterSection = () => {
   const [formData, setFormData] = useState({
