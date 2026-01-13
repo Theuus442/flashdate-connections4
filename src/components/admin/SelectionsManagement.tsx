@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useUsers } from '@/context/UsersContext';
-import { Heart, Users, X } from 'lucide-react';
+import { Heart, Users, X, Zap } from 'lucide-react';
 import { selectionsService } from '@/lib/selections.service';
 import { Selection } from '@/context/SelectionsContext';
+
+interface MutualMatch {
+  userId: string;
+  selectedUserId: string;
+  createdAt: string;
+}
 
 export const SelectionsManagement = () => {
   const { users } = useUsers();
   const [selections, setSelections] = useState<Selection[]>([]);
+  const [mutualMatches, setMutualMatches] = useState<MutualMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load all selections from database on mount
@@ -14,16 +21,27 @@ export const SelectionsManagement = () => {
     const loadSelections = async () => {
       setIsLoading(true);
       try {
-        const { data, error } = await selectionsService.getSelections();
-        if (error) {
-          console.error('Error loading selections:', error);
+        // Load all selections
+        const { data: selectionsData, error: selectionsError } = await selectionsService.getSelections();
+        if (selectionsError) {
+          console.error('Error loading selections:', selectionsError);
           setSelections([]);
-        } else if (data) {
-          setSelections(data);
+        } else if (selectionsData) {
+          setSelections(selectionsData);
+        }
+
+        // Load mutual matches
+        const { data: mutualData, error: mutualError } = await selectionsService.getMutualMatches();
+        if (mutualError) {
+          console.error('Error loading mutual matches:', mutualError);
+          setMutualMatches([]);
+        } else if (mutualData) {
+          setMutualMatches(mutualData);
         }
       } catch (error) {
-        console.error('Error loading selections:', error);
+        console.error('Error loading data:', error);
         setSelections([]);
+        setMutualMatches([]);
       } finally {
         setIsLoading(false);
       }
