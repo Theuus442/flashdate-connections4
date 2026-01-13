@@ -703,6 +703,7 @@ function MatchesTab({ userId }: { userId?: string }) {
                 profileImage: matchedUser?.profileImage,
                 email: matchedUser?.email,
                 whatsapp: matchedUser?.whatsapp,
+                matchType: m.matchType,
               };
             });
 
