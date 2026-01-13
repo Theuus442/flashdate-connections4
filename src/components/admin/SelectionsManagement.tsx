@@ -196,12 +196,12 @@ export const SelectionsManagement = () => {
             {mutualMatches.length} par{mutualMatches.length !== 1 ? 'es de' : ''} pessoas encontraram um ao outro! 💕
           </p>
           <div className="grid md:grid-cols-2 gap-3">
-            {mutualMatches.map((match, idx) => {
+            {mutualMatches.map((match) => {
               const user1 = users.find(u => u.id === match.userId);
               const user2 = users.find(u => u.id === match.selectedUserId);
               return (
                 <div
-                  key={idx}
+                  key={`${match.userId}-${match.selectedUserId}`}
                   className="flex items-center justify-between p-3 rounded-lg bg-card border border-gold/30 hover:border-gold/50 transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
