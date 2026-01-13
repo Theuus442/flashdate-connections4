@@ -513,16 +513,39 @@ export const EventsManagement = () => {
               </div>
 
               {/* City */}
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-foreground mb-2">Cidade</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  placeholder="Cidade, Estado"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="city"
+                    value={citySearchInput || formData.city}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        city: e.target.value,
+                      }));
+                      handleCitySearch(e.target.value);
+                    }}
+                    onFocus={() => citySearchInput.length >= 2 && setShowCitySuggestions(true)}
+                    placeholder="Digite o nome da cidade"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                  />
+                  {showCitySuggestions && cities.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                      {cities.slice(0, 10).map((city) => (
+                        <button
+                          key={city.id}
+                          type="button"
+                          onClick={() => handleCitySelect(city.nome)}
+                          className="w-full text-left px-4 py-2 hover:bg-muted/50 focus:bg-muted/50 outline-none transition-colors border-b border-border last:border-b-0"
+                        >
+                          {city.nome}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Date */}
@@ -542,11 +565,16 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Próxima Data</label>
                 <input
-                  type="text"
+                  type="date"
                   name="nextDate"
-                  value={formData.nextDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/AAAA"
+                  value={formatDate(formData.nextDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateToDisplay(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      nextDate: formatted,
+                    }));
+                  }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -646,11 +674,12 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Vagas</label>
                 <input
-                  type="text"
+                  type="number"
                   name="vagas"
                   value={formData.vagas}
                   onChange={handleInputChange}
-                  placeholder="(1)"
+                  placeholder="0"
+                  min="0"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
@@ -659,11 +688,16 @@ export const EventsManagement = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Data Limite de Vagas</label>
                 <input
-                  type="text"
+                  type="date"
                   name="vagasLimitDate"
-                  value={formData.vagasLimitDate}
-                  onChange={handleInputChange}
-                  placeholder="DD/MM/AAAA"
+                  value={formatDate(formData.vagasLimitDate)}
+                  onChange={(e) => {
+                    const formatted = formatDateToDisplay(e.target.value);
+                    setFormData(prev => ({
+                      ...prev,
+                      vagasLimitDate: formatted,
+                    }));
+                  }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>
