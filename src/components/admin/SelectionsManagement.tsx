@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useUsers } from '@/context/UsersContext';
-import { Heart, Users, X, Zap } from 'lucide-react';
+import { Heart, Users, X, Zap, ArrowRightLeft } from 'lucide-react';
 import { selectionsService } from '@/lib/selections.service';
 import { Selection } from '@/context/SelectionsContext';
 
