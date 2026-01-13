@@ -165,6 +165,8 @@ export const EventsManagement = () => {
   const handleCancel = () => {
     setFormData(eventData);
     setImagePreview(eventData.eventImage);
+    setImageLoadError(false);
+    setPreviewLoadError(false);
     setSelectedImageFile(null);
     setIsEditing(false);
   };
