@@ -59,6 +59,7 @@ export const EventsManagement = () => {
   const supabaseConfigured = isSupabaseConfigured();
   const [eventData, setEventData] = useState<EventData>(defaultEventData);
   const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<EventData>(eventData);
   const [imagePreview, setImagePreview] = useState(eventData.eventImage);
   const [isLoading, setIsLoading] = useState(false);
