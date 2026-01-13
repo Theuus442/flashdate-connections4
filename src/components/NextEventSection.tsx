@@ -74,7 +74,7 @@ export const NextEventSection = () => {
               {/* Venue Image */}
               <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
                 <img
-                  src={getProxiedUrl(event.eventImage) || venueImage}
+                  src={event.eventImage || venueImage}
                   alt={event.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
