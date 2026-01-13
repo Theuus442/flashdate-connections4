@@ -59,7 +59,14 @@ export const SelectionsManagement = () => {
   };
 
   const getSelectionsByVote = (vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
-    return selections.filter(s => s.vote === vote).map(s => ({
+    let filtered = selections.filter(s => s.vote === vote);
+
+    // If a user is selected, only show their selections
+    if (selectedUserId) {
+      filtered = filtered.filter(s => s.userId === selectedUserId);
+    }
+
+    return filtered.map(s => ({
       selectedUserId: s.selectedUserId,
       vote: s.vote,
       userId: s.userId,
