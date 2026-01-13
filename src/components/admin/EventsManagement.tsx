@@ -446,9 +446,12 @@ export const EventsManagement = () => {
           {/* Image */}
           <div>
             <img
-              src={eventData.eventImage}
+              src={getProxiedUrl(eventData.eventImage)}
               alt={eventData.title}
               className="w-full h-96 object-cover rounded-2xl border border-border"
+              onError={(e) => {
+                console.error('[EventsManagement] Error loading event image:', eventData.eventImage);
+              }}
             />
           </div>
 
