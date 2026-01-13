@@ -93,9 +93,9 @@ export const LGBTSection = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.nome || !formData.email || !formData.estado || !formData.cidade) {
       toast.error('Por favor, preencha todos os campos obrigatórios');
       return;
@@ -116,18 +116,25 @@ export const LGBTSection = () => {
       return;
     }
 
-    toast.success('Cadastro realizado com sucesso! Entraremos em contato em breve.');
-    setFormData({
-      nome: '',
-      email: '',
-      whatsapp: '',
-      identidadeGenero: '',
-      orientacao: '',
-      generoBusca: [],
-      estado: '',
-      cidade: '',
-    });
-    setCidadesDisponiveis([]);
+    try {
+      await sendLGBTSignupEmail(formData);
+
+      toast.success('Cadastro realizado com sucesso! Entraremos em contato em breve.');
+      setFormData({
+        nome: '',
+        email: '',
+        whatsapp: '',
+        identidadeGenero: '',
+        orientacao: '',
+        generoBusca: [],
+        estado: '',
+        cidade: '',
+      });
+      setMunicipios([]);
+    } catch (error) {
+      toast.error('Erro ao enviar cadastro. Tente novamente.');
+      console.error('Erro:', error);
+    }
   };
 
   return (
