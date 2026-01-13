@@ -291,14 +291,6 @@ export default function EventUserSelection() {
           <div className="bg-muted/30 rounded-xl p-6 mb-8 border border-border">
             <h3 className="text-sm font-semibold text-foreground mb-4">Filtros</h3>
 
-            {/* Auto Gender Filter Info */}
-            <div className="mb-6 p-4 rounded-lg bg-gold/10 border border-gold/30">
-              <p className="text-sm text-foreground font-medium mb-2">🔒 Filtro de Gênero Automático</p>
-              <p className="text-xs text-muted-foreground">
-                Você está vendo apenas participantes do gênero <span className="font-semibold text-foreground">{getGenderLabel(currentUser?.gender || 'Outro')}</span>
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Sort By */}
               <div className="flex flex-col gap-2">
