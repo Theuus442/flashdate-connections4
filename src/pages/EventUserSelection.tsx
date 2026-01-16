@@ -217,13 +217,13 @@ export default function EventUserSelection() {
   const handleSelection = async (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
     if (!authUser) return;
 
-    const existingSelection = selections.find(s => s.userId === participantId);
-
-    // If already selected, don't allow changes (vote is locked)
-    if (existingSelection) {
-      toast.info('Seu voto já foi registrado e não pode ser alterado');
+    // If finalized, don't allow any changes
+    if (isFinalized) {
+      toast.info('Seu voto está bloqueado e não pode ser alterado');
       return;
     }
+
+    const existingSelection = selections.find(s => s.userId === participantId);
 
     // Convert type to vote format for database
     const voteMap = {
@@ -236,9 +236,20 @@ export default function EventUserSelection() {
     // Use null for event_id since we're not in a specific event yet
     const eventId = null;
 
-    // Add new selection (only option when no existing selection)
-    setSelections([...selections, { userId: participantId, type }]);
-    await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+    // If selection already exists, update it; otherwise add new
+    if (existingSelection) {
+      if (existingSelection.type !== type) {
+        // Update the selection to the new type
+        setSelections(selections.map(s =>
+          s.userId === participantId ? { ...s, type } : s
+        ));
+        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
+      }
+    } else {
+      // Add new selection
+      setSelections([...selections, { userId: participantId, type }]);
+      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+    }
   };
 
   const handleFinish = async () => {
