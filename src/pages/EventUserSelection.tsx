@@ -259,11 +259,16 @@ export default function EventUserSelection() {
     }
 
     try {
+      // Mark selections as finalized
+      setIsFinalized(true);
+
       const matchCount = selections.filter(s => s.type === 'match').length;
       const friendshipCount = selections.filter(s => s.type === 'friendship').length;
 
       toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
-      navigate('/dashboard');
+
+      // Delay navigation slightly to allow the toast to be seen
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error('Error finishing selections:', errorMsg);
