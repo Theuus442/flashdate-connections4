@@ -22,6 +22,7 @@ export default function EventUserSelection() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'original'>('original');
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F' | 'Outro'>('all');
+  const [isFinalized, setIsFinalized] = useState(false);
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
@@ -216,13 +217,13 @@ export default function EventUserSelection() {
   const handleSelection = async (participantId: string, type: 'match' | 'friendship' | 'no-interest') => {
     if (!authUser) return;
 
-    const existingSelection = selections.find(s => s.userId === participantId);
-
-    // If already selected, don't allow changes (vote is locked)
-    if (existingSelection) {
-      toast.info('Seu voto já foi registrado e não pode ser alterado');
+    // If finalized, don't allow any changes
+    if (isFinalized) {
+      toast.info('Seu voto está bloqueado e não pode ser alterado');
       return;
     }
+
+    const existingSelection = selections.find(s => s.userId === participantId);
 
     // Convert type to vote format for database
     const voteMap = {
@@ -235,9 +236,20 @@ export default function EventUserSelection() {
     // Use null for event_id since we're not in a specific event yet
     const eventId = null;
 
-    // Add new selection (only option when no existing selection)
-    setSelections([...selections, { userId: participantId, type }]);
-    await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+    // If selection already exists, update it; otherwise add new
+    if (existingSelection) {
+      if (existingSelection.type !== type) {
+        // Update the selection to the new type
+        setSelections(selections.map(s =>
+          s.userId === participantId ? { ...s, type } : s
+        ));
+        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
+      }
+    } else {
+      // Add new selection
+      setSelections([...selections, { userId: participantId, type }]);
+      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+    }
   };
 
   const handleFinish = async () => {
@@ -247,11 +259,16 @@ export default function EventUserSelection() {
     }
 
     try {
+      // Mark selections as finalized
+      setIsFinalized(true);
+
       const matchCount = selections.filter(s => s.type === 'match').length;
       const friendshipCount = selections.filter(s => s.type === 'friendship').length;
 
       toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
-      navigate('/dashboard');
+
+      // Delay navigation slightly to allow the toast to be seen
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error('Error finishing selections:', errorMsg);
@@ -406,8 +423,8 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      {selection ? (
-                        // If already selected, show locked state
+                      {selection && isFinalized ? (
+                        // If finalized, show locked state
                         <>
                           <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
                             <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
@@ -420,11 +437,15 @@ export default function EventUserSelection() {
                           </p>
                         </>
                       ) : (
-                        // If not selected, show voting buttons
+                        // If not finalized, show voting buttons (allow changes before finalization)
                         <>
                           <Button
                             onClick={() => handleSelection(participant.id, 'match')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-rose-100 text-rose-900 hover:bg-rose-200 active:bg-rose-300"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'match'
+                                ? 'bg-rose-200 text-rose-900 hover:bg-rose-300 border-2 border-rose-400'
+                                : 'bg-rose-100 text-rose-900 hover:bg-rose-200'
+                            }`}
                             variant="outline"
                           >
                             <Heart className="w-4 h-4 mr-2" />
@@ -432,7 +453,11 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'friendship')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-blue-100 text-blue-900 hover:bg-blue-200 active:bg-blue-300"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'friendship'
+                                ? 'bg-blue-200 text-blue-900 hover:bg-blue-300 border-2 border-blue-400'
+                                : 'bg-blue-100 text-blue-900 hover:bg-blue-200'
+                            }`}
                             variant="outline"
                           >
                             <Users className="w-4 h-4 mr-2" />
@@ -440,7 +465,11 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'no-interest')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-red-100 text-red-900 hover:bg-red-200 active:bg-red-300"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'no-interest'
+                                ? 'bg-red-200 text-red-900 hover:bg-red-300 border-2 border-red-400'
+                                : 'bg-red-100 text-red-900 hover:bg-red-200'
+                            }`}
                             variant="outline"
                           >
                             <X className="w-4 h-4 mr-2" />
