@@ -297,8 +297,14 @@ export default function EventUserSelection() {
     try {
       setIsFinalizingSelections(true);
 
+      // If no event ID, use a default/global event ID for finalization tracking
+      // This allows us to persist finalization status even without a specific event
+      const eventIdForFinalization = currentEventId || '00000000-0000-0000-0000-000000000000';
+
+      console.log('[EventUserSelection] Finalizing with event ID:', eventIdForFinalization);
+
       // Call finalization service
-      const result = await finalizationService.finalizeUserSelections(currentEventId, authUser?.id || '');
+      const result = await finalizationService.finalizeUserSelections(eventIdForFinalization, authUser?.id || '');
 
       if (!result.success) {
         toast.error(result.message);
