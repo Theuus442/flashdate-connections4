@@ -751,10 +751,9 @@ export const EventsManagement = () => {
                   name="vagasLimitDate"
                   value={formatDate(formData.vagasLimitDate)}
                   onChange={(e) => {
-                    const formatted = formatDateToDisplay(e.target.value);
                     setFormData(prev => ({
                       ...prev,
-                      vagasLimitDate: formatted,
+                      vagasLimitDate: e.target.value,
                     }));
                   }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
