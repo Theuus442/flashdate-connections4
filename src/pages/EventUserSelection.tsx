@@ -248,7 +248,7 @@ export default function EventUserSelection() {
 
     // If finalized, don't allow any changes
     if (isFinalized) {
-      toast.info('Seu voto está bloqueado e não pode ser alterado');
+      toast.error('Suas seleções foram finalizadas e não podem ser alteradas');
       return;
     }
 
@@ -273,11 +273,13 @@ export default function EventUserSelection() {
           s.userId === participantId ? { ...s, type } : s
         ));
         await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
+        toast.success('Seleção atualizada');
       }
     } else {
       // Add new selection
       setSelections([...selections, { userId: participantId, type }]);
       await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+      toast.success('Seleção registrada');
     }
   };
 
