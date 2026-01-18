@@ -25,20 +25,20 @@ CREATE POLICY "Users can update selections if not finalized"
   ON selections
   FOR UPDATE
   USING (
-    auth.uid()::text = user_id
+    auth.uid() = user_id
     AND NOT EXISTS (
       SELECT 1 FROM event_participants
       WHERE event_id = selections.event_id
-      AND user_id = auth.uid()::text
+      AND user_id = auth.uid()
       AND finalizado = true
     )
   )
   WITH CHECK (
-    auth.uid()::text = user_id
+    auth.uid() = user_id
     AND NOT EXISTS (
       SELECT 1 FROM event_participants
       WHERE event_id = selections.event_id
-      AND user_id = auth.uid()::text
+      AND user_id = auth.uid()
       AND finalizado = true
     )
   );
@@ -49,11 +49,11 @@ CREATE POLICY "Users can delete selections if not finalized"
   ON selections
   FOR DELETE
   USING (
-    auth.uid()::text = user_id
+    auth.uid() = user_id
     AND NOT EXISTS (
       SELECT 1 FROM event_participants
       WHERE event_id = selections.event_id
-      AND user_id = auth.uid()::text
+      AND user_id = auth.uid()
       AND finalizado = true
     )
   );
@@ -68,7 +68,7 @@ CREATE POLICY "Users can update profile if not finalized in any event"
     auth.uid() = id
     AND NOT EXISTS (
       SELECT 1 FROM event_participants
-      WHERE user_id = auth.uid()::text
+      WHERE user_id = auth.uid()
       AND finalizado = true
     )
   )
@@ -76,7 +76,7 @@ CREATE POLICY "Users can update profile if not finalized in any event"
     auth.uid() = id
     AND NOT EXISTS (
       SELECT 1 FROM event_participants
-      WHERE user_id = auth.uid()::text
+      WHERE user_id = auth.uid()
       AND finalizado = true
     )
   );
