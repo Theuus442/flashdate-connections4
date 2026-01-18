@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Selection } from '@/context/SelectionsContext';
+import { finalizationService } from './finalization.service';
 
 /**
  * Check if a string is a valid UUID v4
@@ -152,6 +153,7 @@ export const selectionsService = {
   /**
    * Add selection (event_id can be null)
    * First checks if selection already exists and removes it to avoid duplicates
+   * Also checks if user is finalized - if so, prevents the addition
    */
   async addSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
     // Return local selection object as fallback (always works, even without Supabase)
@@ -168,6 +170,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot add selection: user is finalized');
+          return { data: null, error: 'User is finalized and cannot make new selections' };
+        }
+      }
+
       console.log('[selectionsService] Adding selection:', { eventId, userId, selectedUserId, vote });
 
       // First, remove any existing selection for this user->selectedUser pair to avoid duplicates when event_id is null
@@ -224,6 +235,7 @@ export const selectionsService = {
 
   /**
    * Update selection (change vote) - event_id can be null
+   * Checks if user is finalized - if so, prevents the update
    */
   async updateSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
     // Return local selection object as fallback (always works, even without Supabase)
@@ -240,6 +252,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot update selection: user is finalized');
+          return { data: null, error: 'User is finalized and cannot modify selections' };
+        }
+      }
+
       console.log('[selectionsService] Updating selection:', { eventId, userId, selectedUserId, vote });
 
       // Build query
@@ -282,6 +303,7 @@ export const selectionsService = {
 
   /**
    * Remove selection (event_id can be null)
+   * Checks if user is finalized - if so, prevents the deletion
    */
   async removeSelection(eventId: string | null, userId: string, selectedUserId: string): Promise<{ error: any }> {
     if (!isSupabaseConfigured()) {
@@ -290,6 +312,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot remove selection: user is finalized');
+          return { error: 'User is finalized and cannot delete selections' };
+        }
+      }
+
       console.log('[selectionsService] Removing selection:', { eventId, userId, selectedUserId });
 
       // Build query

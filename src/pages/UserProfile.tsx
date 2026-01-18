@@ -7,6 +7,9 @@ import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
 import { useAuth } from '@/context/AuthContext';
 import { eventsService } from '@/lib/events.service';
+import { finalizationService } from '@/lib/finalization.service';
+import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
+import FinalizedProfileBadge, { FinalizedStatusCard } from '@/components/FinalizedProfileBadge';
 
 export default function UserProfile() {
   const navigate = useNavigate();
@@ -62,6 +65,21 @@ export default function UserProfile() {
     }
   }, [currentUser, currentEventId, setCurrentUserId, setCurrentEventId]);
 
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!authUser || !currentEventId) {
+        setIsUserFinalized(false);
+        return;
+      }
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, authUser.id);
+      setIsUserFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, currentEventId]);
+
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
@@ -69,6 +87,9 @@ export default function UserProfile() {
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUserFinalized, setIsUserFinalized] = useState(false);
+  const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
+  const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
 
   // Filter and sort users excluding the current user and admins
   const otherUsers = useMemo(() => {
@@ -136,11 +157,66 @@ export default function UserProfile() {
 
   const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!currentUser || !currentEventId) return;
+
+    // Check if user is finalized
+    if (isUserFinalized) {
+      toast.info('Seu perfil está consolidado e não pode ser alterado');
+      return;
+    }
+
     try {
       await updateSelection(currentEventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
+    }
+  };
+
+  const handleFinalize = () => {
+    // Check if user has made at least one selection
+    if (allSelections.length === 0) {
+      toast.error('Faça pelo menos uma seleção antes de finalizar');
+      return;
+    }
+
+    // Show finalization confirmation dialog
+    setShowFinalizationDialog(true);
+  };
+
+  const handleConfirmFinalization = async () => {
+    if (!currentUser || !currentEventId) {
+      toast.error('Erro: Evento não carregado');
+      return;
+    }
+
+    try {
+      setIsFinalizingSelections(true);
+
+      // Call finalization service
+      const result = await finalizationService.finalizeUserSelections(currentEventId, currentUser.id);
+
+      if (!result.success) {
+        toast.error(result.message);
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Update local state
+      setIsUserFinalized(true);
+
+      const matchesCount = getSelectionsByVote('SIM').length;
+      const talvezCount = getSelectionsByVote('TALVEZ').length;
+
+      toast.success(`✓ Seleções finalizadas! ${matchesCount} match(es) e ${talvezCount} amizade(s)`);
+
+      // Close dialog
+      setShowFinalizationDialog(false);
+      setIsFinalizingSelections(false);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('Error finalizing selections:', errorMsg);
+      toast.error('Erro ao finalizar seleções');
+      setIsFinalizingSelections(false);
     }
   };
 
@@ -196,6 +272,9 @@ export default function UserProfile() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              {isUserFinalized && (
+                <FinalizedProfileBadge size="sm" />
+              )}
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
               </span>
@@ -212,6 +291,16 @@ export default function UserProfile() {
           </div>
         </div>
       </header>
+
+      {/* Finalization Dialog */}
+      <FinalizationConfirmDialog
+        open={showFinalizationDialog}
+        onOpenChange={setShowFinalizationDialog}
+        onConfirm={handleConfirmFinalization}
+        isLoading={isFinalizingSelections}
+        matchCount={getSelectionsByVote('SIM').length}
+        friendshipCount={getSelectionsByVote('TALVEZ').length}
+      />
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
@@ -325,53 +414,70 @@ export default function UserProfile() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
-                          <button
-                            onClick={() => handleSelection(user.id, 'SIM')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'SIM'
-                                ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "SIM" : "Nenhum evento disponível"}
-                          >
-                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'TALVEZ')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'TALVEZ'
-                                ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
-                          >
-                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'NÃO')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'NÃO'
-                                ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
-                          >
-                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
-                          </button>
-                        </div>
+                        {isUserFinalized ? (
+                          <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
+                            {selection ? (
+                              <div className="flex-1 text-center">
+                                <p className="text-xs font-medium text-gold mb-1">Voto Registrado</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {selection.vote === 'SIM' ? '💕 Match' : selection.vote === 'TALVEZ' ? '👥 Amizade' : '❌ Sem Interesse'}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex-1 text-center">
+                                <p className="text-xs text-muted-foreground">Sem voto</p>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
+                            <button
+                              onClick={() => handleSelection(user.id, 'SIM')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'SIM'
+                                  ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "SIM" : "Nenhum evento disponível"}
+                            >
+                              <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
+                            </button>
+                            <button
+                              onClick={() => handleSelection(user.id, 'TALVEZ')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'TALVEZ'
+                                  ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
+                            >
+                              <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
+                            </button>
+                            <button
+                              onClick={() => handleSelection(user.id, 'NÃO')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'NÃO'
+                                  ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
+                            >
+                              <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* Contact Info Below Actions */}
@@ -405,7 +511,10 @@ export default function UserProfile() {
 
           {/* Profile View */}
           {activeTab === 'profile' && (
-            <div className="max-w-2xl mx-auto w-full">
+            <div className="max-w-2xl mx-auto w-full space-y-8">
+              {isUserFinalized && (
+                <FinalizedStatusCard />
+              )}
               <div className="bg-card border border-border rounded-2xl p-8">
                 {/* Profile Image Section */}
                 <div className="mb-8">
@@ -434,15 +543,22 @@ export default function UserProfile() {
                     </div>
                   )}
 
-                  <label className="flex items-center justify-center w-full max-w-sm mx-auto px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
+                  <label className={`flex items-center justify-center w-full max-w-sm mx-auto px-4 py-3 border-2 border-dashed border-border rounded-lg transition-colors ${
+                    isUserFinalized
+                      ? 'opacity-50 cursor-not-allowed bg-muted/20'
+                      : 'cursor-pointer hover:border-gold bg-muted/30'
+                  }`}>
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <Camera className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-foreground">Adicionar foto</span>
+                      <span className="font-medium text-foreground">
+                        {isUserFinalized ? 'Fotos travadas' : 'Adicionar foto'}
+                      </span>
                     </div>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
+                      disabled={isUserFinalized}
                       className="hidden"
                     />
                   </label>
@@ -495,7 +611,7 @@ export default function UserProfile() {
                   </div>
 
                   {/* Stats */}
-                  <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
+                  <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4 mb-8">
                     <div className="text-center">
                       <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">SIM</p>
                       <p className="text-3xl font-bold text-gold">{matchCount}</p>
@@ -509,6 +625,19 @@ export default function UserProfile() {
                       <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
                     </div>
                   </div>
+
+                  {/* Finalize Button */}
+                  {!isUserFinalized && allSelections.length > 0 && (
+                    <div className="pt-8 border-t border-border">
+                      <Button
+                        onClick={handleFinalize}
+                        variant="hero"
+                        className="w-full py-3"
+                      >
+                        Finalizar Seleções
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

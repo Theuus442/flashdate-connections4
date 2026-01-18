@@ -7,6 +7,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { User } from '@/context/UsersContext';
 import { selectionsService } from '@/lib/selections.service';
+import { finalizationService } from '@/lib/finalization.service';
+import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
+import FinalizedProfileBadge from '@/components/FinalizedProfileBadge';
 
 interface Selection {
   userId: string;
@@ -23,6 +26,9 @@ export default function EventUserSelection() {
   const [sortBy, setSortBy] = useState<'name' | 'original'>('original');
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F' | 'Outro'>('all');
   const [isFinalized, setIsFinalized] = useState(false);
+  const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
+  const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
+  const [currentEventId] = useState<string | null>(null); // Will be loaded from context if needed
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
@@ -252,27 +258,47 @@ export default function EventUserSelection() {
     }
   };
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
     if (selections.length === 0) {
       toast.error('Faça pelo menos uma seleção antes de finalizar');
       return;
     }
 
+    // Show finalization confirmation dialog
+    setShowFinalizationDialog(true);
+  };
+
+  const handleConfirmFinalization = async () => {
     try {
-      // Mark selections as finalized
+      setIsFinalizingSelections(true);
+
+      // Call finalization service
+      const result = await finalizationService.finalizeUserSelections(currentEventId, authUser?.id || '');
+
+      if (!result.success) {
+        toast.error(result.message);
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Mark selections as finalized locally
       setIsFinalized(true);
 
       const matchCount = selections.filter(s => s.type === 'match').length;
       const friendshipCount = selections.filter(s => s.type === 'friendship').length;
 
-      toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
+      toast.success(`✓ Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
+
+      // Close dialog
+      setShowFinalizationDialog(false);
 
       // Delay navigation slightly to allow the toast to be seen
       setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error('Error finishing selections:', errorMsg);
+      console.error('Error finalizing selections:', errorMsg);
       toast.error('Erro ao finalizar seleções');
+      setIsFinalizingSelections(false);
     }
   };
 
@@ -313,6 +339,9 @@ export default function EventUserSelection() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              {isFinalized && (
+                <FinalizedProfileBadge size="sm" />
+              )}
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{currentUser?.name || 'Usuário'}</span>
               </span>
@@ -320,6 +349,16 @@ export default function EventUserSelection() {
           </div>
         </div>
       </header>
+
+      {/* Finalization Dialog */}
+      <FinalizationConfirmDialog
+        open={showFinalizationDialog}
+        onOpenChange={setShowFinalizationDialog}
+        onConfirm={handleConfirmFinalization}
+        isLoading={isFinalizingSelections}
+        matchCount={selections.filter(s => s.type === 'match').length}
+        friendshipCount={selections.filter(s => s.type === 'friendship').length}
+      />
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
@@ -484,23 +523,45 @@ export default function EventUserSelection() {
             })}
           </div>
 
-          {/* Finish Button */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-muted-foreground">Seleções feitas</p>
-              <p className="text-2xl font-bold text-foreground">
-                {matchCount} <span className="text-rose-500">♥</span> {friendshipCount} <span className="text-blue-500">👥</span>
+          {/* Finish Button Section */}
+          {isFinalized ? (
+            <div className="mt-8 p-6 bg-gradient-to-r from-gold/10 to-gold-dark/5 border-2 border-gold rounded-2xl text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 bg-gold/20 rounded-full">
+                  <Heart className="w-6 h-6 text-gold" />
+                </div>
+              </div>
+              <h3 className="font-serif text-xl font-bold text-foreground mb-2">Perfil Consolidado</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Suas seleções foram finalizadas com sucesso. Seus dados estão agora protegidos contra modificações.
               </p>
+              <div className="space-y-2">
+                <div className="text-sm">
+                  <p className="text-muted-foreground mb-1">Seu resumo:</p>
+                  <p className="font-bold text-lg text-foreground">
+                    {matchCount} <span className="text-rose-500">♥</span> Match(es) · {friendshipCount} <span className="text-blue-500">👥</span> Amizade(s)
+                  </p>
+                </div>
+              </div>
             </div>
-            <Button
-              onClick={handleFinish}
-              variant="hero"
-              className="px-8 py-3 text-base"
-              disabled={selections.length === 0}
-            >
-              Finalizar Seleção ({selections.length})
-            </Button>
-          </div>
+          ) : (
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-center sm:text-left">
+                <p className="text-sm text-muted-foreground">Seleções feitas</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {matchCount} <span className="text-rose-500">♥</span> {friendshipCount} <span className="text-blue-500">👥</span>
+                </p>
+              </div>
+              <Button
+                onClick={handleFinish}
+                variant="hero"
+                className="px-8 py-3 text-base"
+                disabled={selections.length === 0}
+              >
+                Finalizar Seleção ({selections.length})
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
