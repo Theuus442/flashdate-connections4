@@ -17,6 +17,53 @@ export interface FinalizationResult {
  * Service to manage user finalization status for events
  * Once finalized, users cannot modify their profile, votes, or selections
  */
+/**
+ * Special event ID used for global finalization (not tied to a specific event)
+ */
+const GLOBAL_EVENT_ID = '00000000-0000-0000-0000-000000000000';
+
+/**
+ * Ensure the global event exists in the database
+ */
+async function ensureGlobalEventExists(): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+
+  try {
+    // Check if global event already exists
+    const { data: existingEvent } = await supabase
+      .from('events')
+      .select('id')
+      .eq('id', GLOBAL_EVENT_ID)
+      .single();
+
+    if (existingEvent) {
+      return; // Event already exists
+    }
+
+    // Create the global event
+    console.log('[finalizationService] Creating global event for finalization tracking...');
+    const { error } = await supabase
+      .from('events')
+      .insert([{
+        id: GLOBAL_EVENT_ID,
+        title: 'Global Finalization Event',
+        description: 'Internal event for tracking user selection finalization status',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }]);
+
+    if (error) {
+      console.warn('[finalizationService] Could not create global event:', error.message);
+      // Don't throw - we'll try to use it anyway
+    } else {
+      console.log('[finalizationService] ✅ Global event created successfully');
+    }
+  } catch (error) {
+    console.warn('[finalizationService] Exception ensuring global event:', error);
+    // Don't throw - continue anyway
+  }
+}
+
 export const finalizationService = {
   /**
    * Check if a user is finalized for a specific event
@@ -27,6 +74,11 @@ export const finalizationService = {
     }
 
     try {
+      // Ensure the event exists (especially for global event ID)
+      if (eventId === GLOBAL_EVENT_ID) {
+        await ensureGlobalEventExists();
+      }
+
       const { data, error } = await supabase
         .from('event_participants')
         .select('finalizado')
