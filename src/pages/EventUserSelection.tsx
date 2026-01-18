@@ -523,23 +523,45 @@ export default function EventUserSelection() {
             })}
           </div>
 
-          {/* Finish Button */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-muted-foreground">Seleções feitas</p>
-              <p className="text-2xl font-bold text-foreground">
-                {matchCount} <span className="text-rose-500">♥</span> {friendshipCount} <span className="text-blue-500">👥</span>
+          {/* Finish Button Section */}
+          {isFinalized ? (
+            <div className="mt-8 p-6 bg-gradient-to-r from-gold/10 to-gold-dark/5 border-2 border-gold rounded-2xl text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 bg-gold/20 rounded-full">
+                  <Heart className="w-6 h-6 text-gold" />
+                </div>
+              </div>
+              <h3 className="font-serif text-xl font-bold text-foreground mb-2">Perfil Consolidado</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Suas seleções foram finalizadas com sucesso. Seus dados estão agora protegidos contra modificações.
               </p>
+              <div className="space-y-2">
+                <div className="text-sm">
+                  <p className="text-muted-foreground mb-1">Seu resumo:</p>
+                  <p className="font-bold text-lg text-foreground">
+                    {matchCount} <span className="text-rose-500">♥</span> Match(es) · {friendshipCount} <span className="text-blue-500">👥</span> Amizade(s)
+                  </p>
+                </div>
+              </div>
             </div>
-            <Button
-              onClick={handleFinish}
-              variant="hero"
-              className="px-8 py-3 text-base"
-              disabled={selections.length === 0}
-            >
-              Finalizar Seleção ({selections.length})
-            </Button>
-          </div>
+          ) : (
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-center sm:text-left">
+                <p className="text-sm text-muted-foreground">Seleções feitas</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {matchCount} <span className="text-rose-500">♥</span> {friendshipCount} <span className="text-blue-500">👥</span>
+                </p>
+              </div>
+              <Button
+                onClick={handleFinish}
+                variant="hero"
+                className="px-8 py-3 text-base"
+                disabled={selections.length === 0}
+              >
+                Finalizar Seleção ({selections.length})
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
