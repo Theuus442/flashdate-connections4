@@ -64,6 +64,54 @@ async function ensureGlobalEventExists(): Promise<void> {
   }
 }
 
+/**
+ * Check if the 'finalizado' column exists in event_participants table
+ */
+let finalizadoColumnChecked = false;
+let finalizadoColumnExists = false;
+
+async function checkFinalizedColumnExists(): Promise<boolean> {
+  if (finalizadoColumnChecked) {
+    return finalizadoColumnExists;
+  }
+
+  if (!isSupabaseConfigured()) return false;
+
+  try {
+    // Try to query the column - if it doesn't exist, we'll get an error
+    const { error } = await supabase
+      .from('event_participants')
+      .select('finalizado')
+      .limit(1);
+
+    finalizadoColumnChecked = true;
+
+    if (error) {
+      if (error.message.includes('column') || error.message.includes('finalizado')) {
+        console.warn('[finalizationService] ⚠️ Column "finalizado" not found in event_participants table');
+        finalizadoColumnExists = false;
+      } else {
+        // Some other error, assume column exists
+        finalizadoColumnExists = true;
+      }
+    } else {
+      finalizadoColumnExists = true;
+    }
+
+    console.log('[finalizationService] Finalized column check:', {
+      exists: finalizadoColumnExists,
+      message: finalizadoColumnExists ? 'Column exists' : 'Column missing - run ADD_FINALIZED_FIELD.sql'
+    });
+
+    return finalizadoColumnExists;
+  } catch (error) {
+    console.warn('[finalizationService] Error checking column:', error);
+    finalizadoColumnChecked = true;
+    finalizadoColumnExists = false;
+    return false;
+  }
+}
+
 export const finalizationService = {
   /**
    * Check if a user is finalized for a specific event
