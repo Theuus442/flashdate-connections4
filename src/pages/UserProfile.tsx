@@ -511,7 +511,10 @@ export default function UserProfile() {
 
           {/* Profile View */}
           {activeTab === 'profile' && (
-            <div className="max-w-2xl mx-auto w-full">
+            <div className="max-w-2xl mx-auto w-full space-y-8">
+              {isUserFinalized && (
+                <FinalizedStatusCard />
+              )}
               <div className="bg-card border border-border rounded-2xl p-8">
                 {/* Profile Image Section */}
                 <div className="mb-8">
