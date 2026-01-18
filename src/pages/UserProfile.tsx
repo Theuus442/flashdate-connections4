@@ -272,6 +272,9 @@ export default function UserProfile() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              {isUserFinalized && (
+                <FinalizedProfileBadge size="sm" />
+              )}
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{currentUser.name}</span>
               </span>
@@ -288,6 +291,16 @@ export default function UserProfile() {
           </div>
         </div>
       </header>
+
+      {/* Finalization Dialog */}
+      <FinalizationConfirmDialog
+        open={showFinalizationDialog}
+        onOpenChange={setShowFinalizationDialog}
+        onConfirm={handleConfirmFinalization}
+        isLoading={isFinalizingSelections}
+        matchCount={getSelectionsByVote('SIM').length}
+        friendshipCount={getSelectionsByVote('TALVEZ').length}
+      />
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
