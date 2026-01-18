@@ -72,6 +72,9 @@ export default function UserProfile() {
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUserFinalized, setIsUserFinalized] = useState(false);
+  const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
+  const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
 
   // Filter and sort users excluding the current user and admins
   const otherUsers = useMemo(() => {
