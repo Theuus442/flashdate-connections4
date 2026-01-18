@@ -543,15 +543,22 @@ export default function UserProfile() {
                     </div>
                   )}
 
-                  <label className="flex items-center justify-center w-full max-w-sm mx-auto px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors bg-muted/30">
+                  <label className={`flex items-center justify-center w-full max-w-sm mx-auto px-4 py-3 border-2 border-dashed border-border rounded-lg transition-colors ${
+                    isUserFinalized
+                      ? 'opacity-50 cursor-not-allowed bg-muted/20'
+                      : 'cursor-pointer hover:border-gold bg-muted/30'
+                  }`}>
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <Camera className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-foreground">Adicionar foto</span>
+                      <span className="font-medium text-foreground">
+                        {isUserFinalized ? 'Fotos travadas' : 'Adicionar foto'}
+                      </span>
                     </div>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
+                      disabled={isUserFinalized}
                       className="hidden"
                     />
                   </label>
