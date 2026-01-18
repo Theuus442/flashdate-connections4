@@ -26,6 +26,9 @@ export default function EventUserSelection() {
   const [sortBy, setSortBy] = useState<'name' | 'original'>('original');
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F' | 'Outro'>('all');
   const [isFinalized, setIsFinalized] = useState(false);
+  const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
+  const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
+  const [currentEventId] = useState<string | null>(null); // Will be loaded from context if needed
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
