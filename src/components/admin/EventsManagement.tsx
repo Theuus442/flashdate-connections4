@@ -213,6 +213,21 @@ export const EventsManagement = () => {
     }).format(value).replace(/\u00A0/g, ' '); // Replace non-breaking space with regular space
   };
 
+  const formatPriceInput = (value: string): string => {
+    if (!value) return '';
+    // Extract only numbers
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+
+    // Convert to cents (last 2 digits are decimals)
+    const cents = numbers.slice(-2) || '00';
+    const reais = numbers.slice(0, -2) || '0';
+
+    // Format with thousands separator and decimal
+    const formatted = Number(reais).toLocaleString('pt-BR') + ',' + cents;
+    return 'R$ ' + formatted;
+  };
+
   const formatWhatsApp = (phone: string): string => {
     if (!phone) return '';
     // Remove all non-numeric characters
