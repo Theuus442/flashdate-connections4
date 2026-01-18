@@ -718,10 +718,9 @@ export const EventsManagement = () => {
                   name="price"
                   value={formData.price}
                   onChange={(e) => {
-                    const formatted = formatPrice(e.target.value);
                     setFormData(prev => ({
                       ...prev,
-                      price: formatted || e.target.value,
+                      price: e.target.value,
                     }));
                   }}
                   placeholder="R$ 40,00"
