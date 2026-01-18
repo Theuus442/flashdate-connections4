@@ -7,6 +7,9 @@ import { useUsers, type User } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
 import { useAuth } from '@/context/AuthContext';
 import { eventsService } from '@/lib/events.service';
+import { finalizationService } from '@/lib/finalization.service';
+import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
+import FinalizedProfileBadge, { FinalizedStatusCard } from '@/components/FinalizedProfileBadge';
 
 export default function UserProfile() {
   const navigate = useNavigate();
