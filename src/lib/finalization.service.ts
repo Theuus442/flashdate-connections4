@@ -116,6 +116,8 @@ async function checkFinalizedColumnExists(): Promise<boolean> {
   if (!isSupabaseConfigured()) return false;
 
   try {
+    console.log('[finalizationService] Checking if "finalizado" column exists...');
+
     // Try to query the column - if it doesn't exist, we'll get an error
     const { error } = await supabase
       .from('event_participants')
@@ -125,28 +127,27 @@ async function checkFinalizedColumnExists(): Promise<boolean> {
     finalizadoColumnChecked = true;
 
     if (error) {
-      if (error.message.includes('column') || error.message.includes('finalizado')) {
+      const errorMsg = error.message?.toLowerCase() || '';
+      if (errorMsg.includes('column') || errorMsg.includes('finalizado')) {
         console.warn('[finalizationService] ⚠️ Column "finalizado" not found in event_participants table');
+        console.warn('[finalizationService] ⚠️ Run the SQL script from ADD_FINALIZED_FIELD.sql in Supabase');
         finalizadoColumnExists = false;
       } else {
-        // Some other error, assume column exists
+        // Some other error, but column probably exists
+        console.log('[finalizationService] ✅ Column exists (other query error)');
         finalizadoColumnExists = true;
       }
     } else {
+      console.log('[finalizationService] ✅ Column "finalizado" exists');
       finalizadoColumnExists = true;
     }
-
-    console.log('[finalizationService] Finalized column check:', {
-      exists: finalizadoColumnExists,
-      message: finalizadoColumnExists ? 'Column exists' : 'Column missing - run ADD_FINALIZED_FIELD.sql'
-    });
 
     return finalizadoColumnExists;
   } catch (error) {
     console.warn('[finalizationService] Error checking column:', error);
     finalizadoColumnChecked = true;
-    finalizadoColumnExists = false;
-    return false;
+    finalizadoColumnExists = true; // Assume it exists to continue
+    return true;
   }
 }
 
