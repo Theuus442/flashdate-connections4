@@ -266,12 +266,19 @@ export const finalizationService = {
     }
 
     try {
-      console.log('[finalizationService] Finalizing selections for user', { eventId, userId });
+      console.log('[finalizationService] 🔒 Finalizing selections for user', { eventId, userId });
 
       // Ensure the event exists (especially for global event ID)
       if (eventId === GLOBAL_EVENT_ID) {
+        console.log('[finalizationService] Ensuring global event exists...');
         await ensureGlobalEventExists();
       }
+
+      // Ensure user is registered as a participant in the event
+      console.log('[finalizationService] Ensuring user is participant in event...');
+      await ensureUserIsParticipant(eventId, userId);
+
+      console.log('[finalizationService] Proceeding with finalization...');
 
       // First try to use the RPC function
       try {
