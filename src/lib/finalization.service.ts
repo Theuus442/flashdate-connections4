@@ -333,6 +333,7 @@ export const finalizationService = {
       const now = new Date().toISOString();
 
       if (existingRecord) {
+        console.log('[finalizationService] Updating existing participant record...');
         // Update existing record
         const { error: updateError } = await supabase
           .from('event_participants')
@@ -344,13 +345,15 @@ export const finalizationService = {
           .eq('user_id', userId);
 
         if (updateError) {
-          console.error('[finalizationService] Error updating participant:', updateError);
+          console.error('[finalizationService] ❌ Error updating participant:', updateError);
           return {
             success: false,
-            message: 'Erro ao finalizar seleções'
+            message: 'Erro ao finalizar seleções: ' + (updateError.message || 'Não foi possível atualizar')
           };
         }
+        console.log('[finalizationService] ✅ Participant record updated successfully');
       } else {
+        console.log('[finalizationService] Creating new participant record...');
         // Insert new record
         const { error: insertError } = await supabase
           .from('event_participants')
@@ -364,12 +367,13 @@ export const finalizationService = {
           }]);
 
         if (insertError) {
-          console.error('[finalizationService] Error creating participant record:', insertError);
+          console.error('[finalizationService] ❌ Error creating participant record:', insertError);
           return {
             success: false,
-            message: 'Erro ao finalizar seleções'
+            message: 'Erro ao finalizar seleções: ' + (insertError.message || 'Não foi possível criar registro')
           };
         }
+        console.log('[finalizationService] ✅ Participant record created successfully');
       }
 
       console.log('[finalizationService] ✅ Selections finalized successfully via manual update');
