@@ -303,6 +303,7 @@ export const selectionsService = {
 
   /**
    * Remove selection (event_id can be null)
+   * Checks if user is finalized - if so, prevents the deletion
    */
   async removeSelection(eventId: string | null, userId: string, selectedUserId: string): Promise<{ error: any }> {
     if (!isSupabaseConfigured()) {
@@ -311,6 +312,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot remove selection: user is finalized');
+          return { error: 'User is finalized and cannot delete selections' };
+        }
+      }
+
       console.log('[selectionsService] Removing selection:', { eventId, userId, selectedUserId });
 
       // Build query
