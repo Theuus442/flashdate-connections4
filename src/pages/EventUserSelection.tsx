@@ -424,13 +424,13 @@ export default function EventUserSelection() {
         friendshipCount={selections.filter(s => s.type === 'friendship').length}
       />
 
-      {/* DEBUG: Show finalization status */}
-      <div className="fixed bottom-4 right-4 bg-slate-900 text-white text-xs p-3 rounded z-50 max-w-xs">
-        <div className="font-bold mb-2">🔍 DEBUG</div>
-        <div>isFinalized: <span className={isFinalized ? 'text-green-400' : 'text-red-400'}>{String(isFinalized)}</span></div>
-        <div>authUser: {authUser?.email || 'none'}</div>
-        <div>selections: {selections.length}</div>
-      </div>
+      {/* DEBUG: Show finalization status - for development only */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-slate-900/95 text-white text-xs p-2 rounded z-50 font-mono">
+          <div>🔍 isFinalized: <span className={isFinalized ? 'text-green-400 font-bold' : 'text-red-400'}>{String(isFinalized)}</span></div>
+          <div>selections: {selections.length}</div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
