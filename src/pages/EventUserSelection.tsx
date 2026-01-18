@@ -147,6 +147,29 @@ export default function EventUserSelection() {
     loadSelections();
   }, [authUser]);
 
+  // Load finalization status from database on mount
+  useEffect(() => {
+    if (!authUser) return;
+
+    const loadFinalizationStatus = async () => {
+      try {
+        console.log('[EventUserSelection] Checking finalization status from database...');
+        // Check if user is finalized (eventId is null, so check globally)
+        const finalizationStatuses = await finalizationService.getUserFinalizationStatus(authUser.id);
+
+        if (finalizationStatuses && finalizationStatuses.length > 0) {
+          const isFinalized = finalizationStatuses.some(status => status.finalizado);
+          console.log('[EventUserSelection] User finalization status:', { isFinalized, statuses: finalizationStatuses });
+          setIsFinalized(isFinalized);
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Error loading finalization status:', error);
+      }
+    };
+
+    loadFinalizationStatus();
+  }, [authUser]);
+
   // Filter and sort participants based on current filters
   const filteredParticipants = useMemo(() => {
     let filtered = participants;
