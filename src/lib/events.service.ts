@@ -26,6 +26,28 @@ export interface EventData {
 }
 
 /**
+ * Helper function to convert date to YYYY-MM-DD format for Supabase
+ */
+function convertDateToSupabaseFormat(dateString: string): string {
+  if (!dateString) return '';
+  try {
+    // Check if it's already in YYYY-MM-DD format
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateString;
+    }
+    // Try parsing as DD/MM/YYYY
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const date = parse(dateString, 'dd/MM/yyyy', new Date());
+      return format(date, 'yyyy-MM-dd');
+    }
+    // Return as is if format is unknown
+    return dateString;
+  } catch {
+    return dateString;
+  }
+}
+
+/**
  * Helper function to transform raw event data with proxied URLs
  */
 function transformEventData(event: any): EventData {
