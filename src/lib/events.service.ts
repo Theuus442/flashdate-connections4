@@ -200,7 +200,7 @@ export const eventsService = {
       if (updates.location) updateData.location = updates.location;
       if (updates.city) updateData.city = updates.city;
       if (updates.date) updateData.date = updates.date;
-      if (updates.nextDate) updateData.next_date = updates.nextDate;
+      if (updates.nextDate) updateData.next_date = convertDateToSupabaseFormat(updates.nextDate);
       if (updates.schedule) updateData.schedule = updates.schedule;
       if (updates.checkIn) updateData.check_in = updates.checkIn;
       if (updates.environment) updateData.environment = updates.environment;
@@ -213,7 +213,7 @@ export const eventsService = {
       if (updates.email) updateData.email = updates.email;
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
-      if (updates.vagasLimitDate) updateData.vagas_limit_date = updates.vagasLimitDate;
+      if (updates.vagasLimitDate) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate);
 
       // Update event without .single() - RLS might affect return value
       const { error: updateError } = await supabase
