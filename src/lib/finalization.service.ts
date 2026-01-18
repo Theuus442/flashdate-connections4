@@ -35,7 +35,7 @@ async function ensureGlobalEventExists(): Promise<void> {
       .from('events')
       .select('id')
       .eq('id', GLOBAL_EVENT_ID)
-      .single();
+      .maybeSingle();
 
     if (existingEvent) {
       return; // Event already exists
@@ -61,6 +61,43 @@ async function ensureGlobalEventExists(): Promise<void> {
     }
   } catch (error) {
     console.warn('[finalizationService] Exception ensuring global event:', error);
+    // Don't throw - continue anyway
+  }
+}
+
+/**
+ * Ensure user is registered as a participant in the event
+ */
+async function ensureUserIsParticipant(eventId: string, userId: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+
+  try {
+    console.log('[finalizationService] Checking if user is participant in event...', { eventId, userId });
+
+    // Check if user is already a participant
+    const { data: isParticipant } = await eventParticipantsService.isUserParticipant(eventId, userId);
+
+    if (isParticipant) {
+      console.log('[finalizationService] ✅ User is already a participant');
+      return;
+    }
+
+    // Register user as participant
+    console.log('[finalizationService] Registering user as participant...');
+    const { data: registered, error: registerError } = await eventParticipantsService.registerParticipant(
+      eventId,
+      userId,
+      'confirmed'
+    );
+
+    if (registerError) {
+      console.warn('[finalizationService] Could not register as participant:', registerError);
+      // Don't throw - we'll try anyway
+    } else {
+      console.log('[finalizationService] ✅ User registered as participant successfully', registered);
+    }
+  } catch (error) {
+    console.warn('[finalizationService] Exception ensuring user is participant:', error);
     // Don't throw - continue anyway
   }
 }
