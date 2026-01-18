@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Selection } from '@/context/SelectionsContext';
+import { finalizationService } from './finalization.service';
 
 /**
  * Check if a string is a valid UUID v4
