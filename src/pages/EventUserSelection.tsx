@@ -148,24 +148,37 @@ export default function EventUserSelection() {
 
   // Load finalization status from database on mount
   useEffect(() => {
-    if (!authUser) return;
+    if (!authUser) {
+      console.log('[EventUserSelection] No authUser yet, skipping finalization check');
+      return;
+    }
 
     const loadFinalizationStatus = async () => {
       try {
-        console.log('[EventUserSelection] Checking finalization status from database...', { userId: authUser.id });
+        console.log('[EventUserSelection] 🔍 Starting finalization status check...', { userId: authUser.id });
 
         // Use the same default event ID that we use for finalization
         const defaultEventId = '00000000-0000-0000-0000-000000000000';
 
+        console.log('[EventUserSelection] Calling finalizationService.isUserFinalized()...');
+
         // Check if user is finalized for the default event
         const finalized = await finalizationService.isUserFinalized(defaultEventId, authUser.id);
 
-        console.log('[EventUserSelection] ✅ User finalization status loaded:', {
+        console.log('[EventUserSelection] ✅ Finalization status result:', {
           isFinalized: finalized,
           eventId: defaultEventId,
-          userId: authUser.id
+          userId: authUser.id,
+          timestamp: new Date().toISOString()
         });
+
         setIsFinalized(finalized);
+
+        if (finalized) {
+          console.log('[EventUserSelection] 🔒 User is FINALIZED - buttons should be blocked');
+        } else {
+          console.log('[EventUserSelection] 🔓 User is NOT finalized - buttons should be enabled');
+        }
       } catch (error) {
         console.error('[EventUserSelection] ❌ Error loading finalization status:', error);
         setIsFinalized(false);
