@@ -170,9 +170,11 @@ export const EventsManagement = () => {
     try {
       // Handle both YYYY-MM-DD and DD/MM/YYYY formats
       let date: Date;
-      if (dateString.includes('-')) {
-        date = new Date(dateString);
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // YYYY-MM-DD format
+        date = new Date(dateString + 'T00:00:00');
       } else {
+        // DD/MM/YYYY format
         date = parse(dateString, 'dd/MM/yyyy', new Date());
       }
       return format(date, 'dd/MM/yyyy', { locale: ptBR });
