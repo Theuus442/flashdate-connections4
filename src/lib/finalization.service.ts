@@ -270,15 +270,19 @@ export const finalizationService = {
       }
 
       // Fallback: Manually create or update the event_participants record
-      console.log('[finalizationService] Using fallback manual finalization...');
+      console.log('[finalizationService] Using fallback manual finalization...', { eventId, userId });
 
       // First, try to find existing record
-      const { data: existingRecord } = await supabase
+      const { data: existingRecord, error: selectError } = await supabase
         .from('event_participants')
         .select('id')
         .eq('event_id', eventId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
+
+      if (selectError) {
+        console.warn('[finalizationService] Error checking for existing record:', selectError);
+      }
 
       const now = new Date().toISOString();
 
