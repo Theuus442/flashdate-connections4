@@ -152,18 +152,23 @@ export default function EventUserSelection() {
 
     const loadFinalizationStatus = async () => {
       try {
-        console.log('[EventUserSelection] Checking finalization status from database...');
+        console.log('[EventUserSelection] Checking finalization status from database...', { userId: authUser.id });
 
         // Use the same default event ID that we use for finalization
         const defaultEventId = '00000000-0000-0000-0000-000000000000';
 
         // Check if user is finalized for the default event
-        const isFinalized = await finalizationService.isUserFinalized(defaultEventId, authUser.id);
+        const finalized = await finalizationService.isUserFinalized(defaultEventId, authUser.id);
 
-        console.log('[EventUserSelection] User finalization status for default event:', { isFinalized, eventId: defaultEventId });
-        setIsFinalized(isFinalized);
+        console.log('[EventUserSelection] ✅ User finalization status loaded:', {
+          isFinalized: finalized,
+          eventId: defaultEventId,
+          userId: authUser.id
+        });
+        setIsFinalized(finalized);
       } catch (error) {
-        console.error('[EventUserSelection] Error loading finalization status:', error);
+        console.error('[EventUserSelection] ❌ Error loading finalization status:', error);
+        setIsFinalized(false);
       }
     };
 
