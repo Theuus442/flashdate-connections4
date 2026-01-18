@@ -20,68 +20,72 @@ COMMENT ON COLUMN event_participants.finalizado IS 'When true, user cannot modif
 
 -- 4. Update RLS policy for selections table
 -- Users cannot update selections if they are finalized for that event
-CREATE OR REPLACE POLICY "Users can update selections if not finalized" 
-  ON selections 
-  FOR UPDATE 
+DROP POLICY IF EXISTS "Users can update selections if not finalized" ON selections;
+CREATE POLICY "Users can update selections if not finalized"
+  ON selections
+  FOR UPDATE
   USING (
-    auth.uid()::text = user_id 
+    auth.uid()::text = user_id
     AND NOT EXISTS (
-      SELECT 1 FROM event_participants 
-      WHERE event_id = selections.event_id 
-      AND user_id = auth.uid()::text 
+      SELECT 1 FROM event_participants
+      WHERE event_id = selections.event_id
+      AND user_id = auth.uid()::text
       AND finalizado = true
     )
   )
   WITH CHECK (
-    auth.uid()::text = user_id 
+    auth.uid()::text = user_id
     AND NOT EXISTS (
-      SELECT 1 FROM event_participants 
-      WHERE event_id = selections.event_id 
-      AND user_id = auth.uid()::text 
+      SELECT 1 FROM event_participants
+      WHERE event_id = selections.event_id
+      AND user_id = auth.uid()::text
       AND finalizado = true
     )
   );
 
 -- 5. Update RLS policy for selections DELETE
-CREATE OR REPLACE POLICY "Users can delete selections if not finalized" 
-  ON selections 
-  FOR DELETE 
+DROP POLICY IF EXISTS "Users can delete selections if not finalized" ON selections;
+CREATE POLICY "Users can delete selections if not finalized"
+  ON selections
+  FOR DELETE
   USING (
-    auth.uid()::text = user_id 
+    auth.uid()::text = user_id
     AND NOT EXISTS (
-      SELECT 1 FROM event_participants 
-      WHERE event_id = selections.event_id 
-      AND user_id = auth.uid()::text 
+      SELECT 1 FROM event_participants
+      WHERE event_id = selections.event_id
+      AND user_id = auth.uid()::text
       AND finalizado = true
     )
   );
 
 -- 6. Create policy to prevent updating users table if finalized
 -- Users cannot update their profile if they have finalized selections in any event
-CREATE OR REPLACE POLICY "Users can update profile if not finalized in any event" 
-  ON users 
-  FOR UPDATE 
+DROP POLICY IF EXISTS "Users can update profile if not finalized in any event" ON users;
+CREATE POLICY "Users can update profile if not finalized in any event"
+  ON users
+  FOR UPDATE
   USING (
-    auth.uid() = id 
+    auth.uid() = id
     AND NOT EXISTS (
-      SELECT 1 FROM event_participants 
-      WHERE user_id = auth.uid()::text 
+      SELECT 1 FROM event_participants
+      WHERE user_id = auth.uid()::text
       AND finalizado = true
     )
   )
   WITH CHECK (
-    auth.uid() = id 
+    auth.uid() = id
     AND NOT EXISTS (
-      SELECT 1 FROM event_participants 
-      WHERE user_id = auth.uid()::text 
+      SELECT 1 FROM event_participants
+      WHERE user_id = auth.uid()::text
       AND finalizado = true
     )
   );
 
 -- 7. Allow admins to always update users
-CREATE OR REPLACE POLICY "Admins can always update any user" 
-  ON users 
-  FOR UPDATE 
+DROP POLICY IF EXISTS "Admins can always update any user" ON users;
+CREATE POLICY "Admins can always update any user"
+  ON users
+  FOR UPDATE
   USING (
     auth.uid() IN (SELECT id FROM users WHERE role = 'admin')
   )
