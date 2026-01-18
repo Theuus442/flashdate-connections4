@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { eventParticipantsService } from './event-participants.service';
 
 export interface FinalizationStatus {
   eventId: string;
