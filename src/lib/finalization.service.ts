@@ -144,11 +144,17 @@ export const finalizationService = {
 
       if (error) {
         console.error('[finalizationService] ❌ Query error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          code: error.code,
+          eventId,
+          userId
+        });
         return false;
       }
 
       if (!data) {
-        console.log('[finalizationService] No event_participant record found for this user');
+        console.log('[finalizationService] No event_participant record found for this user - status is NOT finalized');
         return false;
       }
 
@@ -156,7 +162,9 @@ export const finalizationService = {
       console.log('[finalizationService] ✅ Record found:', {
         isFinalized,
         finalizado: data.finalizado,
-        id: data.id
+        id: data.id,
+        eventId,
+        userId
       });
 
       return isFinalized;
