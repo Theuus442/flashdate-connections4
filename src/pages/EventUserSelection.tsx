@@ -7,6 +7,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { User } from '@/context/UsersContext';
 import { selectionsService } from '@/lib/selections.service';
+import { finalizationService } from '@/lib/finalization.service';
+import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
+import FinalizedProfileBadge from '@/components/FinalizedProfileBadge';
 
 interface Selection {
   userId: string;
