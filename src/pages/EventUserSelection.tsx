@@ -462,13 +462,13 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      {selection ? (
-                        // If selection already made, show locked state
+                      {isFinalized ? (
+                        // If finalized, show locked state
                         <>
                           <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
-                            <p className="text-sm font-semibold text-gold">✓ Seleção Registrada</p>
+                            <p className="text-sm font-semibold text-gold">✓ Seleção Bloqueada</p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
+                              {selection?.type === 'match' ? '💕 Match' : selection?.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground text-center italic">
@@ -476,11 +476,15 @@ export default function EventUserSelection() {
                           </p>
                         </>
                       ) : (
-                        // If not selected yet, show voting buttons
+                        // If not finalized, show voting buttons (allow changes before finalization)
                         <>
                           <Button
                             onClick={() => handleSelection(participant.id, 'match')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-rose-100 text-rose-900 hover:bg-rose-200 border-2 border-rose-200"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'match'
+                                ? 'bg-rose-200 text-rose-900 hover:bg-rose-300 border-2 border-rose-400'
+                                : 'bg-rose-100 text-rose-900 hover:bg-rose-200 border-2 border-rose-200'
+                            }`}
                             variant="outline"
                           >
                             <Heart className="w-4 h-4 mr-2" />
@@ -488,7 +492,11 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'friendship')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-blue-100 text-blue-900 hover:bg-blue-200 border-2 border-blue-200"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'friendship'
+                                ? 'bg-blue-200 text-blue-900 hover:bg-blue-300 border-2 border-blue-400'
+                                : 'bg-blue-100 text-blue-900 hover:bg-blue-200 border-2 border-blue-200'
+                            }`}
                             variant="outline"
                           >
                             <Users className="w-4 h-4 mr-2" />
@@ -496,7 +504,11 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'no-interest')}
-                            className="w-full py-2 text-sm font-medium transition-all bg-red-100 text-red-900 hover:bg-red-200 border-2 border-red-200"
+                            className={`w-full py-2 text-sm font-medium transition-all ${
+                              selection?.type === 'no-interest'
+                                ? 'bg-red-200 text-red-900 hover:bg-red-300 border-2 border-red-400'
+                                : 'bg-red-100 text-red-900 hover:bg-red-200 border-2 border-red-200'
+                            }`}
                             variant="outline"
                           >
                             <X className="w-4 h-4 mr-2" />
