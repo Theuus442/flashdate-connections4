@@ -154,36 +154,103 @@ export const finalizationService = {
     try {
       console.log('[finalizationService] Finalizing selections for user', { eventId, userId });
 
-      // Call the finalize_user_selections function
-      const { data, error } = await supabase
-        .rpc('finalize_user_selections', {
-          target_event_id: eventId,
-          target_user_id: userId
-        });
-
-      if (error) {
-        console.error('[finalizationService] Error finalizing selections:', error);
-        return {
-          success: false,
-          message: 'Erro ao finalizar seleções: ' + (error.message || 'Unknown error')
-        };
+      // Ensure the event exists (especially for global event ID)
+      if (eventId === GLOBAL_EVENT_ID) {
+        await ensureGlobalEventExists();
       }
 
-      // data is an array with one row due to RETURNS TABLE
-      const result = Array.isArray(data) ? data[0] : data;
+      // First try to use the RPC function
+      try {
+        const { data, error } = await supabase
+          .rpc('finalize_user_selections', {
+            target_event_id: eventId,
+            target_user_id: userId
+          });
 
-      if (!result.success) {
-        return {
-          success: false,
-          message: result.message
-        };
+        if (error) {
+          console.warn('[finalizationService] RPC function error:', error.message);
+          // Fall through to manual update method
+        } else {
+          // data is an array with one row due to RETURNS TABLE
+          const result = Array.isArray(data) ? data[0] : data;
+
+          if (!result.success) {
+            return {
+              success: false,
+              message: result.message
+            };
+          }
+
+          console.log('[finalizationService] Selections finalized successfully via RPC');
+          return {
+            success: true,
+            message: result.message,
+            finalizedAt: result.finalized_at
+          };
+        }
+      } catch (rpcError) {
+        console.warn('[finalizationService] RPC exception:', rpcError);
+        // Fall through to manual update
       }
 
-      console.log('[finalizationService] Selections finalized successfully');
+      // Fallback: Manually create or update the event_participants record
+      console.log('[finalizationService] Using fallback manual finalization...');
+
+      // First, try to find existing record
+      const { data: existingRecord } = await supabase
+        .from('event_participants')
+        .select('id')
+        .eq('event_id', eventId)
+        .eq('user_id', userId)
+        .single();
+
+      const now = new Date().toISOString();
+
+      if (existingRecord) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('event_participants')
+          .update({
+            finalizado: true,
+            updated_at: now
+          })
+          .eq('event_id', eventId)
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error('[finalizationService] Error updating participant:', updateError);
+          return {
+            success: false,
+            message: 'Erro ao finalizar seleções'
+          };
+        }
+      } else {
+        // Insert new record
+        const { error: insertError } = await supabase
+          .from('event_participants')
+          .insert([{
+            event_id: eventId,
+            user_id: userId,
+            status: 'confirmed',
+            finalizado: true,
+            joined_at: now,
+            updated_at: now
+          }]);
+
+        if (insertError) {
+          console.error('[finalizationService] Error creating participant record:', insertError);
+          return {
+            success: false,
+            message: 'Erro ao finalizar seleções'
+          };
+        }
+      }
+
+      console.log('[finalizationService] ✅ Selections finalized successfully via manual update');
       return {
         success: true,
-        message: result.message,
-        finalizedAt: result.finalized_at
+        message: 'Seleções finalizadas com sucesso',
+        finalizedAt: now
       };
     } catch (error: any) {
       console.error('[finalizationService] Exception finalizing selections:', error?.message || error);
