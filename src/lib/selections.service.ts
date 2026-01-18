@@ -235,6 +235,7 @@ export const selectionsService = {
 
   /**
    * Update selection (change vote) - event_id can be null
+   * Checks if user is finalized - if so, prevents the update
    */
   async updateSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
     // Return local selection object as fallback (always works, even without Supabase)
@@ -251,6 +252,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot update selection: user is finalized');
+          return { data: null, error: 'User is finalized and cannot modify selections' };
+        }
+      }
+
       console.log('[selectionsService] Updating selection:', { eventId, userId, selectedUserId, vote });
 
       // Build query
