@@ -849,7 +849,7 @@ export const EventsManagement = () => {
               <InfoItem label="Local" value={eventData.location} />
               <InfoItem label="Cidade" value={eventData.city} />
               <InfoItem label="Data" value={eventData.date} />
-              <InfoItem label="Próxima Data" value={eventData.nextDate} />
+              <InfoItem label="Próxima Data" value={formatDateToDisplay(eventData.nextDate)} />
               <InfoItem label="Horário" value={eventData.schedule} />
               <InfoItem label="Check-in" value={eventData.checkIn} />
               <InfoItem label="Ambiente" value={eventData.environment} />
@@ -860,7 +860,7 @@ export const EventsManagement = () => {
               <InfoItem label="Email" value={eventData.email} />
               <InfoItem label="WhatsApp" value={eventData.whatsapp} />
               <InfoItem label="Vagas" value={eventData.vagas} />
-              <InfoItem label="Limite de Vagas" value={eventData.vagasLimitDate} />
+              <InfoItem label="Limite de Vagas" value={formatDateToDisplay(eventData.vagasLimitDate)} />
             </div>
           </div>
         </div>
