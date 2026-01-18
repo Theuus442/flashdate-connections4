@@ -157,11 +157,66 @@ export default function UserProfile() {
 
   const handleSelection = async (selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO') => {
     if (!currentUser || !currentEventId) return;
+
+    // Check if user is finalized
+    if (isUserFinalized) {
+      toast.info('Seu perfil está consolidado e não pode ser alterado');
+      return;
+    }
+
     try {
       await updateSelection(currentEventId, currentUser.id, selectedUserId, vote);
     } catch (error) {
       console.error('Error updating selection:', error);
       toast.error('Erro ao processar seleção');
+    }
+  };
+
+  const handleFinalize = () => {
+    // Check if user has made at least one selection
+    if (allSelections.length === 0) {
+      toast.error('Faça pelo menos uma seleção antes de finalizar');
+      return;
+    }
+
+    // Show finalization confirmation dialog
+    setShowFinalizationDialog(true);
+  };
+
+  const handleConfirmFinalization = async () => {
+    if (!currentUser || !currentEventId) {
+      toast.error('Erro: Evento não carregado');
+      return;
+    }
+
+    try {
+      setIsFinalizingSelections(true);
+
+      // Call finalization service
+      const result = await finalizationService.finalizeUserSelections(currentEventId, currentUser.id);
+
+      if (!result.success) {
+        toast.error(result.message);
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Update local state
+      setIsUserFinalized(true);
+
+      const matchesCount = getSelectionsByVote('SIM').length;
+      const talvezCount = getSelectionsByVote('TALVEZ').length;
+
+      toast.success(`✓ Seleções finalizadas! ${matchesCount} match(es) e ${talvezCount} amizade(s)`);
+
+      // Close dialog
+      setShowFinalizationDialog(false);
+      setIsFinalizingSelections(false);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('Error finalizing selections:', errorMsg);
+      toast.error('Erro ao finalizar seleções');
+      setIsFinalizingSelections(false);
     }
   };
 
