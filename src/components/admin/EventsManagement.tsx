@@ -152,6 +152,10 @@ export const EventsManagement = () => {
   const formatDate = (dateString: string): string => {
     if (!dateString) return '';
     try {
+      // Check if it's already in YYYY-MM-DD format
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
       // Try parsing as DD/MM/YYYY
       const date = parse(dateString, 'dd/MM/yyyy', new Date());
       return format(date, 'yyyy-MM-dd');
