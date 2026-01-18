@@ -611,7 +611,7 @@ export default function UserProfile() {
                   </div>
 
                   {/* Stats */}
-                  <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4">
+                  <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4 mb-8">
                     <div className="text-center">
                       <p className="text-xs font-medium text-muted-foreground mb-2 uppercase">SIM</p>
                       <p className="text-3xl font-bold text-gold">{matchCount}</p>
@@ -625,6 +625,19 @@ export default function UserProfile() {
                       <p className="text-3xl font-bold text-foreground">{allSelections.length}</p>
                     </div>
                   </div>
+
+                  {/* Finalize Button */}
+                  {!isUserFinalized && allSelections.length > 0 && (
+                    <div className="pt-8 border-t border-border">
+                      <Button
+                        onClick={handleFinalize}
+                        variant="hero"
+                        className="w-full py-3"
+                      >
+                        Finalizar Seleções
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
