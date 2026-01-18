@@ -69,11 +69,19 @@ export const finalizationService = {
    * Check if a user is finalized for a specific event
    */
   async isUserFinalized(eventId: string | null, userId: string): Promise<boolean> {
-    if (!isSupabaseConfigured() || !eventId) {
+    if (!isSupabaseConfigured()) {
+      console.warn('[finalizationService] Supabase not configured');
+      return false;
+    }
+
+    if (!eventId) {
+      console.warn('[finalizationService] No eventId provided');
       return false;
     }
 
     try {
+      console.log('[finalizationService] Checking finalization status for:', { eventId, userId });
+
       // Ensure the event exists (especially for global event ID)
       if (eventId === GLOBAL_EVENT_ID) {
         await ensureGlobalEventExists();
@@ -81,19 +89,31 @@ export const finalizationService = {
 
       const { data, error } = await supabase
         .from('event_participants')
-        .select('finalizado')
+        .select('id, finalizado, user_id, event_id')
         .eq('event_id', eventId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.warn('[finalizationService] Error checking finalized status:', error);
+        console.error('[finalizationService] ❌ Query error:', error);
         return false;
       }
 
-      return data?.finalizado || false;
+      if (!data) {
+        console.log('[finalizationService] No event_participant record found for this user');
+        return false;
+      }
+
+      const isFinalized = data.finalizado === true;
+      console.log('[finalizationService] ✅ Record found:', {
+        isFinalized,
+        finalizado: data.finalizado,
+        id: data.id
+      });
+
+      return isFinalized;
     } catch (error) {
-      console.error('[finalizationService] Exception checking finalized status:', error);
+      console.error('[finalizationService] ❌ Exception checking finalized status:', error);
       return false;
     }
   },
