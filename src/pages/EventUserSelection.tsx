@@ -505,11 +505,12 @@ export default function EventUserSelection() {
                         <>
                           <Button
                             onClick={() => handleSelection(participant.id, 'match')}
+                            disabled={isFinalized}
                             className={`w-full py-2 text-sm font-medium transition-all ${
                               selection?.type === 'match'
                                 ? 'bg-rose-200 text-rose-900 hover:bg-rose-300 border-2 border-rose-400'
                                 : 'bg-rose-100 text-rose-900 hover:bg-rose-200 border-2 border-rose-200'
-                            }`}
+                            } ${isFinalized ? 'opacity-50 cursor-not-allowed' : ''}`}
                             variant="outline"
                           >
                             <Heart className="w-4 h-4 mr-2" />
@@ -517,11 +518,12 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'friendship')}
+                            disabled={isFinalized}
                             className={`w-full py-2 text-sm font-medium transition-all ${
                               selection?.type === 'friendship'
                                 ? 'bg-blue-200 text-blue-900 hover:bg-blue-300 border-2 border-blue-400'
                                 : 'bg-blue-100 text-blue-900 hover:bg-blue-200 border-2 border-blue-200'
-                            }`}
+                            } ${isFinalized ? 'opacity-50 cursor-not-allowed' : ''}`}
                             variant="outline"
                           >
                             <Users className="w-4 h-4 mr-2" />
@@ -529,11 +531,12 @@ export default function EventUserSelection() {
                           </Button>
                           <Button
                             onClick={() => handleSelection(participant.id, 'no-interest')}
+                            disabled={isFinalized}
                             className={`w-full py-2 text-sm font-medium transition-all ${
                               selection?.type === 'no-interest'
                                 ? 'bg-red-200 text-red-900 hover:bg-red-300 border-2 border-red-400'
                                 : 'bg-red-100 text-red-900 hover:bg-red-200 border-2 border-red-200'
-                            }`}
+                            } ${isFinalized ? 'opacity-50 cursor-not-allowed' : ''}`}
                             variant="outline"
                           >
                             <X className="w-4 h-4 mr-2" />
