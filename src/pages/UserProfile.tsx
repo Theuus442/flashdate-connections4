@@ -414,53 +414,70 @@ export default function UserProfile() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
-                          <button
-                            onClick={() => handleSelection(user.id, 'SIM')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'SIM'
-                                ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "SIM" : "Nenhum evento disponível"}
-                          >
-                            <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'TALVEZ')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'TALVEZ'
-                                ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
-                          >
-                            <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
-                          </button>
-                          <button
-                            onClick={() => handleSelection(user.id, 'NÃO')}
-                            disabled={!currentEventId}
-                            className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
-                              !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
-                            } ${
-                              selection?.vote === 'NÃO'
-                                ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
-                                : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
-                            }`}
-                            title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
-                          >
-                            <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
-                            <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
-                          </button>
-                        </div>
+                        {isUserFinalized ? (
+                          <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
+                            {selection ? (
+                              <div className="flex-1 text-center">
+                                <p className="text-xs font-medium text-gold mb-1">Voto Registrado</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {selection.vote === 'SIM' ? '💕 Match' : selection.vote === 'TALVEZ' ? '👥 Amizade' : '❌ Sem Interesse'}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex-1 text-center">
+                                <p className="text-xs text-muted-foreground">Sem voto</p>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex items-center justify-around sm:justify-start px-2 sm:px-4 py-2 sm:py-4 gap-1 sm:gap-4">
+                            <button
+                              onClick={() => handleSelection(user.id, 'SIM')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'SIM'
+                                  ? 'ring-3 ring-gold ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-gold/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "SIM" : "Nenhum evento disponível"}
+                            >
+                              <Heart size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'SIM' ? 'text-gold fill-gold' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">SIM</span>
+                            </button>
+                            <button
+                              onClick={() => handleSelection(user.id, 'TALVEZ')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'TALVEZ'
+                                  ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-secondary/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "TALVEZ" : "Nenhum evento disponível"}
+                            >
+                              <Users size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'TALVEZ' ? 'text-secondary fill-secondary' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">TALVEZ</span>
+                            </button>
+                            <button
+                              onClick={() => handleSelection(user.id, 'NÃO')}
+                              disabled={!currentEventId}
+                              className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-full transition-all flex-shrink-0 ${
+                                !currentEventId ? 'opacity-50 cursor-not-allowed' : ''
+                              } ${
+                                selection?.vote === 'NÃO'
+                                  ? 'ring-3 ring-destructive ring-offset-2 ring-offset-background'
+                                  : 'hover:ring-2 hover:ring-destructive/50 hover:ring-offset-2 hover:ring-offset-background'
+                              }`}
+                              title={currentEventId ? "NÃO" : "Nenhum evento disponível"}
+                            >
+                              <X size={18} className={`sm:w-6 sm:h-6 ${selection?.vote === 'NÃO' ? 'text-destructive' : 'text-foreground'}`} />
+                              <span className="text-xs font-medium mt-0.5 sm:mt-1">NÃO</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* Contact Info Below Actions */}
