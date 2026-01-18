@@ -856,7 +856,7 @@ export const EventsManagement = () => {
               <InfoItem label="Música" value={eventData.music} />
               <InfoItem label="Dress Code" value={eventData.dressCode} />
               <InfoItem label="Estacionamento" value={eventData.parking} />
-              <InfoItem label="Preço" value={eventData.price} />
+              <InfoItem label="Preço" value={formatPrice(eventData.price)} />
               <InfoItem label="Email" value={eventData.email} />
               <InfoItem label="WhatsApp" value={eventData.whatsapp} />
               <InfoItem label="Vagas" value={eventData.vagas} />
