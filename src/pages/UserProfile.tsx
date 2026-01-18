@@ -65,6 +65,21 @@ export default function UserProfile() {
     }
   }, [currentUser, currentEventId, setCurrentUserId, setCurrentEventId]);
 
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!authUser || !currentEventId) {
+        setIsUserFinalized(false);
+        return;
+      }
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, authUser.id);
+      setIsUserFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, currentEventId]);
+
   const [imagePreview, setImagePreview] = useState<string | undefined>(currentUser?.profileImage);
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
