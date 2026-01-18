@@ -152,6 +152,10 @@ export const EventsManagement = () => {
   const formatDate = (dateString: string): string => {
     if (!dateString) return '';
     try {
+      // Check if it's already in YYYY-MM-DD format
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
       // Try parsing as DD/MM/YYYY
       const date = parse(dateString, 'dd/MM/yyyy', new Date());
       return format(date, 'yyyy-MM-dd');
@@ -166,9 +170,11 @@ export const EventsManagement = () => {
     try {
       // Handle both YYYY-MM-DD and DD/MM/YYYY formats
       let date: Date;
-      if (dateString.includes('-')) {
-        date = new Date(dateString);
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // YYYY-MM-DD format
+        date = new Date(dateString + 'T00:00:00');
       } else {
+        // DD/MM/YYYY format
         date = parse(dateString, 'dd/MM/yyyy', new Date());
       }
       return format(date, 'dd/MM/yyyy', { locale: ptBR });
@@ -195,16 +201,31 @@ export const EventsManagement = () => {
 
   const formatPrice = (priceString: string): string => {
     if (!priceString) return '';
-    // Remove non-numeric characters except decimal point
-    const numericValue = priceString.replace(/[^0-9.,]/g, '');
+    // Remove non-numeric characters except decimal point, including non-breaking spaces
+    const numericValue = priceString.replace(/[^0-9.,]/g, '').trim();
     // Replace comma with dot for parsing
     const value = parseFloat(numericValue.replace(',', '.'));
     if (isNaN(value)) return priceString;
-    // Format as Brazilian currency
+    // Format as Brazilian currency and remove non-breaking spaces
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(value);
+    }).format(value).replace(/\u00A0/g, ' '); // Replace non-breaking space with regular space
+  };
+
+  const formatPriceInput = (value: string): string => {
+    if (!value) return '';
+    // Extract only numbers
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+
+    // Convert to cents (last 2 digits are decimals)
+    const cents = numbers.slice(-2) || '00';
+    const reais = numbers.slice(0, -2) || '0';
+
+    // Format with thousands separator and decimal
+    const formatted = Number(reais).toLocaleString('pt-BR') + ',' + cents;
+    return 'R$ ' + formatted;
   };
 
   const formatWhatsApp = (phone: string): string => {
@@ -612,10 +633,9 @@ export const EventsManagement = () => {
                   name="nextDate"
                   value={formatDate(formData.nextDate)}
                   onChange={(e) => {
-                    const formatted = formatDateToDisplay(e.target.value);
                     setFormData(prev => ({
                       ...prev,
-                      nextDate: formatted,
+                      nextDate: e.target.value,
                     }));
                   }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
@@ -713,10 +733,10 @@ export const EventsManagement = () => {
                   name="price"
                   value={formData.price}
                   onChange={(e) => {
-                    const formatted = formatPrice(e.target.value);
+                    const formatted = formatPriceInput(e.target.value);
                     setFormData(prev => ({
                       ...prev,
-                      price: formatted || e.target.value,
+                      price: formatted,
                     }));
                   }}
                   placeholder="R$ 40,00"
@@ -746,10 +766,9 @@ export const EventsManagement = () => {
                   name="vagasLimitDate"
                   value={formatDate(formData.vagasLimitDate)}
                   onChange={(e) => {
-                    const formatted = formatDateToDisplay(e.target.value);
                     setFormData(prev => ({
                       ...prev,
-                      vagasLimitDate: formatted,
+                      vagasLimitDate: e.target.value,
                     }));
                   }}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
@@ -845,18 +864,18 @@ export const EventsManagement = () => {
               <InfoItem label="Local" value={eventData.location} />
               <InfoItem label="Cidade" value={eventData.city} />
               <InfoItem label="Data" value={eventData.date} />
-              <InfoItem label="Próxima Data" value={eventData.nextDate} />
+              <InfoItem label="Próxima Data" value={formatDateToDisplay(eventData.nextDate)} />
               <InfoItem label="Horário" value={eventData.schedule} />
               <InfoItem label="Check-in" value={eventData.checkIn} />
               <InfoItem label="Ambiente" value={eventData.environment} />
               <InfoItem label="Música" value={eventData.music} />
               <InfoItem label="Dress Code" value={eventData.dressCode} />
               <InfoItem label="Estacionamento" value={eventData.parking} />
-              <InfoItem label="Preço" value={eventData.price} />
+              <InfoItem label="Preço" value={formatPrice(eventData.price)} />
               <InfoItem label="Email" value={eventData.email} />
               <InfoItem label="WhatsApp" value={eventData.whatsapp} />
               <InfoItem label="Vagas" value={eventData.vagas} />
-              <InfoItem label="Limite de Vagas" value={eventData.vagasLimitDate} />
+              <InfoItem label="Limite de Vagas" value={formatDateToDisplay(eventData.vagasLimitDate)} />
             </div>
           </div>
         </div>

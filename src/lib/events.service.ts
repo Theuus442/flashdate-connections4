@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { storageService } from './storage.service';
 import { getProxiedUrl } from './url-proxy';
+import { parse, format } from 'date-fns';
 
 export interface EventData {
   id: string;
@@ -22,6 +23,28 @@ export interface EventData {
   whatsapp: string;
   vagas: string;
   vagasLimitDate: string;
+}
+
+/**
+ * Helper function to convert date to YYYY-MM-DD format for Supabase
+ */
+function convertDateToSupabaseFormat(dateString: string): string {
+  if (!dateString) return '';
+  try {
+    // Check if it's already in YYYY-MM-DD format
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateString;
+    }
+    // Try parsing as DD/MM/YYYY
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const date = parse(dateString, 'dd/MM/yyyy', new Date());
+      return format(date, 'yyyy-MM-dd');
+    }
+    // Return as is if format is unknown
+    return dateString;
+  } catch {
+    return dateString;
+  }
 }
 
 /**
@@ -126,7 +149,7 @@ export const eventsService = {
           location: eventData.location,
           city: eventData.city,
           date: eventData.date,
-          next_date: eventData.nextDate,
+          next_date: convertDateToSupabaseFormat(eventData.nextDate),
           schedule: eventData.schedule,
           check_in: eventData.checkIn,
           environment: eventData.environment,
@@ -139,7 +162,7 @@ export const eventsService = {
           email: eventData.email,
           whatsapp: eventData.whatsapp,
           vagas: parseInt(eventData.vagas) || 0,
-          vagas_limit_date: eventData.vagasLimitDate,
+          vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
         }])
         .select()
         .single();
@@ -177,7 +200,7 @@ export const eventsService = {
       if (updates.location) updateData.location = updates.location;
       if (updates.city) updateData.city = updates.city;
       if (updates.date) updateData.date = updates.date;
-      if (updates.nextDate) updateData.next_date = updates.nextDate;
+      if (updates.nextDate) updateData.next_date = convertDateToSupabaseFormat(updates.nextDate);
       if (updates.schedule) updateData.schedule = updates.schedule;
       if (updates.checkIn) updateData.check_in = updates.checkIn;
       if (updates.environment) updateData.environment = updates.environment;
@@ -190,16 +213,31 @@ export const eventsService = {
       if (updates.email) updateData.email = updates.email;
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
-      if (updates.vagasLimitDate) updateData.vagas_limit_date = updates.vagasLimitDate;
+      if (updates.vagasLimitDate) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate);
 
-      const { data, error } = await supabase
+      // Update event without .single() - RLS might affect return value
+      const { error: updateError } = await supabase
         .from('events')
         .update(updateData)
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      // Fetch the updated event to return
+      const { data, error: fetchError } = await supabase
+        .from('events')
+        .select('*')
         .eq('id', id)
-        .select()
         .single();
 
-      if (error) throw error;
+      if (fetchError) {
+        // Event might not exist or RLS blocked it
+        throw new Error(`Falha ao recuperar evento após atualização: ${fetchError.message}`);
+      }
+
+      if (!data) {
+        throw new Error('Evento não encontrado após atualização');
+      }
 
       const transformedData = transformEventData(data);
 
