@@ -26,24 +26,33 @@ const GLOBAL_EVENT_ID = '00000000-0000-0000-0000-000000000000';
 /**
  * Ensure the global event exists in the database
  */
-async function ensureGlobalEventExists(): Promise<void> {
-  if (!isSupabaseConfigured()) return;
+async function ensureGlobalEventExists(): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    console.log('[finalizationService] Supabase not configured, skipping global event creation');
+    return false;
+  }
 
   try {
+    console.log('[finalizationService] Checking if global event exists...');
+
     // Check if global event already exists
-    const { data: existingEvent } = await supabase
+    const { data: existingEvent, error: selectError } = await supabase
       .from('events')
       .select('id')
       .eq('id', GLOBAL_EVENT_ID)
       .maybeSingle();
 
-    if (existingEvent) {
-      return; // Event already exists
+    if (selectError) {
+      console.warn('[finalizationService] Error checking for global event:', selectError.message);
     }
 
-    // Create the global event
+    if (existingEvent) {
+      console.log('[finalizationService] ✅ Global event already exists');
+      return true;
+    }
+
     console.log('[finalizationService] Creating global event for finalization tracking...');
-    const { error } = await supabase
+    const { error: insertError } = await supabase
       .from('events')
       .insert([{
         id: GLOBAL_EVENT_ID,
@@ -53,15 +62,23 @@ async function ensureGlobalEventExists(): Promise<void> {
         updated_at: new Date().toISOString()
       }]);
 
-    if (error) {
-      console.warn('[finalizationService] Could not create global event:', error.message);
-      // Don't throw - we'll try to use it anyway
-    } else {
-      console.log('[finalizationService] ✅ Global event created successfully');
+    if (insertError) {
+      console.warn('[finalizationService] ⚠️ Could not create global event:', insertError.message);
+      // Check if it actually exists despite the error
+      const { data: checkAfter } = await supabase
+        .from('events')
+        .select('id')
+        .eq('id', GLOBAL_EVENT_ID)
+        .maybeSingle();
+
+      return !!checkAfter;
     }
+
+    console.log('[finalizationService] ✅ Global event created successfully');
+    return true;
   } catch (error) {
-    console.warn('[finalizationService] Exception ensuring global event:', error);
-    // Don't throw - continue anyway
+    console.error('[finalizationService] Exception ensuring global event:', error);
+    return false;
   }
 }
 
