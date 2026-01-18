@@ -192,14 +192,29 @@ export const eventsService = {
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
       if (updates.vagasLimitDate) updateData.vagas_limit_date = updates.vagasLimitDate;
 
-      const { data, error } = await supabase
+      // Update event without .single() - RLS might affect return value
+      const { error: updateError } = await supabase
         .from('events')
         .update(updateData)
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      // Fetch the updated event to return
+      const { data, error: fetchError } = await supabase
+        .from('events')
+        .select('*')
         .eq('id', id)
-        .select()
         .single();
 
-      if (error) throw error;
+      if (fetchError) {
+        // Event might not exist or RLS blocked it
+        throw new Error(`Falha ao recuperar evento após atualização: ${fetchError.message}`);
+      }
+
+      if (!data) {
+        throw new Error('Evento não encontrado após atualização');
+      }
 
       const transformedData = transformEventData(data);
 
