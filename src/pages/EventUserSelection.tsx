@@ -10,7 +10,6 @@ import { selectionsService } from '@/lib/selections.service';
 import { finalizationService } from '@/lib/finalization.service';
 import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
 import FinalizedProfileBadge from '@/components/FinalizedProfileBadge';
-import { useSelections } from '@/context/SelectionsContext';
 
 interface Selection {
   userId: string;
