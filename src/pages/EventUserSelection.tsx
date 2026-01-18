@@ -339,6 +339,9 @@ export default function EventUserSelection() {
               </span>
             </a>
             <div className="flex items-center gap-4">
+              {isFinalized && (
+                <FinalizedProfileBadge size="sm" />
+              )}
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Bem-vindo, <span className="text-foreground font-medium">{currentUser?.name || 'Usuário'}</span>
               </span>
@@ -346,6 +349,16 @@ export default function EventUserSelection() {
           </div>
         </div>
       </header>
+
+      {/* Finalization Dialog */}
+      <FinalizationConfirmDialog
+        open={showFinalizationDialog}
+        onOpenChange={setShowFinalizationDialog}
+        onConfirm={handleConfirmFinalization}
+        isLoading={isFinalizingSelections}
+        matchCount={selections.filter(s => s.type === 'match').length}
+        friendshipCount={selections.filter(s => s.type === 'friendship').length}
+      />
 
       {/* Main Content */}
       <div className="flex-1 pt-20 flex flex-col">
