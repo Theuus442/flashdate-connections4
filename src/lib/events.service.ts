@@ -149,7 +149,7 @@ export const eventsService = {
           location: eventData.location,
           city: eventData.city,
           date: eventData.date,
-          next_date: eventData.nextDate,
+          next_date: convertDateToSupabaseFormat(eventData.nextDate),
           schedule: eventData.schedule,
           check_in: eventData.checkIn,
           environment: eventData.environment,
@@ -162,7 +162,7 @@ export const eventsService = {
           email: eventData.email,
           whatsapp: eventData.whatsapp,
           vagas: parseInt(eventData.vagas) || 0,
-          vagas_limit_date: eventData.vagasLimitDate,
+          vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
         }])
         .select()
         .single();
