@@ -320,22 +320,33 @@ export default function EventUserSelection() {
       // This allows us to persist finalization status even without a specific event
       const eventIdForFinalization = currentEventId || '00000000-0000-0000-0000-000000000000';
 
-      console.log('[EventUserSelection] Finalizing with event ID:', eventIdForFinalization);
+      console.log('[EventUserSelection] 🔒 Starting finalization...', {
+        eventId: eventIdForFinalization,
+        userId: authUser?.id,
+        selectionsCount: selections.length
+      });
 
       // Call finalization service
+      console.log('[EventUserSelection] Calling finalizationService.finalizeUserSelections()...');
       const result = await finalizationService.finalizeUserSelections(eventIdForFinalization, authUser?.id || '');
 
+      console.log('[EventUserSelection] Finalization result:', result);
+
       if (!result.success) {
+        console.error('[EventUserSelection] ❌ Finalization failed:', result.message);
         toast.error(result.message);
         setIsFinalizingSelections(false);
         return;
       }
 
+      console.log('[EventUserSelection] ✅ Finalization successful! Setting isFinalized = true');
       // Mark selections as finalized locally
       setIsFinalized(true);
 
       const matchCount = selections.filter(s => s.type === 'match').length;
       const friendshipCount = selections.filter(s => s.type === 'friendship').length;
+
+      console.log('[EventUserSelection] 🎉 Summary:', { matchCount, friendshipCount });
 
       toast.success(`✓ Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
 
@@ -343,10 +354,13 @@ export default function EventUserSelection() {
       setShowFinalizationDialog(false);
 
       // Delay navigation slightly to allow the toast to be seen
-      setTimeout(() => navigate('/dashboard'), 1000);
+      setTimeout(() => {
+        console.log('[EventUserSelection] Navigating to /dashboard');
+        navigate('/dashboard');
+      }, 1000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error('Error finalizing selections:', errorMsg);
+      console.error('[EventUserSelection] ❌ Exception finalizing selections:', errorMsg);
       toast.error('Erro ao finalizar seleções');
       setIsFinalizingSelections(false);
     }
