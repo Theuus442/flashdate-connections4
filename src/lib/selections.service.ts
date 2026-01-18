@@ -153,6 +153,7 @@ export const selectionsService = {
   /**
    * Add selection (event_id can be null)
    * First checks if selection already exists and removes it to avoid duplicates
+   * Also checks if user is finalized - if so, prevents the addition
    */
   async addSelection(eventId: string | null, userId: string, selectedUserId: string, vote: 'SIM' | 'TALVEZ' | 'NÃO'): Promise<{ data: Selection | null; error: any }> {
     // Return local selection object as fallback (always works, even without Supabase)
@@ -169,6 +170,15 @@ export const selectionsService = {
     }
 
     try {
+      // Check if user is finalized for this event
+      if (eventId) {
+        const isFinalized = await finalizationService.isUserFinalized(eventId, userId);
+        if (isFinalized) {
+          console.log('[selectionsService] Cannot add selection: user is finalized');
+          return { data: null, error: 'User is finalized and cannot make new selections' };
+        }
+      }
+
       console.log('[selectionsService] Adding selection:', { eventId, userId, selectedUserId, vote });
 
       // First, remove any existing selection for this user->selectedUser pair to avoid duplicates when event_id is null
