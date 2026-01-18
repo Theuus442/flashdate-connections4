@@ -201,16 +201,16 @@ export const EventsManagement = () => {
 
   const formatPrice = (priceString: string): string => {
     if (!priceString) return '';
-    // Remove non-numeric characters except decimal point
-    const numericValue = priceString.replace(/[^0-9.,]/g, '');
+    // Remove non-numeric characters except decimal point, including non-breaking spaces
+    const numericValue = priceString.replace(/[^0-9.,]/g, '').trim();
     // Replace comma with dot for parsing
     const value = parseFloat(numericValue.replace(',', '.'));
     if (isNaN(value)) return priceString;
-    // Format as Brazilian currency
+    // Format as Brazilian currency and remove non-breaking spaces
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-    }).format(value);
+    }).format(value).replace(/\u00A0/g, ' '); // Replace non-breaking space with regular space
   };
 
   const formatWhatsApp = (phone: string): string => {
