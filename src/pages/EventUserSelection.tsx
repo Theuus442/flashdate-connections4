@@ -258,27 +258,47 @@ export default function EventUserSelection() {
     }
   };
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
     if (selections.length === 0) {
       toast.error('Faça pelo menos uma seleção antes de finalizar');
       return;
     }
 
+    // Show finalization confirmation dialog
+    setShowFinalizationDialog(true);
+  };
+
+  const handleConfirmFinalization = async () => {
     try {
-      // Mark selections as finalized
+      setIsFinalizingSelections(true);
+
+      // Call finalization service
+      const result = await finalizationService.finalizeUserSelections(currentEventId, authUser?.id || '');
+
+      if (!result.success) {
+        toast.error(result.message);
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Mark selections as finalized locally
       setIsFinalized(true);
 
       const matchCount = selections.filter(s => s.type === 'match').length;
       const friendshipCount = selections.filter(s => s.type === 'friendship').length;
 
-      toast.success(`Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
+      toast.success(`✓ Seleções finalizadas! ${matchCount} match(es) e ${friendshipCount} amizade(s)`);
+
+      // Close dialog
+      setShowFinalizationDialog(false);
 
       // Delay navigation slightly to allow the toast to be seen
       setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error('Error finishing selections:', errorMsg);
+      console.error('Error finalizing selections:', errorMsg);
       toast.error('Erro ao finalizar seleções');
+      setIsFinalizingSelections(false);
     }
   };
 
