@@ -23,6 +23,7 @@ export interface EventData {
   whatsapp: string;
   vagas: string;
   vagasLimitDate: string;
+  ageRange: string;
 }
 
 /**
