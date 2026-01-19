@@ -792,6 +792,19 @@ export const EventsManagement = () => {
                 />
               </div>
 
+              {/* Age Range */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Faixa Etária</label>
+                <input
+                  type="text"
+                  name="ageRange"
+                  value={formData.ageRange}
+                  onChange={handleInputChange}
+                  placeholder="Ex: 21+ ou 25-45 anos"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                />
+              </div>
+
               {/* Description */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-2">Descrição</label>
