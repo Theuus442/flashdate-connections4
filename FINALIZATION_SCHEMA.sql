@@ -1,102 +1,21 @@
--- ========================================
--- INTEGRITY LOCK SYSTEM FOR SPEED DATING
--- ========================================
--- This migration adds finalization support to prevent
--- data manipulation after users complete their selections
+-- ============================================================
+-- MIGRATION: Adicionar suporte a finalização de seleções
+-- Data: 2024
+-- ============================================================
 
--- 1. Add 'finalizado' column to event_participants table
-ALTER TABLE event_participants ADD COLUMN IF NOT EXISTS finalizado BOOLEAN DEFAULT false;
+-- 1️⃣ ADICIONAR COLUNA 'finalizado' à tabela event_participants
+ALTER TABLE event_participants
+ADD COLUMN IF NOT EXISTS finalizado BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 
--- 2. Create index on finalizado column for better query performance
-CREATE INDEX IF NOT EXISTS idx_event_participants_finalizado ON event_participants(finalizado);
+-- 2️⃣ CRIAR ÍNDICE PARA MELHORAR PERFORMANCE
+CREATE INDEX IF NOT EXISTS idx_event_participants_finalizado 
+ON event_participants(finalizado);
 
--- 3. Add comment explaining the field
-COMMENT ON COLUMN event_participants.finalizado IS 'When true, user cannot modify their profile, selections, or votes for this event';
+CREATE INDEX IF NOT EXISTS idx_event_participants_event_user_finalized 
+ON event_participants(event_id, user_id, finalizado);
 
--- ========================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- ========================================
--- These policies ensure that once a user is finalized, they cannot modify their data
-
--- 4. Update RLS policy for selections table
--- Users cannot update selections if they are finalized for that event
-DROP POLICY IF EXISTS "Users can update selections if not finalized" ON selections;
-CREATE POLICY "Users can update selections if not finalized"
-  ON selections
-  FOR UPDATE
-  USING (
-    auth.uid() = user_id
-    AND NOT EXISTS (
-      SELECT 1 FROM event_participants
-      WHERE event_id = selections.event_id
-      AND user_id = auth.uid()
-      AND finalizado = true
-    )
-  )
-  WITH CHECK (
-    auth.uid() = user_id
-    AND NOT EXISTS (
-      SELECT 1 FROM event_participants
-      WHERE event_id = selections.event_id
-      AND user_id = auth.uid()
-      AND finalizado = true
-    )
-  );
-
--- 5. Update RLS policy for selections DELETE
-DROP POLICY IF EXISTS "Users can delete selections if not finalized" ON selections;
-CREATE POLICY "Users can delete selections if not finalized"
-  ON selections
-  FOR DELETE
-  USING (
-    auth.uid() = user_id
-    AND NOT EXISTS (
-      SELECT 1 FROM event_participants
-      WHERE event_id = selections.event_id
-      AND user_id = auth.uid()
-      AND finalizado = true
-    )
-  );
-
--- 6. Create policy to prevent updating users table if finalized
--- Users cannot update their profile if they have finalized selections in any event
-DROP POLICY IF EXISTS "Users can update profile if not finalized in any event" ON users;
-CREATE POLICY "Users can update profile if not finalized in any event"
-  ON users
-  FOR UPDATE
-  USING (
-    auth.uid() = id
-    AND NOT EXISTS (
-      SELECT 1 FROM event_participants
-      WHERE user_id = auth.uid()
-      AND finalizado = true
-    )
-  )
-  WITH CHECK (
-    auth.uid() = id
-    AND NOT EXISTS (
-      SELECT 1 FROM event_participants
-      WHERE user_id = auth.uid()
-      AND finalizado = true
-    )
-  );
-
--- 7. Allow admins to always update users
-DROP POLICY IF EXISTS "Admins can always update any user" ON users;
-CREATE POLICY "Admins can always update any user"
-  ON users
-  FOR UPDATE
-  USING (
-    auth.uid() IN (SELECT id FROM users WHERE role = 'admin')
-  )
-  WITH CHECK (
-    auth.uid() IN (SELECT id FROM users WHERE role = 'admin')
-  );
-
--- ========================================
--- FUNCTION TO FINALIZE USER SELECTIONS
--- ========================================
--- This function marks a user as finalized for an event
+-- 3️⃣ FUNÇÃO PARA FINALIZAR AS SELEÇÕES DE UM USUÁRIO
 CREATE OR REPLACE FUNCTION finalize_user_selections(
   target_event_id UUID,
   target_user_id UUID
@@ -108,98 +27,107 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
   v_participant_exists BOOLEAN;
-  v_was_finalized BOOLEAN;
+  v_now TIMESTAMP := NOW();
 BEGIN
-  -- Check if participant exists
+  -- Verificar se o participante existe
   SELECT EXISTS(
     SELECT 1 FROM event_participants 
-    WHERE event_id = target_event_id 
-    AND user_id = target_user_id
+    WHERE event_id = target_event_id AND user_id = target_user_id
   ) INTO v_participant_exists;
 
   IF NOT v_participant_exists THEN
-    RETURN QUERY SELECT 
-      FALSE, 
-      'Participant not found for this event', 
-      NULL::TIMESTAMP;
-    RETURN;
+    -- Criar registro do participante se não existir
+    INSERT INTO event_participants (event_id, user_id, status, finalizado, updated_at)
+    VALUES (target_event_id, target_user_id, 'confirmed', TRUE, v_now)
+    ON CONFLICT (event_id, user_id) DO UPDATE
+    SET finalizado = TRUE, updated_at = v_now;
+  ELSE
+    -- Apenas atualizar o status
+    UPDATE event_participants
+    SET finalizado = TRUE, updated_at = v_now
+    WHERE event_id = target_event_id AND user_id = target_user_id;
   END IF;
-
-  -- Check if already finalized
-  SELECT finalizado INTO v_was_finalized
-  FROM event_participants
-  WHERE event_id = target_event_id 
-  AND user_id = target_user_id;
-
-  IF v_was_finalized THEN
-    RETURN QUERY SELECT 
-      FALSE, 
-      'User already finalized for this event', 
-      NULL::TIMESTAMP;
-    RETURN;
-  END IF;
-
-  -- Update finalized status
-  UPDATE event_participants
-  SET finalizado = true, updated_at = NOW()
-  WHERE event_id = target_event_id 
-  AND user_id = target_user_id;
 
   RETURN QUERY SELECT 
-    TRUE, 
-    'Selections finalized successfully', 
-    NOW();
+    TRUE as success,
+    'Seleções finalizadas com sucesso'::TEXT as message,
+    v_now as finalized_at;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 8. Function to check if a user is finalized for an event
+-- 4️⃣ FUNÇÃO PARA VERIFICAR SE UM USUÁRIO ESTÁ FINALIZADO
 CREATE OR REPLACE FUNCTION is_user_finalized(
   target_event_id UUID,
   target_user_id UUID
 )
-RETURNS TABLE (
-  finalized BOOLEAN
-) AS $$
+RETURNS BOOLEAN AS $$
 BEGIN
-  RETURN QUERY SELECT ep.finalizado
-  FROM event_participants ep
-  WHERE ep.event_id = target_event_id 
-  AND ep.user_id = target_user_id;
+  RETURN EXISTS(
+    SELECT 1 FROM event_participants 
+    WHERE event_id = target_event_id 
+    AND user_id = target_user_id 
+    AND finalizado = TRUE
+  );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
--- 9. Function to get finalization status for a user across all events
+-- 5️⃣ FUNÇÃO PARA OBTER STATUS DE FINALIZAÇÃO DE UM USUÁRIO
 CREATE OR REPLACE FUNCTION get_user_finalization_status(target_user_id UUID)
 RETURNS TABLE (
   event_id UUID,
-  event_title TEXT,
   finalized BOOLEAN,
   finalized_at TIMESTAMP
 ) AS $$
 BEGIN
-  RETURN QUERY SELECT 
+  RETURN QUERY
+  SELECT 
     ep.event_id,
-    e.title,
     ep.finalizado,
-    CASE WHEN ep.finalizado THEN ep.updated_at ELSE NULL END
+    ep.updated_at
   FROM event_participants ep
-  JOIN events e ON ep.event_id = e.id
   WHERE ep.user_id = target_user_id
-  ORDER BY e.next_date DESC;
+  ORDER BY ep.updated_at DESC;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
--- ========================================
--- VERIFICATION QUERIES
--- ========================================
--- Run these to verify everything is set up correctly
+-- 6️⃣ RLS POLICY: Impedir updates em seleções se o usuário está finalizado
+CREATE POLICY "Users cannot modify selections if finalized"
+ON selections FOR UPDATE
+USING (
+  NOT EXISTS(
+    SELECT 1 FROM event_participants
+    WHERE event_id = selections.event_id
+    AND user_id = selections.user_id
+    AND finalizado = TRUE
+  )
+);
 
--- Check if column was added
+CREATE POLICY "Users cannot delete selections if finalized"
+ON selections FOR DELETE
+USING (
+  NOT EXISTS(
+    SELECT 1 FROM event_participants
+    WHERE event_id = selections.event_id
+    AND user_id = selections.user_id
+    AND finalizado = TRUE
+  )
+);
+
+-- 7️⃣ RLS POLICY: Impedir que admins atualizem dados de usuários finalizados
+CREATE POLICY "Prevent updating users if they are finalized"
+ON users FOR UPDATE
+USING (
+  NOT EXISTS(
+    SELECT 1 FROM event_participants
+    WHERE user_id = users.id
+    AND finalizado = TRUE
+  )
+);
+
+-- ============================================================
+-- VERIFICAÇÃO
+-- ============================================================
+-- Execute esta query para verificar se tudo foi criado:
 -- SELECT column_name, data_type, is_nullable FROM information_schema.columns 
--- WHERE table_name = 'event_participants' AND column_name = 'finalizado';
-
--- Check if policies were created
--- SELECT * FROM pg_policies WHERE tablename IN ('selections', 'users', 'event_participants');
-
--- Check if functions were created
--- SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public';
+-- WHERE table_name = 'event_participants' 
+-- ORDER BY ordinal_position;

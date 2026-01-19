@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
+import { LogOut, User, Calendar, Settings, Upload, X, Heart, Lock, Camera, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
+import { useSelections } from '@/context/SelectionsContext';
 import { usersService } from '@/lib/users.service';
+import { eventsService } from '@/lib/events.service';
+import { finalizationService } from '@/lib/finalization.service';
 import { toast } from 'sonner';
 
 /**
@@ -29,6 +32,7 @@ export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
   const { users, updateUser, isLoading, refreshUsers } = useUsers();
+  const { setCurrentUserId, setCurrentEventId: setSelectionsEventId } = useSelections();
 
   // Load real user data from users array
   const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
@@ -41,6 +45,8 @@ export default function ClientDashboard() {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [maxRetries] = useState(3);
+  const [isUserFinalized, setIsUserFinalized] = useState(false);
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
@@ -144,7 +150,82 @@ export default function ClientDashboard() {
     }
   }, [realUser]);
 
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('[ClientDashboard] Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          console.log('[ClientDashboard] Event loaded:', data[0].id);
+          setCurrentEventId(data[0].id);
+        }
+      } catch (error) {
+        console.error('[ClientDashboard] Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
+  useEffect(() => {
+    if (authUser) {
+      setCurrentUserId(authUser.id);
+    }
+    if (currentEventId) {
+      setSelectionsEventId(currentEventId);
+    }
+  }, [authUser, currentEventId, setCurrentUserId, setSelectionsEventId]);
+
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!currentEventId) {
+        console.log('[ClientDashboard] No current event ID, skipping finalization check');
+        setIsUserFinalized(false);
+        return;
+      }
+
+      // Check finalization status of the clientUser (not necessarily the auth user)
+      // This works for both the user viewing their own profile and admins viewing others
+      const userToCheck = clientUser?.id || authUser?.id;
+      if (!userToCheck) {
+        console.log('[ClientDashboard] No user to check, skipping finalization check');
+        setIsUserFinalized(false);
+        return;
+      }
+
+      console.log('[ClientDashboard] Checking finalization status...', {
+        userToCheck,
+        currentEventId,
+        clientUserId: clientUser?.id,
+        clientUserName: clientUser?.name,
+        authUserId: authUser?.id
+      });
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, userToCheck);
+      console.log('[ClientDashboard] Finalization check result:', {
+        userId: userToCheck,
+        eventId: currentEventId,
+        finalized,
+        userName: clientUser?.name || authUser?.email
+      });
+      setIsUserFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, clientUser?.id, currentEventId]);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isUserFinalized) {
+      toast.error('Seu perfil está bloqueado após finalizar suas seleções');
+      return;
+    }
+
     const file = e.target.files?.[0];
     if (file && clientUser) {
       // Store the file for upload when saving
@@ -179,6 +260,12 @@ export default function ClientDashboard() {
 
     if (!clientUser || !authUser) {
       toast.error('Erro: dados do usuário não encontrados');
+      return;
+    }
+
+    // Check if the user we're trying to edit is finalized
+    if (isUserFinalized) {
+      toast.error('Este perfil está bloqueado. O participante finalizou suas seleções e não pode fazer alterações.');
       return;
     }
 
@@ -262,9 +349,26 @@ export default function ClientDashboard() {
       usersCount: users.length,
       hasClientUser: !!clientUser,
       userId: authUser?.id,
+      isUserFinalized,
+      currentEventId,
       clientUserData: clientUser ? { id: clientUser.id, name: clientUser.name, email: clientUser.email } : null,
     });
-  }, [isLoading, isLoadingUserData, authUser, users, clientUser]);
+  }, [isLoading, isLoadingUserData, authUser, users, clientUser, isUserFinalized, currentEventId]);
+
+  // Re-check finalization when window regains focus
+  useEffect(() => {
+    const handleFocus = async () => {
+      console.log('[ClientDashboard] Window regained focus, re-checking finalization...');
+      if (!currentEventId || !clientUser?.id) return;
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, clientUser.id);
+      console.log('[ClientDashboard] Re-check finalization result:', { finalized });
+      setIsUserFinalized(finalized);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [currentEventId, clientUser?.id]);
 
   // Show loading state while data is being fetched
   if ((isLoading || isLoadingUserData) && !clientUser) {
@@ -502,7 +606,7 @@ export default function ClientDashboard() {
                             </span>
                           </div>
                         )}
-                        {!isEditingImage && (
+                        {!isEditingImage && !isUserFinalized && (
                           <button
                             onClick={() => setIsEditingImage(true)}
                             className="absolute bottom-0 right-0 p-2 bg-gold rounded-full text-secondary-foreground hover:bg-gold-dark transition-colors shadow-lg"
@@ -518,13 +622,14 @@ export default function ClientDashboard() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
+                        disabled={isUserFinalized}
                         className="hidden"
                       />
 
-                      {isEditingImage && !clientUser?.profileImage && (
+                      {isEditingImage && !clientUser?.profileImage && !isUserFinalized && (
                         <button
                           onClick={() => document.getElementById('profileImageInput')?.click()}
-                          className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
+                          className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Escolher Foto
                         </button>
@@ -532,7 +637,8 @@ export default function ClientDashboard() {
 
                       <button
                         onClick={() => setIsEditingImage(!isEditingImage)}
-                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2"
+                        disabled={isUserFinalized}
+                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isEditingImage ? 'Cancelar' : 'Editar Foto'}
                       </button>
@@ -550,7 +656,15 @@ export default function ClientDashboard() {
 
                   {/* Edit Profile Card */}
                   <div className="bg-card border border-border rounded-2xl p-8">
-                    <h3 className="font-serif text-xl font-bold text-foreground mb-6">Editar Perfil</h3>
+                    <div className="mb-6">
+                      <h3 className="font-serif text-xl font-bold text-foreground">Editar Perfil</h3>
+                      {isUserFinalized && (
+                        <div className="flex items-center gap-2 text-sm text-gold mt-2">
+                          <Lock size={16} />
+                          <p>Seu perfil está bloqueado após finalizar suas seleções</p>
+                        </div>
+                      )}
+                    </div>
                     {clientUser ? (
                       <form onSubmit={handleSaveProfile} className="space-y-4">
                         <div>
@@ -561,7 +675,8 @@ export default function ClientDashboard() {
                             type="text"
                             name="name"
                             defaultValue={clientUser.name}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <div>
@@ -572,7 +687,8 @@ export default function ClientDashboard() {
                             type="email"
                             name="email"
                             defaultValue={clientUser.email}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <div>
@@ -583,16 +699,22 @@ export default function ClientDashboard() {
                             type="tel"
                             name="whatsapp"
                             defaultValue={clientUser.whatsapp || ''}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <Button
                           type="submit"
                           variant="gold"
                           className="w-full mt-6"
-                          disabled={isUpdatingProfile}
+                          disabled={isUpdatingProfile || isUserFinalized}
                         >
-                          {isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações'}
+                          {isUserFinalized ? (
+                            <>
+                              <Lock size={16} className="mr-2" />
+                              Perfil Bloqueado
+                            </>
+                          ) : (isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações')}
                         </Button>
                       </form>
                     ) : (
@@ -762,9 +884,19 @@ function MatchesTab({ userId }: { userId?: string }) {
                   <h3 className="font-serif text-xl font-bold text-foreground">
                     {match.name}
                   </h3>
-                  <p className={`font-semibold text-sm ${match.matchType === 'MATCH' ? 'text-gold' : 'text-emerald'}`}>
-                    {match.matchType === 'MATCH' ? '💕 Você deu match' : '💫 Vocês são amigos'}
-                  </p>
+                  <div className={`flex items-center gap-1 font-semibold text-sm ${match.matchType === 'MATCH' ? 'text-gold' : 'text-emerald'}`}>
+                    {match.matchType === 'MATCH' ? (
+                      <>
+                        <Heart size={14} className="fill-current" />
+                        <span>Você deu match</span>
+                      </>
+                    ) : (
+                      <>
+                        <UsersIcon size={14} />
+                        <span>Vocês são amigos</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 

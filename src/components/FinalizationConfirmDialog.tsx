@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Lock, AlertTriangle } from 'lucide-react';
+import { Lock, AlertTriangle, Heart, Users, X, Check } from 'lucide-react';
 
 interface FinalizationConfirmDialogProps {
   open: boolean;
@@ -71,17 +71,17 @@ export default function FinalizationConfirmDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-background rounded border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Matches</p>
-              <p className="text-2xl font-bold text-gold">
+              <div className="text-2xl font-bold text-gold flex items-center justify-center gap-2">
                 {matchCount}
-                <span className="text-lg ml-1">💕</span>
-              </p>
+                <Heart size={20} className="fill-current" />
+              </div>
             </div>
             <div className="bg-background rounded border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Amizade</p>
-              <p className="text-2xl font-bold text-secondary">
+              <div className="text-2xl font-bold text-secondary flex items-center justify-center gap-2">
                 {friendshipCount}
-                <span className="text-lg ml-1">👥</span>
-              </p>
+                <Users size={20} />
+              </div>
             </div>
           </div>
         </div>
@@ -93,10 +93,22 @@ export default function FinalizationConfirmDialog({
             <div className="text-sm text-amber-900 dark:text-amber-100">
               <p className="font-semibold mb-2">Depois de confirmar:</p>
               <ul className="space-y-1 text-xs">
-                <li>✗ Você não poderá alterar suas seleções</li>
-                <li>✗ Seu perfil será travado (somente leitura)</li>
-                <li>✗ Você receberá um badge "Perfil Consolidado"</li>
-                <li>✓ Apenas resultados de matches serão visíveis</li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Você não poderá alterar suas seleções
+                </li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Seu perfil será travado (somente leitura)
+                </li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Você receberá um badge "Perfil Consolidado"
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check size={14} className="flex-shrink-0 text-emerald-600" />
+                  Apenas resultados de matches serão visíveis
+                </li>
               </ul>
             </div>
           </div>

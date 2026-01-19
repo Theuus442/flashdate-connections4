@@ -126,12 +126,23 @@ export const SelectionsManagement = () => {
               <span className="text-sm font-medium text-foreground">
                 {getUserName(selection.selectedUserId)}
               </span>
-              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${color}`}>
-                {title === 'SIM'
-                  ? '💕 SIM'
-                  : title === 'TALVEZ'
-                  ? '👥 TALVEZ'
-                  : '❌ NÃO'}
+              <span className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 ${color}`}>
+                {title === 'SIM' ? (
+                  <>
+                    <Heart size={12} className="fill-current" />
+                    SIM
+                  </>
+                ) : title === 'TALVEZ' ? (
+                  <>
+                    <Users size={12} />
+                    TALVEZ
+                  </>
+                ) : (
+                  <>
+                    <X size={12} />
+                    NÃO
+                  </>
+                )}
               </span>
             </div>
           ))}

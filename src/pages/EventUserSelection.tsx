@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, Heart, Users, X, ChevronLeft } from 'lucide-react';
+import { LogOut, Heart, Users, X, ChevronLeft, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { User } from '@/context/UsersContext';
+import { useSelections } from '@/context/SelectionsContext';
 import { selectionsService } from '@/lib/selections.service';
+import { eventsService } from '@/lib/events.service';
 import { finalizationService } from '@/lib/finalization.service';
 import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
 import FinalizedProfileBadge from '@/components/FinalizedProfileBadge';
@@ -20,6 +22,7 @@ export default function EventUserSelection() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const { users, isLoading, refreshUsers } = useUsers();
+  const { setCurrentUserId, setCurrentEventId: setSelectionsEventId } = useSelections();
   const [selections, setSelections] = useState<Selection[]>([]);
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -28,7 +31,7 @@ export default function EventUserSelection() {
   const [isFinalized, setIsFinalized] = useState(false);
   const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
   const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
-  const [currentEventId] = useState<string | null>(null); // Will be loaded from context if needed
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
@@ -38,6 +41,55 @@ export default function EventUserSelection() {
     // Only refresh when authUser changes, not when refreshUsers reference changes
     // refreshUsers is memoized so we don't need it in dependencies
   }, [authUser]);
+
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('[EventUserSelection] Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          console.log('[EventUserSelection] Event loaded:', data[0].id);
+          setCurrentEventId(data[0].id);
+        } else {
+          console.warn('[EventUserSelection] No events found');
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
+  useEffect(() => {
+    if (authUser) {
+      setCurrentUserId(authUser.id);
+    }
+    if (currentEventId) {
+      setSelectionsEventId(currentEventId);
+    }
+  }, [authUser, currentEventId, setCurrentUserId, setSelectionsEventId]);
+
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!authUser || !currentEventId) {
+        setIsFinalized(false);
+        return;
+      }
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, authUser.id);
+      console.log('[EventUserSelection] Finalization status:', { userId: authUser.id, eventId: currentEventId, finalized });
+      setIsFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, currentEventId]);
 
   // Load current user and participants from database
   useEffect(() => {
@@ -239,9 +291,6 @@ export default function EventUserSelection() {
     } as const;
     const vote = voteMap[type];
 
-    // Use null for event_id since we're not in a specific event yet
-    const eventId = null;
-
     // If selection already exists, update it; otherwise add new
     if (existingSelection) {
       if (existingSelection.type !== type) {
@@ -249,12 +298,12 @@ export default function EventUserSelection() {
         setSelections(selections.map(s =>
           s.userId === participantId ? { ...s, type } : s
         ));
-        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
+        await selectionsService.updateSelection(currentEventId, authUser.id, participantId, vote);
       }
     } else {
       // Add new selection
       setSelections([...selections, { userId: participantId, type }]);
-      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+      await selectionsService.addSelection(currentEventId, authUser.id, participantId, vote);
     }
   };
 
@@ -272,7 +321,13 @@ export default function EventUserSelection() {
     try {
       setIsFinalizingSelections(true);
 
-      // Call finalization service
+      if (!currentEventId) {
+        toast.error('Erro: Evento não carregado');
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Call finalization service with the current event ID
       const result = await finalizationService.finalizeUserSelections(currentEventId, authUser?.id || '');
 
       if (!result.success) {
@@ -462,18 +517,29 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      {selection && isFinalized ? (
+                      {isFinalized ? (
                         // If finalized, show locked state
                         <>
-                          <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
-                            <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground text-center italic">
-                            Seu voto está bloqueado e não pode ser alterado
-                          </p>
+                          {selection ? (
+                            <>
+                              <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
+                                <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
+                                </p>
+                              </div>
+                              <p className="text-xs text-muted-foreground text-center italic">
+                                Seu voto está bloqueado e não pode ser alterado
+                              </p>
+                            </>
+                          ) : (
+                            <div className="w-full py-3 px-4 rounded-lg bg-muted text-center flex items-center justify-center gap-2">
+                              <Lock size={14} className="text-muted-foreground" />
+                              <p className="text-xs text-muted-foreground">
+                                Seleções bloqueadas
+                              </p>
+                            </div>
+                          )}
                         </>
                       ) : (
                         // If not finalized, show voting buttons (allow changes before finalization)
