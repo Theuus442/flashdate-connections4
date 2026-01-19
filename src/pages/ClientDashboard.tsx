@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
+import { useSelections } from '@/context/SelectionsContext';
 import { usersService } from '@/lib/users.service';
+import { eventsService } from '@/lib/events.service';
+import { finalizationService } from '@/lib/finalization.service';
 import { toast } from 'sonner';
 
 /**
