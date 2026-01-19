@@ -150,6 +150,53 @@ export default function ClientDashboard() {
     }
   }, [realUser]);
 
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('[ClientDashboard] Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          console.log('[ClientDashboard] Event loaded:', data[0].id);
+          setCurrentEventId(data[0].id);
+        }
+      } catch (error) {
+        console.error('[ClientDashboard] Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
+  useEffect(() => {
+    if (authUser) {
+      setCurrentUserId(authUser.id);
+    }
+    if (currentEventId) {
+      setSelectionsEventId(currentEventId);
+    }
+  }, [authUser, currentEventId, setCurrentUserId, setSelectionsEventId]);
+
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!authUser || !currentEventId) {
+        setIsUserFinalized(false);
+        return;
+      }
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, authUser.id);
+      console.log('[ClientDashboard] Finalization status:', { userId: authUser.id, eventId: currentEventId, finalized });
+      setIsUserFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, currentEventId]);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && clientUser) {
