@@ -517,18 +517,28 @@ export default function EventUserSelection() {
 
                     {/* Action Buttons */}
                     <div className="space-y-2 mt-auto">
-                      {selection && isFinalized ? (
+                      {isFinalized ? (
                         // If finalized, show locked state
                         <>
-                          <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
-                            <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground text-center italic">
-                            Seu voto está bloqueado e não pode ser alterado
-                          </p>
+                          {selection ? (
+                            <>
+                              <div className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-gold/20 to-gold-dark/20 border-2 border-gold text-center">
+                                <p className="text-sm font-semibold text-gold">✓ Voto Registrado</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {selection.type === 'match' ? '💕 Match' : selection.type === 'friendship' ? '👥 Amizade' : '❌ Sem Interesse'}
+                                </p>
+                              </div>
+                              <p className="text-xs text-muted-foreground text-center italic">
+                                Seu voto está bloqueado e não pode ser alterado
+                              </p>
+                            </>
+                          ) : (
+                            <div className="w-full py-3 px-4 rounded-lg bg-muted text-center">
+                              <p className="text-xs text-muted-foreground">
+                                🔒 Seleções bloqueadas
+                              </p>
+                            </div>
+                          )}
                         </>
                       ) : (
                         // If not finalized, show voting buttons (allow changes before finalization)
