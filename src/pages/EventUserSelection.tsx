@@ -533,9 +533,10 @@ export default function EventUserSelection() {
                               </p>
                             </>
                           ) : (
-                            <div className="w-full py-3 px-4 rounded-lg bg-muted text-center">
+                            <div className="w-full py-3 px-4 rounded-lg bg-muted text-center flex items-center justify-center gap-2">
+                              <Lock size={14} className="text-muted-foreground" />
                               <p className="text-xs text-muted-foreground">
-                                🔒 Seleções bloqueadas
+                                Seleções bloqueadas
                               </p>
                             </div>
                           )}
