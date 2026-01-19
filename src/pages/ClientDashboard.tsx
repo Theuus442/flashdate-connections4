@@ -248,8 +248,9 @@ export default function ClientDashboard() {
       return;
     }
 
+    // Check if the user we're trying to edit is finalized
     if (isUserFinalized) {
-      toast.error('Seu perfil está bloqueado após finalizar suas seleções');
+      toast.error('Este perfil está bloqueado. O participante finalizou suas seleções e não pode fazer alterações.');
       return;
     }
 
