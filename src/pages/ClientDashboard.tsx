@@ -349,9 +349,26 @@ export default function ClientDashboard() {
       usersCount: users.length,
       hasClientUser: !!clientUser,
       userId: authUser?.id,
+      isUserFinalized,
+      currentEventId,
       clientUserData: clientUser ? { id: clientUser.id, name: clientUser.name, email: clientUser.email } : null,
     });
-  }, [isLoading, isLoadingUserData, authUser, users, clientUser]);
+  }, [isLoading, isLoadingUserData, authUser, users, clientUser, isUserFinalized, currentEventId]);
+
+  // Re-check finalization when window regains focus
+  useEffect(() => {
+    const handleFocus = async () => {
+      console.log('[ClientDashboard] Window regained focus, re-checking finalization...');
+      if (!currentEventId || !clientUser?.id) return;
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, clientUser.id);
+      console.log('[ClientDashboard] Re-check finalization result:', { finalized });
+      setIsUserFinalized(finalized);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [currentEventId, clientUser?.id]);
 
   // Show loading state while data is being fetched
   if ((isLoading || isLoadingUserData) && !clientUser) {
