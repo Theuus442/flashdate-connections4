@@ -555,7 +555,7 @@ export default function ClientDashboard() {
                             </span>
                           </div>
                         )}
-                        {!isEditingImage && (
+                        {!isEditingImage && !isUserFinalized && (
                           <button
                             onClick={() => setIsEditingImage(true)}
                             className="absolute bottom-0 right-0 p-2 bg-gold rounded-full text-secondary-foreground hover:bg-gold-dark transition-colors shadow-lg"
