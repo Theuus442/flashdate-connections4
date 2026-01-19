@@ -176,18 +176,6 @@ export const NextEventSection = () => {
                         <p className="text-muted-foreground text-sm">{event.parking}</p>
                       </div>
                     </div>
-
-                    {event.price && (
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                          <CreditCard className="w-6 h-6 text-secondary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-foreground mb-1">Valor</h4>
-                          <p className="text-secondary font-bold text-sm">{event.price}</p>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
 
