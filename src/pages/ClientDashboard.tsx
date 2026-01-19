@@ -32,6 +32,7 @@ export default function ClientDashboard() {
   const navigate = useNavigate();
   const { signOut, user: authUser } = useAuth();
   const { users, updateUser, isLoading, refreshUsers } = useUsers();
+  const { setCurrentUserId, setCurrentEventId: setSelectionsEventId } = useSelections();
 
   // Load real user data from users array
   const realUser = authUser ? users.find(u => u.id === authUser.id) : null;
@@ -44,6 +45,8 @@ export default function ClientDashboard() {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [maxRetries] = useState(3);
+  const [isUserFinalized, setIsUserFinalized] = useState(false);
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
