@@ -42,6 +42,55 @@ export default function EventUserSelection() {
     // refreshUsers is memoized so we don't need it in dependencies
   }, [authUser]);
 
+  // Load first available event from database
+  useEffect(() => {
+    const loadEvent = async () => {
+      try {
+        const { data, error } = await eventsService.getEvents();
+        if (error) {
+          console.error('[EventUserSelection] Error loading events:', error);
+          return;
+        }
+        if (data && data.length > 0) {
+          console.log('[EventUserSelection] Event loaded:', data[0].id);
+          setCurrentEventId(data[0].id);
+        } else {
+          console.warn('[EventUserSelection] No events found');
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Unexpected error loading events:', error);
+      }
+    };
+
+    loadEvent();
+  }, []);
+
+  // Set current user and event in selections context
+  useEffect(() => {
+    if (authUser) {
+      setCurrentUserId(authUser.id);
+    }
+    if (currentEventId) {
+      setSelectionsEventId(currentEventId);
+    }
+  }, [authUser, currentEventId, setCurrentUserId, setSelectionsEventId]);
+
+  // Check if user is finalized for the current event
+  useEffect(() => {
+    const checkFinalizationStatus = async () => {
+      if (!authUser || !currentEventId) {
+        setIsFinalized(false);
+        return;
+      }
+
+      const finalized = await finalizationService.isUserFinalized(currentEventId, authUser.id);
+      console.log('[EventUserSelection] Finalization status:', { userId: authUser.id, eventId: currentEventId, finalized });
+      setIsFinalized(finalized);
+    };
+
+    checkFinalizationStatus();
+  }, [authUser, currentEventId]);
+
   // Load current user and participants from database
   useEffect(() => {
     if (!authUser) {
