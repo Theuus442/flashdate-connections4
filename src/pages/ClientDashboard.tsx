@@ -585,7 +585,8 @@ export default function ClientDashboard() {
 
                       <button
                         onClick={() => setIsEditingImage(!isEditingImage)}
-                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2"
+                        disabled={isUserFinalized}
+                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isEditingImage ? 'Cancelar' : 'Editar Foto'}
                       </button>
