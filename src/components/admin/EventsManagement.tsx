@@ -625,23 +625,6 @@ export const EventsManagement = () => {
                 />
               </div>
 
-              {/* Next Date */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Próxima Data</label>
-                <input
-                  type="date"
-                  name="nextDate"
-                  value={formatDate(formData.nextDate)}
-                  onChange={(e) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      nextDate: e.target.value,
-                    }));
-                  }}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
-              </div>
-
               {/* Schedule */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Horário</label>
