@@ -659,7 +659,10 @@ export default function ClientDashboard() {
                     <div className="mb-6">
                       <h3 className="font-serif text-xl font-bold text-foreground">Editar Perfil</h3>
                       {isUserFinalized && (
-                        <p className="text-sm text-gold mt-2">🔒 Seu perfil está bloqueado após finalizar suas seleções</p>
+                        <div className="flex items-center gap-2 text-sm text-gold mt-2">
+                          <Lock size={16} />
+                          <p>Seu perfil está bloqueado após finalizar suas seleções</p>
+                        </div>
                       )}
                     </div>
                     {clientUser ? (
