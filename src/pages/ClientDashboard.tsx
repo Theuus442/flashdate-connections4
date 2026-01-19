@@ -574,10 +574,10 @@ export default function ClientDashboard() {
                         className="hidden"
                       />
 
-                      {isEditingImage && !clientUser?.profileImage && (
+                      {isEditingImage && !clientUser?.profileImage && !isUserFinalized && (
                         <button
                           onClick={() => document.getElementById('profileImageInput')?.click()}
-                          className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm"
+                          className="mb-4 px-4 py-2 bg-gold text-secondary-foreground rounded-lg font-medium hover:bg-gold-dark transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Escolher Foto
                         </button>
