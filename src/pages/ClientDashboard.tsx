@@ -235,6 +235,11 @@ export default function ClientDashboard() {
       return;
     }
 
+    if (isUserFinalized) {
+      toast.error('Seu perfil está bloqueado após finalizar suas seleções');
+      return;
+    }
+
     setIsUpdatingProfile(true);
     try {
       const formData = new FormData(e.currentTarget);
