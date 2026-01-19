@@ -71,17 +71,17 @@ export default function FinalizationConfirmDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-background rounded border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Matches</p>
-              <p className="text-2xl font-bold text-gold">
+              <div className="text-2xl font-bold text-gold flex items-center justify-center gap-2">
                 {matchCount}
-                <span className="text-lg ml-1">💕</span>
-              </p>
+                <Heart size={20} className="fill-current" />
+              </div>
             </div>
             <div className="bg-background rounded border border-border p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Amizade</p>
-              <p className="text-2xl font-bold text-secondary">
+              <div className="text-2xl font-bold text-secondary flex items-center justify-center gap-2">
                 {friendshipCount}
-                <span className="text-lg ml-1">👥</span>
-              </p>
+                <Users size={20} />
+              </div>
             </div>
           </div>
         </div>
