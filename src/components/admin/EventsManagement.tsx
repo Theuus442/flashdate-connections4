@@ -32,6 +32,7 @@ const defaultEventData: EventData = {
   whatsapp: '(11) 97032-9710',
   vagas: '1',
   vagasLimitDate: '25/01/2026',
+  ageRange: '',
 };
 
 // Empty form for creating new events
