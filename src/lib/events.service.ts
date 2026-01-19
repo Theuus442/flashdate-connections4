@@ -165,6 +165,7 @@ export const eventsService = {
           whatsapp: eventData.whatsapp,
           vagas: parseInt(eventData.vagas) || 0,
           vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
+          age_range: eventData.ageRange,
         }])
         .select()
         .single();
