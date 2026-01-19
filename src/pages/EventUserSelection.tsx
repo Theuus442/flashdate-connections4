@@ -291,9 +291,6 @@ export default function EventUserSelection() {
     } as const;
     const vote = voteMap[type];
 
-    // Use null for event_id since we're not in a specific event yet
-    const eventId = null;
-
     // If selection already exists, update it; otherwise add new
     if (existingSelection) {
       if (existingSelection.type !== type) {
@@ -301,12 +298,12 @@ export default function EventUserSelection() {
         setSelections(selections.map(s =>
           s.userId === participantId ? { ...s, type } : s
         ));
-        await selectionsService.updateSelection(eventId, authUser.id, participantId, vote);
+        await selectionsService.updateSelection(currentEventId, authUser.id, participantId, vote);
       }
     } else {
       // Add new selection
       setSelections([...selections, { userId: participantId, type }]);
-      await selectionsService.addSelection(eventId, authUser.id, participantId, vote);
+      await selectionsService.addSelection(currentEventId, authUser.id, participantId, vote);
     }
   };
 
