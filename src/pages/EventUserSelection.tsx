@@ -22,6 +22,7 @@ export default function EventUserSelection() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const { users, isLoading, refreshUsers } = useUsers();
+  const { setCurrentUserId, setCurrentEventId: setSelectionsEventId } = useSelections();
   const [selections, setSelections] = useState<Selection[]>([]);
   const [participants, setParticipants] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -30,7 +31,7 @@ export default function EventUserSelection() {
   const [isFinalized, setIsFinalized] = useState(false);
   const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
   const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
-  const [currentEventId] = useState<string | null>(null); // Will be loaded from context if needed
+  const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
   // Refresh users on mount to ensure we have latest data
   useEffect(() => {
