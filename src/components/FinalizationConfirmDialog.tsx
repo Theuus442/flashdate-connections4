@@ -93,10 +93,22 @@ export default function FinalizationConfirmDialog({
             <div className="text-sm text-amber-900 dark:text-amber-100">
               <p className="font-semibold mb-2">Depois de confirmar:</p>
               <ul className="space-y-1 text-xs">
-                <li>✗ Você não poderá alterar suas seleções</li>
-                <li>✗ Seu perfil será travado (somente leitura)</li>
-                <li>✗ Você receberá um badge "Perfil Consolidado"</li>
-                <li>✓ Apenas resultados de matches serão visíveis</li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Você não poderá alterar suas seleções
+                </li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Seu perfil será travado (somente leitura)
+                </li>
+                <li className="flex items-center gap-2">
+                  <X size={14} className="flex-shrink-0" />
+                  Você receberá um badge "Perfil Consolidado"
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check size={14} className="flex-shrink-0 text-emerald-600" />
+                  Apenas resultados de matches serão visíveis
+                </li>
               </ul>
             </div>
           </div>
