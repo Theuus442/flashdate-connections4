@@ -709,7 +709,12 @@ export default function ClientDashboard() {
                           className="w-full mt-6"
                           disabled={isUpdatingProfile || isUserFinalized}
                         >
-                          {isUserFinalized ? 'Perfil Bloqueado' : (isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações')}
+                          {isUserFinalized ? (
+                            <>
+                              <Lock size={16} className="mr-2" />
+                              Perfil Bloqueado
+                            </>
+                          ) : (isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações')}
                         </Button>
                       </form>
                     ) : (
