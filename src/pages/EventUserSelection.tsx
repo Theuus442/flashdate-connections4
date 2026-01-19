@@ -324,7 +324,13 @@ export default function EventUserSelection() {
     try {
       setIsFinalizingSelections(true);
 
-      // Call finalization service
+      if (!currentEventId) {
+        toast.error('Erro: Evento não carregado');
+        setIsFinalizingSelections(false);
+        return;
+      }
+
+      // Call finalization service with the current event ID
       const result = await finalizationService.finalizeUserSelections(currentEventId, authUser?.id || '');
 
       if (!result.success) {
