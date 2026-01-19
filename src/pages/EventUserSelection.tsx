@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, Heart, Users, X, ChevronLeft } from 'lucide-react';
+import { LogOut, Heart, Users, X, ChevronLeft, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
