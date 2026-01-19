@@ -86,33 +86,6 @@ export default function FinalizationConfirmDialog({
           </div>
         </div>
 
-        {/* Warning details */}
-        <div className="space-y-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-          <div className="flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-900 dark:text-amber-100">
-              <p className="font-semibold mb-2">Depois de confirmar:</p>
-              <ul className="space-y-1 text-xs">
-                <li className="flex items-center gap-2">
-                  <X size={14} className="flex-shrink-0" />
-                  Você não poderá alterar suas seleções
-                </li>
-                <li className="flex items-center gap-2">
-                  <X size={14} className="flex-shrink-0" />
-                  Seu perfil será travado (somente leitura)
-                </li>
-                <li className="flex items-center gap-2">
-                  <X size={14} className="flex-shrink-0" />
-                  Você receberá um badge "Perfil Consolidado"
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check size={14} className="flex-shrink-0 text-emerald-600" />
-                  Apenas resultados de matches serão visíveis
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
 
         {/* Agreement checkbox */}
         <label className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
