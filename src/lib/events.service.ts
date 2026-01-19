@@ -72,6 +72,7 @@ function transformEventData(event: any): EventData {
     whatsapp: event.whatsapp,
     vagas: event.vagas?.toString() || '',
     vagasLimitDate: event.vagas_limit_date,
+    ageRange: event.age_range || '',
   };
 }
 
