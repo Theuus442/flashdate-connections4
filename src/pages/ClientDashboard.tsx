@@ -571,6 +571,7 @@ export default function ClientDashboard() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
+                        disabled={isUserFinalized}
                         className="hidden"
                       />
 
