@@ -117,7 +117,6 @@ export const NextEventSection = () => {
                       <div>
                         <h4 className="font-semibold text-foreground mb-1">Data</h4>
                         <p className="text-muted-foreground text-sm">{event.date}</p>
-                        <p className="text-wine font-semibold text-xs mt-1">{event.nextDate}</p>
                       </div>
                     </div>
 
