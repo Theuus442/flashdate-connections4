@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, Settings, Upload, X, Heart } from 'lucide-react';
+import { LogOut, User, Calendar, Settings, Upload, X, Heart, Lock, Camera, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
