@@ -214,7 +214,7 @@ export const NextEventSection = () => {
                   <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
                     <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {event.vagasLimitDate}</p>
+                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {formatDateToBR(event.vagasLimitDate)}</p>
                       <p className="text-muted-foreground">Vagas limitadas</p>
                     </div>
                   </div>
