@@ -4,6 +4,28 @@ import { useState, useEffect } from 'react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
+import { parse, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+// Format date to Brazilian format (DD/MM/YYYY)
+const formatDateToBR = (dateString: string): string => {
+  if (!dateString) return '';
+  try {
+    // Check if it's already in DD/MM/YYYY format
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      return dateString;
+    }
+    // Try parsing YYYY-MM-DD format
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const date = parse(dateString, 'yyyy-MM-dd', new Date());
+      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+    }
+    return dateString;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
+};
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
