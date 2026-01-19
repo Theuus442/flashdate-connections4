@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Lock, AlertTriangle, Heart, Users } from 'lucide-react';
+import { Lock, AlertTriangle, Heart, Users, X, Check } from 'lucide-react';
 
 interface FinalizationConfirmDialogProps {
   open: boolean;
