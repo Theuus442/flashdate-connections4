@@ -23,6 +23,7 @@ export interface EventData {
   whatsapp: string;
   vagas: string;
   vagasLimitDate: string;
+  ageRange: string;
 }
 
 /**
@@ -71,6 +72,7 @@ function transformEventData(event: any): EventData {
     whatsapp: event.whatsapp,
     vagas: event.vagas?.toString() || '',
     vagasLimitDate: event.vagas_limit_date,
+    ageRange: event.age_range || '',
   };
 }
 
@@ -163,6 +165,7 @@ export const eventsService = {
           whatsapp: eventData.whatsapp,
           vagas: parseInt(eventData.vagas) || 0,
           vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
+          age_range: eventData.ageRange,
         }])
         .select()
         .single();
@@ -214,6 +217,7 @@ export const eventsService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
       if (updates.vagasLimitDate) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate);
+      if (updates.ageRange) updateData.age_range = updates.ageRange;
 
       // Update event without .single() - RLS might affect return value
       const { error: updateError } = await supabase

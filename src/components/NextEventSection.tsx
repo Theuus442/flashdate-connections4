@@ -4,6 +4,28 @@ import { useState, useEffect } from 'react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
+import { parse, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+// Format date to Brazilian format (DD/MM/YYYY)
+const formatDateToBR = (dateString: string): string => {
+  if (!dateString) return '';
+  try {
+    // Check if it's already in DD/MM/YYYY format
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      return dateString;
+    }
+    // Try parsing YYYY-MM-DD format
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const date = parse(dateString, 'yyyy-MM-dd', new Date());
+      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+    }
+    return dateString;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
+};
 
 export const NextEventSection = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
@@ -117,7 +139,6 @@ export const NextEventSection = () => {
                       <div>
                         <h4 className="font-semibold text-foreground mb-1">Data</h4>
                         <p className="text-muted-foreground text-sm">{event.date}</p>
-                        <p className="text-wine font-semibold text-xs mt-1">{event.nextDate}</p>
                       </div>
                     </div>
 
@@ -156,6 +177,18 @@ export const NextEventSection = () => {
                       </div>
                     </div>
 
+                    {event.ageRange && (
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Users className="w-6 h-6 text-secondary" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">Faixa Etária</h4>
+                          <p className="text-muted-foreground text-sm">{event.ageRange}</p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
                         <Users className="w-6 h-6 text-secondary" />
@@ -181,7 +214,7 @@ export const NextEventSection = () => {
                   <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
                     <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {event.vagasLimitDate}</p>
+                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {formatDateToBR(event.vagasLimitDate)}</p>
                       <p className="text-muted-foreground">Vagas limitadas</p>
                     </div>
                   </div>

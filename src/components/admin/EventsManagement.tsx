@@ -18,7 +18,7 @@ const defaultEventData: EventData = {
   location: 'Armazém São Caetano',
   city: 'São Caetano do Sul, SP',
   date: 'Sábados com eventos regulares',
-  nextDate: '25/01/2026',
+  nextDate: '',
   schedule: 'Conforme agendado',
   checkIn: '15-30 min antes',
   environment: 'Rústico e elegante',
@@ -32,6 +32,7 @@ const defaultEventData: EventData = {
   whatsapp: '(11) 97032-9710',
   vagas: '1',
   vagasLimitDate: '25/01/2026',
+  ageRange: '',
 };
 
 // Empty form for creating new events
@@ -55,6 +56,7 @@ const emptyEventForm: EventData = {
   whatsapp: '',
   vagas: '',
   vagasLimitDate: '',
+  ageRange: '',
 };
 
 export const EventsManagement = () => {
@@ -625,23 +627,6 @@ export const EventsManagement = () => {
                 />
               </div>
 
-              {/* Next Date */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Próxima Data</label>
-                <input
-                  type="date"
-                  name="nextDate"
-                  value={formatDate(formData.nextDate)}
-                  onChange={(e) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      nextDate: e.target.value,
-                    }));
-                  }}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                />
-              </div>
-
               {/* Schedule */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Horário</label>
@@ -807,6 +792,19 @@ export const EventsManagement = () => {
                 />
               </div>
 
+              {/* Age Range */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Faixa Etária</label>
+                <input
+                  type="text"
+                  name="ageRange"
+                  value={formData.ageRange}
+                  onChange={handleInputChange}
+                  placeholder="Ex: 21+ ou 25-45 anos"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                />
+              </div>
+
               {/* Description */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-2">Descrição</label>
@@ -872,6 +870,7 @@ export const EventsManagement = () => {
               <InfoItem label="Dress Code" value={eventData.dressCode} />
               <InfoItem label="Estacionamento" value={eventData.parking} />
               <InfoItem label="Preço" value={formatPrice(eventData.price)} />
+              <InfoItem label="Faixa Etária" value={eventData.ageRange} />
               <InfoItem label="Email" value={eventData.email} />
               <InfoItem label="WhatsApp" value={eventData.whatsapp} />
               <InfoItem label="Vagas" value={eventData.vagas} />
