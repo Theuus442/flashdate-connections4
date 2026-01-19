@@ -56,6 +56,7 @@ const emptyEventForm: EventData = {
   whatsapp: '',
   vagas: '',
   vagasLimitDate: '',
+  ageRange: '',
 };
 
 export const EventsManagement = () => {
