@@ -603,7 +603,12 @@ export default function ClientDashboard() {
 
                   {/* Edit Profile Card */}
                   <div className="bg-card border border-border rounded-2xl p-8">
-                    <h3 className="font-serif text-xl font-bold text-foreground mb-6">Editar Perfil</h3>
+                    <div className="mb-6">
+                      <h3 className="font-serif text-xl font-bold text-foreground">Editar Perfil</h3>
+                      {isUserFinalized && (
+                        <p className="text-sm text-gold mt-2">🔒 Seu perfil está bloqueado após finalizar suas seleções</p>
+                      )}
+                    </div>
                     {clientUser ? (
                       <form onSubmit={handleSaveProfile} className="space-y-4">
                         <div>
@@ -614,7 +619,8 @@ export default function ClientDashboard() {
                             type="text"
                             name="name"
                             defaultValue={clientUser.name}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <div>
@@ -625,7 +631,8 @@ export default function ClientDashboard() {
                             type="email"
                             name="email"
                             defaultValue={clientUser.email}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <div>
@@ -636,16 +643,17 @@ export default function ClientDashboard() {
                             type="tel"
                             name="whatsapp"
                             defaultValue={clientUser.whatsapp || ''}
-                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all"
+                            disabled={isUserFinalized}
+                            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                         <Button
                           type="submit"
                           variant="gold"
                           className="w-full mt-6"
-                          disabled={isUpdatingProfile}
+                          disabled={isUpdatingProfile || isUserFinalized}
                         >
-                          {isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações'}
+                          {isUserFinalized ? 'Perfil Bloqueado' : (isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações')}
                         </Button>
                       </form>
                     ) : (
