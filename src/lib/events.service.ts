@@ -217,6 +217,7 @@ export const eventsService = {
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
       if (updates.vagasLimitDate) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate);
+      if (updates.ageRange) updateData.age_range = updates.ageRange;
 
       // Update event without .single() - RLS might affect return value
       const { error: updateError } = await supabase
