@@ -18,7 +18,7 @@ const defaultEventData: EventData = {
   location: 'Armazém São Caetano',
   city: 'São Caetano do Sul, SP',
   date: 'Sábados com eventos regulares',
-  nextDate: '25/01/2026',
+  nextDate: '',
   schedule: 'Conforme agendado',
   checkIn: '15-30 min antes',
   environment: 'Rústico e elegante',
