@@ -198,6 +198,11 @@ export default function ClientDashboard() {
   }, [authUser, currentEventId]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isUserFinalized) {
+      toast.error('Seu perfil está bloqueado após finalizar suas seleções');
+      return;
+    }
+
     const file = e.target.files?.[0];
     if (file && clientUser) {
       // Store the file for upload when saving
