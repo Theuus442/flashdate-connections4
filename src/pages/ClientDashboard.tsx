@@ -185,6 +185,7 @@ export default function ClientDashboard() {
   useEffect(() => {
     const checkFinalizationStatus = async () => {
       if (!currentEventId) {
+        console.log('[ClientDashboard] No current event ID, skipping finalization check');
         setIsUserFinalized(false);
         return;
       }
@@ -193,17 +194,31 @@ export default function ClientDashboard() {
       // This works for both the user viewing their own profile and admins viewing others
       const userToCheck = clientUser?.id || authUser?.id;
       if (!userToCheck) {
+        console.log('[ClientDashboard] No user to check, skipping finalization check');
         setIsUserFinalized(false);
         return;
       }
 
+      console.log('[ClientDashboard] Checking finalization status...', {
+        userToCheck,
+        currentEventId,
+        clientUserId: clientUser?.id,
+        clientUserName: clientUser?.name,
+        authUserId: authUser?.id
+      });
+
       const finalized = await finalizationService.isUserFinalized(currentEventId, userToCheck);
-      console.log('[ClientDashboard] Finalization status:', { userId: userToCheck, eventId: currentEventId, finalized });
+      console.log('[ClientDashboard] Finalization check result:', {
+        userId: userToCheck,
+        eventId: currentEventId,
+        finalized,
+        userName: clientUser?.name || authUser?.email
+      });
       setIsUserFinalized(finalized);
     };
 
     checkFinalizationStatus();
-  }, [authUser, clientUser, currentEventId]);
+  }, [authUser, clientUser?.id, currentEventId]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isUserFinalized) {
