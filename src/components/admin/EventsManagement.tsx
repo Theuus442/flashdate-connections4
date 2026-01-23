@@ -29,7 +29,7 @@ const defaultEventData: EventData = {
   description: 'Encontros Presenciais com Inteligência Artificial',
   eventImage: 'https://kdwnptqxwnnzvdinhhin.supabase.co/storage/v1/object/public/events/placeholder.png',
   email: 'contato@flashdate.com.br',
-  whatsapp: '(11) 97032-9710',
+  whatsapp: '(11) 94163-7875',
   vagas: '1',
   vagasLimitDate: '25/01/2026',
   ageRange: '',
@@ -787,7 +787,7 @@ export const EventsManagement = () => {
                       whatsapp: formatted || e.target.value,
                     }));
                   }}
-                  placeholder="(11) 97032-9710"
+                  placeholder="(11) 94163-7875"
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
               </div>

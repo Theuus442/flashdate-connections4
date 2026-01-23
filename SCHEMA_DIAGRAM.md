@@ -92,7 +92,7 @@
   "description": "Encontros Presenciais com Inteligência Artificial",
   "event_image_url": "https://supabase.co/events/armazem.jpg",
   "email": "contato@flashdate.com.br",
-  "whatsapp": "(11) 97032-9710",
+  "whatsapp": "(11) 94163-7875",
   "created_at": "2024-01-15T10:00:00Z",
   "updated_at": "2024-01-20T10:00:00Z"
 }
