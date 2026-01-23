@@ -69,7 +69,7 @@ src/
 ## Contato
 
 - **Email**: contato@flashdate.com.br
-- **WhatsApp**: (11) 97032-9710
+- **WhatsApp**: (11) 94163-7875
 
 ## Licença
 

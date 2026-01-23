@@ -356,8 +356,8 @@ export const LGBTSection = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Contato direto</p>
-                  <a href="https://wa.me/5511970329710" className="text-foreground font-semibold hover:text-gold transition-colors">
-                    (11) 97032-9710
+                  <a href="https://wa.me/5511941637875" className="text-foreground font-semibold hover:text-gold transition-colors">
+                    (11) 94163-7875
                   </a>
                 </div>
               </div>
