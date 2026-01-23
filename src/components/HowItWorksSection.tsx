@@ -15,7 +15,7 @@ const steps = [
     number: '02',
     icon: UserPlus,
     title: 'Inscrição',
-    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp\u00A011\u00A0970327910:',
+    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp 11 941637875:',
     details: [
       'Comprovante de pagamento',
       'Data de Nascimento',
