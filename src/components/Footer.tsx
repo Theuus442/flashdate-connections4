@@ -42,11 +42,11 @@ export const Footer = () => {
                 <span>contato@flashdate.com.br</span>
               </a>
               <a
-                href="tel:+5511970329710"
+                href="tel:+5511941637875"
                 className="flex items-center gap-3 text-muted-foreground hover:text-wine transition-colors"
               >
                 <Phone className="w-5 h-5" />
-                <span>(11) 9 7032-9710</span>
+                <span>(11) 9 4163-7875</span>
               </a>
             </div>
           </div>
