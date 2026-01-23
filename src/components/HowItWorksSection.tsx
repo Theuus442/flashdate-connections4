@@ -7,7 +7,7 @@ const steps = [
     title: 'Pagamento',
     description: 'Efetue o pagamento do valor informado do evento via Pix:',
     details: [
-      'Chave Pix: 11 970329710',
+      'Chave Pix: 11 941637875',
       'Sidnei'
     ],
   },
