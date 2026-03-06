@@ -23,11 +23,11 @@ const faqData = [
       },
       { 
         q: 'Quanto tempo dura cada encontro no speed dating?', 
-        a: 'O formato do nosso evento de flashdate é dinâmico e otimizado por IA. O tempo de conversação varia entre 5 e 10 minutos, dependendo do nível de compatibilidade pré-avaliada entre os participantes. Alta e Média Compatibilidade: 10 minutos para maximizar as chances de conexão. Baixa Compatibilidade: 5 minutos. Compatibilidade Mínima/Nula: A IA pode optar por não agendar a interação, poupando o tempo dos participantes e focando nos encontros com maior potencial de sucesso.' 
+        a: 'O formato do nosso evento FlashDate é dinâmico e otimizado por IA. Cada encontro dura 7 minutos, tempo suficiente para conhecer um pouco mais a outra pessoa, sentir a “química”, você também terá o auxílio de um painel de compatibilidade, que mostrará em um telão o quanto de compatibilidade cada pessoa tem com você.' 
       },
       { 
         q: 'Quantos encontros terei num evento Speed Dating?', 
-        a: 'O número de encontros e com quem você conversará são definidos por Inteligência Artificial (IA), que determina o tempo de interação com base na compatibilidade. Os fatores que influenciam são: Número de Participantes (mínimo 10 homens e 10 mulheres) e Grau de Compatibilidade (definido por IA). Portanto, você não conversará necessariamente com todos os participantes do sexo oposto, mas sim com aqueles que a IA identificou como seus pares mais compatíveis.' 
+        a: 'Em média terá de 12 a 15 encontros por evento.' 
       },
       {
         q: 'O speed dating é eficaz?',
@@ -110,8 +110,8 @@ const faqData = [
         a: 'Sim, a conduta é crucial: 1) Pontualidade: Chegue na hora para não prejudicar a rotação dos encontros. 2) Respeito: Trate todos os participantes e a equipe com respeito, mantendo uma atitude positiva. 3) Privacidade: Não insista em pedir contatos pessoais durante o encontro e use linguagem apropriada. 4) Tempo: Respeite rigorosamente o tempo limite estipulado de 5 a 10 minutos de cada rodada, movendo-se ao sinal sonoro.' 
       },
       { 
-        q: 'Apenas (05 a 10) minutos são suficientes para se conhecer uma pessoa?', 
-        a: 'Sim, 5 a 10 minutos são suficientes para avaliar três pontos cruciais: 1) Aparência e Confiança: Causar uma primeira impressão física e visual. 2) Comunicação e Química: Sentir o senso de humor e a fluidez da conversa e a "química" inicial. 3) Potencial para o Futuro: Sentir se há compatibilidade de ambas as partes para investir em um segundo encontro. O objetivo principal não é conhecer a pessoa profundamente, mas sim determinar se a conexão inicial justifica um segundo encontro especial.' 
+        q: 'Apenas 7 minutos são suficientes para se conhecer uma pessoa?', 
+        a: 'Sim, 7 minutos são suficientes para avaliar três pontos cruciais: 1) Aparência e Confiança: Causar uma primeira impressão física e visual. 2) Comunicação e Química: Sentir o senso de humor e a fluidez da conversa e a "química" inicial. 3) Potencial para o Futuro: Sentir se há compatibilidade de ambas as partes para investir em um segundo encontro. O objetivo principal não é conhecer a pessoa profundamente, mas sim determinar se a conexão inicial justifica um segundo encontro especial.' 
       },
       { 
         q: 'Que perguntas devo fazer durante o speed dating?', 
@@ -132,7 +132,7 @@ const faqData = [
     questions: [
       { 
         q: 'Quando recebo os resultados?', 
-        a: 'Você receberá a confirmação dos matchs mútuos por e-mail em até 24 horas após o evento.' 
+        a: 'Ao final do evento já é possível consultar os seus matchs, e por que não já chamar algum deles para um jantar no mesmo local? De qualquer forma você receberá seus matchs via email em 24hs.' 
       },
       { 
         q: 'Como funciona o sistema de match?', 
@@ -144,7 +144,7 @@ const faqData = [
       },
       { 
         q: 'Como saberei se alguém demonstrou interesse por mim?', 
-        a: 'Se vocês dois se selecionarem como match, a organização do evento (geralmente por meio de uma plataforma ou e-mail) envia uma notificação informando que houve o match e libera as informações de contato um do outro (como e-mail ou telefone). Se a pessoa se interessou por você, mas você não a selecionou como match / talvez, ou vice-versa, o contato não é liberado.' 
+        a: 'É pouco provável que você não encontre ninguém interessante, porém o evento também depende da sorte, se você não tiver boa sorte em um evento, nada impede que você participe de outros. Você é livre para se inscrever em quantos eventos desejar!' 
       },
       { 
         q: 'Quantos matches (combinações) posso esperar conseguir no speed dating?', 
