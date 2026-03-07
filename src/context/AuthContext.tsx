@@ -48,7 +48,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (error) {
         console.error('[AuthContext:signIn] Error:', error);
-        return { success: false, error: 'Email ou senha inválidos' };
+
+        // Provide more helpful error messages
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (errorMsg.includes('Invalid login credentials')) {
+          return {
+            success: false,
+            error: 'Email ou senha incorretos. Verifique seus dados e tente novamente.'
+          };
+        }
+        if (errorMsg.includes('Email not confirmed')) {
+          return {
+            success: false,
+            error: 'Por favor, confirme seu email antes de fazer login.'
+          };
+        }
+        if (errorMsg.includes('Network') || errorMsg.includes('Failed to fetch')) {
+          return {
+            success: false,
+            error: 'Erro de conexão. Verifique sua internet e tente novamente.'
+          };
+        }
+
+        return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
       }
 
       if (authUser) {
