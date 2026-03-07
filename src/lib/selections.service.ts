@@ -357,17 +357,21 @@ export const selectionsService = {
    * - TALVEZ + SIM = AMIZADE
    * - TALVEZ + TALVEZ = AMIZADE
    * - Anything with NÃO = no match
+   *
+   * IMPORTANT: This function returns ALL mutual matches, regardless of finalization status.
+   * The eventId is included so frontend can check finalization if needed.
+   * Use getMutualMatchesIfFinalized() to get only matches where both users have finalized.
    */
-  async getMutualMatches(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> | null; error: any }> {
+  async getMutualMatches(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string; eventId: string | null }> | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
 
     try {
-      // Fetch all selections (not just SIM)
+      // Fetch all selections (not just SIM) - include event_id
       const { data: allSelections, error: queryError } = await supabase
         .from('selections')
-        .select('id, user_id, selected_user_id, vote, created_at')
+        .select('id, user_id, selected_user_id, vote, created_at, event_id')
         .in('vote', ['SIM', 'TALVEZ'])
         .order('created_at', { ascending: false });
 
@@ -389,7 +393,7 @@ export const selectionsService = {
       }
 
       // Find mutual connections and apply priority rule
-      const mutualMatches: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> = [];
+      const mutualMatches: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string; eventId: string | null }> = [];
       const seen = new Set<string>();
 
       for (const selection of allSelections) {
@@ -427,6 +431,7 @@ export const selectionsService = {
           selectedUserId: userB,
           matchType,
           createdAt: selection.created_at,
+          eventId: selection.event_id,
         });
 
         seen.add(pair);
@@ -435,6 +440,47 @@ export const selectionsService = {
       console.log('[getMutualMatches] Total mutual matches found:', mutualMatches.length, mutualMatches);
       return { data: mutualMatches, error: null };
     } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  /**
+   * Get mutual matches ONLY if both users have finalized their selections.
+   * This ensures contact information is only shared when both parties have confirmed.
+   * Uses the RPC function get_mutual_matches_if_finalized() from the database.
+   */
+  async getMutualMatchesIfFinalized(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      console.log('[getMutualMatchesIfFinalized] Supabase not configured');
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      console.log('[getMutualMatchesIfFinalized] Calling RPC function...');
+
+      const { data, error } = await supabase.rpc('get_mutual_matches_if_finalized');
+
+      if (error) {
+        console.error('[getMutualMatchesIfFinalized] RPC error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.log('[getMutualMatchesIfFinalized] No finalized matches found');
+        return { data: [], error: null };
+      }
+
+      const transformedData = data.map((match: any) => ({
+        userId: match.user_id,
+        selectedUserId: match.selected_user_id,
+        matchType: match.match_type as 'MATCH' | 'AMIZADE',
+        createdAt: match.created_at,
+      }));
+
+      console.log('[getMutualMatchesIfFinalized] Found', transformedData.length, 'finalized matches');
+      return { data: transformedData, error: null };
+    } catch (error) {
+      console.error('[getMutualMatchesIfFinalized] Exception:', error);
       return { data: null, error };
     }
   },

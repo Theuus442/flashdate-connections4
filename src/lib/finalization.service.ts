@@ -13,6 +13,11 @@ export interface FinalizationResult {
   finalizedAt?: string;
 }
 
+export interface ContactVisibilityInfo {
+  canViewContact: boolean;
+  reason?: 'both_finalized' | 'user_not_finalized' | 'other_user_not_finalized' | 'same_user' | 'event_not_found';
+}
+
 /**
  * Service to manage user finalization status for events
  * Once finalized, users cannot modify their profile, votes, or selections
@@ -224,6 +229,78 @@ export const finalizationService = {
         totalParticipants: 0,
         finalizedCount: 0,
         pendingCount: 0
+      };
+    }
+  },
+
+  /**
+   * Check if a user can view another user's contact information
+   * Contact info should only be visible when BOTH users have finalized their selections
+   *
+   * @param eventId - The event ID
+   * @param viewerId - The user trying to view the contact info
+   * @param targetUserId - The user whose contact info is being viewed
+   * @returns Object with canViewContact boolean and reason for decision
+   */
+  async canUserViewContact(
+    eventId: string | null,
+    viewerId: string,
+    targetUserId: string
+  ): Promise<ContactVisibilityInfo> {
+    // Can't view your own contact info
+    if (viewerId === targetUserId) {
+      return {
+        canViewContact: false,
+        reason: 'same_user'
+      };
+    }
+
+    // Without event context, contact cannot be shared
+    if (!eventId) {
+      return {
+        canViewContact: false,
+        reason: 'event_not_found'
+      };
+    }
+
+    if (!isSupabaseConfigured()) {
+      // Without Supabase, assume contact can be shared in fallback mode
+      return {
+        canViewContact: true,
+        reason: 'both_finalized'
+      };
+    }
+
+    try {
+      // Check if BOTH users have finalized
+      const viewerFinalized = await this.isUserFinalized(eventId, viewerId);
+      const targetFinalized = await this.isUserFinalized(eventId, targetUserId);
+
+      if (!viewerFinalized) {
+        return {
+          canViewContact: false,
+          reason: 'user_not_finalized'
+        };
+      }
+
+      if (!targetFinalized) {
+        return {
+          canViewContact: false,
+          reason: 'other_user_not_finalized'
+        };
+      }
+
+      // Both finalized, contact can be shared
+      return {
+        canViewContact: true,
+        reason: 'both_finalized'
+      };
+    } catch (error) {
+      console.error('[finalizationService] Error checking contact visibility:', error);
+      // On error, deny contact access for safety
+      return {
+        canViewContact: false,
+        reason: 'event_not_found'
       };
     }
   }
