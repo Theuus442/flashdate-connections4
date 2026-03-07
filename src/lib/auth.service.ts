@@ -106,7 +106,7 @@ export const authService = {
     }
 
     try {
-      console.log('[signIn] Starting authentication...');
+      console.log('[signIn] Starting authentication for email:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -114,10 +114,15 @@ export const authService = {
 
       if (error) {
         console.error('[signIn] Auth error:', error.message);
+        console.error('[signIn] Error details:', {
+          status: error.status,
+          name: error.name,
+          message: error.message,
+        });
         throw error;
       }
 
-      console.log('[signIn] Success, user ID:', data.user?.id);
+      console.log('[signIn] ✅ Success, user ID:', data.user?.id);
       console.log('[signIn] User metadata:', data.user?.user_metadata);
 
       return { user: data.user, session: data.session, error: null };
@@ -126,12 +131,22 @@ export const authService = {
       console.error('[signIn] Caught error:', {
         message: errorMessage,
         isNetworkError: error instanceof TypeError && errorMessage.includes('Failed to fetch'),
-        error,
       });
 
-      // Provide better error messages for network issues
-      if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
-        console.error('[signIn] Network Error: Cannot reach Supabase. This may be a temporary issue or a network isolation problem.');
+      // Provide context about the error
+      if (errorMessage.includes('Invalid login credentials')) {
+        console.error('[signIn] ℹ️  This typically means:');
+        console.error('[signIn]   1. User account does not exist');
+        console.error('[signIn]   2. Password is incorrect');
+        console.error('[signIn]   3. User email is not confirmed (if email confirmation is enabled)');
+        console.error('[signIn] Check SUPABASE_SETUP.md for how to create test users.');
+      } else if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+        console.error('[signIn] 🌐 Network Error: Cannot reach Supabase.');
+        console.error('[signIn] This may be due to:');
+        console.error('[signIn]   1. Network is offline');
+        console.error('[signIn]   2. CORS policy is blocking requests');
+        console.error('[signIn]   3. Firewall/proxy is blocking access');
+        console.error('[signIn]   4. Supabase URL is incorrect');
       }
 
       return { user: null, session: null, error };

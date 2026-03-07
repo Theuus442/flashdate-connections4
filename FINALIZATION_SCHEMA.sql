@@ -124,10 +124,64 @@ USING (
   )
 );
 
+-- 8️⃣ FUNÇÃO PARA OBTER MATCHES MÚTUOS APENAS SE AMBOS FINALIZARAM
+-- Esta função retorna matches somente quando ambos os usuários finalizaram suas seleções
+CREATE OR REPLACE FUNCTION get_mutual_matches_if_finalized()
+RETURNS TABLE (
+  user_id UUID,
+  selected_user_id UUID,
+  match_type TEXT,
+  created_at TIMESTAMP
+) AS $$
+WITH mutual_selections AS (
+  -- Get all selections where both SIM or one/both TALVEZ
+  SELECT
+    s1.user_id,
+    s1.selected_user_id,
+    s1.vote as vote_a_to_b,
+    s2.vote as vote_b_to_a,
+    s1.created_at,
+    s1.event_id
+  FROM selections s1
+  INNER JOIN selections s2 ON
+    s1.user_id = s2.selected_user_id
+    AND s1.selected_user_id = s2.user_id
+  WHERE s1.vote IN ('SIM', 'TALVEZ')
+    AND s2.vote IN ('SIM', 'TALVEZ')
+    AND s1.user_id < s1.selected_user_id -- Avoid duplicates, keep ordered pair
+),
+with_finalization AS (
+  -- Add finalization status for both users
+  SELECT
+    ms.*,
+    ep1.finalizado as user_a_finalized,
+    ep2.finalizado as user_b_finalized
+  FROM mutual_selections ms
+  LEFT JOIN event_participants ep1 ON
+    ep1.user_id = ms.user_id
+    AND ep1.event_id = ms.event_id
+  LEFT JOIN event_participants ep2 ON
+    ep2.user_id = ms.selected_user_id
+    AND ep2.event_id = ms.event_id
+)
+SELECT
+  user_id,
+  selected_user_id,
+  CASE
+    WHEN vote_a_to_b = 'SIM' AND vote_b_to_a = 'SIM' THEN 'MATCH'
+    ELSE 'AMIZADE'
+  END as match_type,
+  created_at
+FROM with_finalization
+-- Only return matches where BOTH users have finalized
+WHERE user_a_finalized = TRUE AND user_b_finalized = TRUE
+ORDER BY created_at DESC;
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
 -- ============================================================
 -- VERIFICAÇÃO
 -- ============================================================
 -- Execute esta query para verificar se tudo foi criado:
--- SELECT column_name, data_type, is_nullable FROM information_schema.columns 
--- WHERE table_name = 'event_participants' 
+-- SELECT column_name, data_type, is_nullable FROM information_schema.columns
+-- WHERE table_name = 'event_participants'
 -- ORDER BY ordinal_position;

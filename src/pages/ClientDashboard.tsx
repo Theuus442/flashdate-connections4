@@ -810,7 +810,10 @@ function MatchesTab({ userId }: { userId?: string }) {
       setIsLoadingMatches(true);
       try {
         const { selectionsService } = await import('@/lib/selections.service');
-        const { data: mutualData } = await selectionsService.getMutualMatches();
+
+        // IMPORTANT: Use getMutualMatchesIfFinalized() to show only matches where BOTH users have finalized
+        // This prevents sharing contact info until both parties have confirmed
+        const { data: mutualData } = await selectionsService.getMutualMatchesIfFinalized();
 
         if (mutualData) {
           // Filter matches for current user and get user details
@@ -829,10 +832,14 @@ function MatchesTab({ userId }: { userId?: string }) {
               };
             });
 
+          console.log('[MatchesTab] Loaded', userMatches.length, 'finalized matches for user', userId);
           setMatches(userMatches);
+        } else {
+          console.log('[MatchesTab] No finalized matches found');
+          setMatches([]);
         }
       } catch (error) {
-        console.error('Error loading matches:', error);
+        console.error('[MatchesTab] Error loading matches:', error);
         setMatches([]);
       } finally {
         setIsLoadingMatches(false);
@@ -901,6 +908,7 @@ function MatchesTab({ userId }: { userId?: string }) {
               </div>
 
               <div className="space-y-3 border-t border-border/50 pt-4">
+                {/* Contact info is only shown when BOTH users have finalized */}
                 {match.email && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">Email:</span>

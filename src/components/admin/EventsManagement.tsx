@@ -259,18 +259,28 @@ export const EventsManagement = () => {
   };
 
   const handleImageLoadError = (e: any) => {
-    console.error('[EventsManagement] Error loading event image:', {
+    const errorInfo = {
       url: eventData.eventImage,
-      error: e,
-    });
+      eventType: e?.type,
+      targetTagName: e?.target?.tagName,
+      status: e?.target?.status,
+      naturalWidth: e?.target?.naturalWidth,
+      naturalHeight: e?.target?.naturalHeight,
+    };
+    console.error('[EventsManagement] Error loading event image:', errorInfo);
     setImageLoadError(true);
   };
 
   const handlePreviewLoadError = (e: any) => {
-    console.error('[EventsManagement] Error loading preview image:', {
+    const errorInfo = {
       url: imagePreview,
-      error: e,
-    });
+      eventType: e?.type,
+      targetTagName: e?.target?.tagName,
+      status: e?.target?.status,
+      naturalWidth: e?.target?.naturalWidth,
+      naturalHeight: e?.target?.naturalHeight,
+    };
+    console.error('[EventsManagement] Error loading preview image:', errorInfo);
     setPreviewLoadError(true);
   };
 
