@@ -251,4 +251,29 @@ export const eventParticipantsService = {
       return { data: null, error };
     }
   },
+
+  /**
+   * Get all event IDs where user is a participant
+   */
+  async getUserEventIds(userId: string): Promise<{ data: string[] | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: 'Supabase not configured' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('event_participants')
+        .select('event_id')
+        .eq('user_id', userId)
+        .order('joined_at', { ascending: false });
+
+      if (error) throw error;
+
+      const eventIds = data?.map((participant: any) => participant.event_id) || [];
+
+      return { data: eventIds, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
 };

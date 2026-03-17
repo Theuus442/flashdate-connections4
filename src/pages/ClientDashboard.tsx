@@ -7,6 +7,7 @@ import { useUsers } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
 import { usersService } from '@/lib/users.service';
 import { eventsService } from '@/lib/events.service';
+import { eventParticipantsService } from '@/lib/event-participants.service';
 import { finalizationService } from '@/lib/finalization.service';
 import { toast } from 'sonner';
 
@@ -47,6 +48,8 @@ export default function ClientDashboard() {
   const [maxRetries] = useState(3);
   const [isUserFinalized, setIsUserFinalized] = useState(false);
   const [currentEventId, setCurrentEventId] = useState<string | null>(null);
+  const [userEvents, setUserEvents] = useState<any[]>([]);
+  const [isLoadingUserEvents, setIsLoadingUserEvents] = useState(false);
 
   // Refresh users list on mount and when auth user changes
   useEffect(() => {
@@ -170,6 +173,61 @@ export default function ClientDashboard() {
 
     loadEvent();
   }, []);
+
+  // Load user's registered events
+  useEffect(() => {
+    const loadUserEvents = async () => {
+      if (!authUser?.id) {
+        console.log('[ClientDashboard] No auth user, skipping events load');
+        return;
+      }
+
+      setIsLoadingUserEvents(true);
+      try {
+        console.log('[ClientDashboard] Loading events for user:', authUser.id);
+        const { data: eventIds, error } = await eventParticipantsService.getUserEventIds(authUser.id);
+
+        if (error) {
+          console.error('[ClientDashboard] Error loading user event IDs:', error);
+          setUserEvents([]);
+          return;
+        }
+
+        if (!eventIds || eventIds.length === 0) {
+          console.log('[ClientDashboard] User has no registered events');
+          setUserEvents([]);
+          return;
+        }
+
+        // Load details for each event
+        const events = [];
+        for (const eventId of eventIds) {
+          try {
+            const { data: eventData, error: eventError } = await eventsService.getEventById(eventId);
+            if (eventError) {
+              console.error('[ClientDashboard] Error loading event details for:', eventId, eventError);
+              continue;
+            }
+            if (eventData) {
+              events.push(eventData);
+            }
+          } catch (err) {
+            console.error('[ClientDashboard] Unexpected error loading event:', eventId, err);
+          }
+        }
+
+        console.log('[ClientDashboard] Loaded user events:', events.length);
+        setUserEvents(events);
+      } catch (error) {
+        console.error('[ClientDashboard] Unexpected error loading user events:', error);
+        setUserEvents([]);
+      } finally {
+        setIsLoadingUserEvents(false);
+      }
+    };
+
+    loadUserEvents();
+  }, [authUser?.id]);
 
   // Set current user and event in selections context
   useEffect(() => {
@@ -735,37 +793,49 @@ export default function ClientDashboard() {
                   <p className="text-muted-foreground mt-2">Eventos em que você está inscrito</p>
                 </div>
 
-                <div className="bg-card border border-border rounded-2xl p-8">
-                  <div className="space-y-6">
-                    <div className="border-l-4 border-gold pl-6 py-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-serif text-xl font-bold text-foreground">
-                            Armazém São Caetano
-                          </h3>
-                          <p className="text-muted-foreground mt-1">São Caetano do Sul, SP</p>
+                {isLoadingUserEvents ? (
+                  <div className="bg-card border border-border rounded-2xl p-8">
+                    <p className="text-muted-foreground text-center">Carregando eventos...</p>
+                  </div>
+                ) : userEvents.length === 0 ? (
+                  <div className="bg-card border border-border rounded-2xl p-8">
+                    <p className="text-muted-foreground text-center">Você não está inscrito em nenhum evento ainda.</p>
+                  </div>
+                ) : (
+                  <div className="bg-card border border-border rounded-2xl p-8">
+                    <div className="space-y-6">
+                      {userEvents.map((event) => (
+                        <div key={event.id} className="border-l-4 border-gold pl-6 py-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h3 className="font-serif text-xl font-bold text-foreground">
+                                {event.title}
+                              </h3>
+                              <p className="text-muted-foreground mt-1">{event.city}</p>
+                            </div>
+                            <span className="bg-gold/10 text-gold px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap">
+                              {event.nextDate}
+                            </span>
+                          </div>
+                          <div className="grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border/50">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Horário</p>
+                              <p className="font-medium text-foreground">{event.schedule || 'Conforme agendado'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Check-in</p>
+                              <p className="font-medium text-foreground">{event.checkIn || '15-30 min antes'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Status</p>
+                              <p className="font-medium text-gold">Inscrito</p>
+                            </div>
+                          </div>
                         </div>
-                        <span className="bg-gold/10 text-gold px-4 py-2 rounded-lg text-sm font-medium">
-                          25/01/2026
-                        </span>
-                      </div>
-                      <div className="grid md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border/50">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Horário</p>
-                          <p className="font-medium text-foreground">Conforme agendado</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Check-in</p>
-                          <p className="font-medium text-foreground">15-30 min antes</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Status</p>
-                          <p className="font-medium text-gold">Inscrito</p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
