@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { networkDiagnostics } from './network-diagnostics';
 
 export interface FinalizationStatus {
   eventId: string;
@@ -40,13 +41,15 @@ export const finalizationService = {
         .single();
 
       if (error) {
-        console.warn('[finalizationService] Error checking finalized status:', error);
+        const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+        console.warn('[finalizationService] Error checking finalized status:', errorMsg);
         return false;
       }
 
       return data?.finalizado || false;
     } catch (error) {
-      console.error('[finalizationService] Exception checking finalized status:', error);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('[finalizationService] Exception checking finalized status:', errorMsg);
       return false;
     }
   },
@@ -115,7 +118,15 @@ export const finalizationService = {
         });
 
       if (error) {
-        console.error('[finalizationService] Error finalizing selections:', error);
+        const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+        console.error('[finalizationService] Error finalizing selections:', errorMsg);
+
+        // Log network-specific errors with diagnostics
+        if (networkDiagnostics.isNetworkError(error)) {
+          console.error('[finalizationService] ⚠️  Network connectivity issue detected');
+          networkDiagnostics.logDiagnostics();
+        }
+
         return {
           success: false,
           message: 'Erro ao finalizar seleções: ' + (error.message || 'Unknown error')
@@ -139,7 +150,8 @@ export const finalizationService = {
         finalizedAt: result.finalized_at
       };
     } catch (error: any) {
-      console.error('[finalizationService] Exception finalizing selections:', error?.message || error);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('[finalizationService] Exception finalizing selections:', errorMsg);
       return {
         success: false,
         message: 'Erro ao finalizar seleções'

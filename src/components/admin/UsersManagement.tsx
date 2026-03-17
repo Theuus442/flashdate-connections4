@@ -57,9 +57,17 @@ export const UsersManagement = () => {
   const loadEvents = async () => {
     setEventsLoading(true);
     try {
+      console.log('[UsersManagement] Loading available events...');
       const result = await eventsService.getEvents();
       if (result.data) {
+        console.log('[UsersManagement] Events loaded successfully:', {
+          count: result.data.length,
+          events: result.data.map(e => ({ id: e.id, title: e.title })),
+        });
         setEvents(result.data);
+      } else {
+        console.warn('[UsersManagement] No event data returned:', result.error);
+        setEvents([]);
       }
     } catch (error) {
       console.error('[UsersManagement] Error loading events:', error);
@@ -117,7 +125,12 @@ export const UsersManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('[UsersManagement] Form submitted with data:', formData);
+    console.log('[UsersManagement] Form submitted with data:', {
+      name: formData.name,
+      email: formData.email,
+      eventId: formData.eventId || 'none',
+      hasEvent: !!formData.eventId,
+    });
     setIsLoading(true);
 
     // Validate required fields
@@ -223,7 +236,12 @@ export const UsersManagement = () => {
           }
         }
       } else {
-        console.log('[UsersManagement] Creating new user with data:', formData);
+        console.log('[UsersManagement] Creating new user with data:', {
+          name: formData.name,
+          email: formData.email,
+          eventId: formData.eventId || 'none',
+        });
+
         const result = await addUser({
           name: formData.name,
           username: formData.username,
@@ -234,11 +252,22 @@ export const UsersManagement = () => {
           role: formData.role,
         }, selectedImageFile, formData.eventId || undefined);
 
-        console.log('[UsersManagement] Add user result:', result);
+        console.log('[UsersManagement] Add user result:', {
+          success: !!result.data,
+          userId: result.data?.id,
+          eventId: formData.eventId,
+          error: result.error,
+        });
+
         if (result.data) {
+          const eventSelected = formData.eventId ? true : false;
+          const eventAssociation = eventSelected
+            ? ` e vinculado ao evento selecionado`
+            : ` (sem evento associado)`;
+
           toast({
             title: 'Sucesso',
-            description: 'Usuário cadastrado com sucesso!',
+            description: `Usuário cadastrado com sucesso${eventAssociation}!`,
           });
           setFormData({
             name: '',
@@ -668,7 +697,10 @@ export const UsersManagement = () => {
                   </label>
                   <select
                     value={formData.eventId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, eventId: e.target.value }))}
+                    onChange={(e) => {
+                      console.log('[UsersManagement] Event selected:', e.target.value);
+                      setFormData(prev => ({ ...prev, eventId: e.target.value }));
+                    }}
                     className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                     disabled={eventsLoading}
                   >
@@ -679,8 +711,14 @@ export const UsersManagement = () => {
                       </option>
                     ))}
                   </select>
+                  {eventsLoading && (
+                    <p className="text-xs text-gold mt-2">Carregando eventos...</p>
+                  )}
                   {events.length === 0 && !eventsLoading && (
                     <p className="text-xs text-muted-foreground mt-2">Nenhum evento disponível</p>
+                  )}
+                  {events.length > 0 && !eventsLoading && (
+                    <p className="text-xs text-muted-foreground mt-2">{events.length} evento(s) disponível(is)</p>
                   )}
                 </div>
               )}

@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Selection } from '@/context/SelectionsContext';
 import { finalizationService } from './finalization.service';
+import { networkDiagnostics } from './network-diagnostics';
 
 /**
  * Check if a string is a valid UUID v4
@@ -38,6 +39,8 @@ export const selectionsService = {
 
       return { data: transformedData || [], error: null };
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('[selectionsService.getSelections] Error:', errorMsg);
       return { data: null, error };
     }
   },
@@ -97,7 +100,8 @@ export const selectionsService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Supabase error getting selections:', error);
+        const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+        console.error('[selectionsService] Supabase error getting selections:', errorMsg, error);
         throw error;
       }
 
@@ -112,7 +116,15 @@ export const selectionsService = {
 
       return { data: transformedData || [], error: null };
     } catch (error: any) {
-      console.error('Exception getting selections:', error?.message || error);
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('[selectionsService] Exception getting selections:', errorMsg);
+
+      // Log network-specific errors with diagnostics
+      if (networkDiagnostics.isNetworkError(error)) {
+        console.error('[selectionsService] ⚠️  Network connectivity issue detected');
+        networkDiagnostics.logDiagnostics();
+      }
+
       // Return empty array instead of error to allow app to continue
       return { data: [], error: null };
     }
@@ -461,7 +473,15 @@ export const selectionsService = {
       const { data, error } = await supabase.rpc('get_mutual_matches_if_finalized');
 
       if (error) {
-        console.error('[getMutualMatchesIfFinalized] RPC error:', error);
+        const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+        console.error('[getMutualMatchesIfFinalized] RPC error:', errorMsg, error);
+
+        // Log network-specific errors with diagnostics
+        if (networkDiagnostics.isNetworkError(error)) {
+          console.error('[getMutualMatchesIfFinalized] ⚠️  Network connectivity issue detected');
+          networkDiagnostics.logDiagnostics();
+        }
+
         throw error;
       }
 
@@ -480,8 +500,10 @@ export const selectionsService = {
       console.log('[getMutualMatchesIfFinalized] Found', transformedData.length, 'finalized matches');
       return { data: transformedData, error: null };
     } catch (error) {
-      console.error('[getMutualMatchesIfFinalized] Exception:', error);
-      return { data: null, error };
+      const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('[getMutualMatchesIfFinalized] Exception:', errorMsg);
+      // Return empty array instead of error to allow app to continue
+      return { data: [], error: null };
     }
   },
 };
