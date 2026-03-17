@@ -473,29 +473,54 @@ export const usersService = {
 
       // If eventId is provided, register the user as a participant in that event
       if (eventId) {
-        console.log('[usersService] Registering user as participant for event:', eventId);
+        console.log('[usersService] Attempting to register user as participant for event:', {
+          eventId,
+          userId,
+          status: 'confirmed',
+        });
         try {
-          const { error: participantError } = await supabase
+          const { data: participantData, error: participantError } = await supabase
             .from('event_participants')
             .insert([{
               event_id: eventId,
               user_id: userId,
               status: 'confirmed', // User is confirmed by admin
               finalizado: false,
-            }]);
+            }])
+            .select();
 
           if (participantError) {
             const errorStr = serializeError(participantError);
-            console.warn('[usersService] Warning: Could not register user as event participant:', errorStr);
+            console.error('[usersService] ❌ Error registering user as event participant:', {
+              error: errorStr,
+              code: participantError?.code,
+              details: participantError?.details,
+              hint: participantError?.hint,
+              eventId,
+              userId,
+            });
             // Don't throw error - user creation was successful, just participant registration failed
             // The user is still created, just not linked to the event
+          } else if (participantData && participantData.length > 0) {
+            console.log('[usersService] ✅ User successfully registered as participant for event:', {
+              participantId: participantData[0].id,
+              eventId,
+              userId,
+            });
           } else {
-            console.log('[usersService] User registered as participant for event:', eventId);
+            console.warn('[usersService] ⚠️ Unexpected: No participant data returned but no error thrown');
           }
         } catch (error) {
-          console.warn('[usersService] Error registering user as event participant:', error);
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          console.error('[usersService] ❌ Exception registering user as event participant:', {
+            error: errorMsg,
+            eventId,
+            userId,
+          });
           // Don't throw error - user creation was successful
         }
+      } else {
+        console.log('[usersService] No event ID provided, user created without event association');
       }
 
       console.log('[usersService] User created successfully:', transformedData);
