@@ -248,14 +248,38 @@ export const EventsManagement = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast({
+          title: 'Erro',
+          description: 'Arquivo muito grande. Máximo 5MB.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       setSelectedImageFile(file);
       setPreviewLoadError(false);
+
       // Show preview
       const reader = new FileReader();
-      reader.onloadend = () => {
+
+      reader.onload = () => {
         const imageUrl = reader.result as string;
         setImagePreview(imageUrl);
       };
+
+      reader.onerror = () => {
+        console.error('[EventsManagement] FileReader error reading image file');
+        setPreviewLoadError(true);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao ler arquivo de imagem',
+          variant: 'destructive',
+        });
+      };
+
       reader.readAsDataURL(file);
     }
   };
@@ -269,7 +293,7 @@ export const EventsManagement = () => {
       naturalWidth: e?.target?.naturalWidth,
       naturalHeight: e?.target?.naturalHeight,
     };
-    console.error('[EventsManagement] Error loading event image:', errorInfo);
+    console.error('[EventsManagement] Error loading event image:', JSON.stringify(errorInfo));
     setImageLoadError(true);
   };
 
@@ -282,7 +306,7 @@ export const EventsManagement = () => {
       naturalWidth: e?.target?.naturalWidth,
       naturalHeight: e?.target?.naturalHeight,
     };
-    console.error('[EventsManagement] Error loading preview image:', errorInfo);
+    console.error('[EventsManagement] Error loading preview image:', JSON.stringify(errorInfo));
     setPreviewLoadError(true);
   };
 

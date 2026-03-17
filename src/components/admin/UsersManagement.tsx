@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
+import { eventsService } from '@/lib/events.service';
 
 /**
  * Helper to check if email already exists
@@ -32,6 +33,7 @@ export const UsersManagement = () => {
     gender: 'Outro' as 'M' | 'F' | 'Outro',
     password: '',
     role: 'client' as 'admin' | 'client',
+    eventId: '',
   });
 
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
@@ -42,6 +44,30 @@ export const UsersManagement = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [bulkDeleteRole, setBulkDeleteRole] = useState<'admin' | 'client'>('client');
   const [bulkDeleteConfirmCount, setBulkDeleteConfirmCount] = useState(0);
+  const [events, setEvents] = useState<any[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+
+  // Load events when form opens
+  useEffect(() => {
+    if (showForm) {
+      loadEvents();
+    }
+  }, [showForm]);
+
+  const loadEvents = async () => {
+    setEventsLoading(true);
+    try {
+      const result = await eventsService.getEvents();
+      if (result.data) {
+        setEvents(result.data);
+      }
+    } catch (error) {
+      console.error('[UsersManagement] Error loading events:', error);
+      setEvents([]);
+    } finally {
+      setEventsLoading(false);
+    }
+  };
 
   const formatPhoneNumber = (value: string): string => {
     // Remove all non-digit characters
@@ -169,6 +195,7 @@ export const UsersManagement = () => {
             gender: 'Outro',
             password: '',
             role: 'client',
+            eventId: '',
           });
           setSelectedImageFile(undefined);
           setImagePreview(undefined);
@@ -205,7 +232,7 @@ export const UsersManagement = () => {
           gender: formData.gender,
           password: formData.password.trim(),
           role: formData.role,
-        }, selectedImageFile);
+        }, selectedImageFile, formData.eventId || undefined);
 
         console.log('[UsersManagement] Add user result:', result);
         if (result.data) {
@@ -221,6 +248,7 @@ export const UsersManagement = () => {
             gender: 'Outro',
             password: '',
             role: 'client',
+            eventId: '',
           });
           setSelectedImageFile(undefined);
           setImagePreview(undefined);
@@ -243,6 +271,7 @@ export const UsersManagement = () => {
         gender: 'Outro',
         password: '',
         role: 'client',
+        eventId: '',
       });
       setSelectedImageFile(undefined);
       setImagePreview(undefined);
@@ -318,6 +347,7 @@ export const UsersManagement = () => {
       gender: 'Outro',
       password: '',
       role: 'client',
+      eventId: '',
     });
     setSelectedImageFile(undefined);
     setImagePreview(undefined);
@@ -629,6 +659,31 @@ export const UsersManagement = () => {
                   <option value="F">Feminino</option>
                 </select>
               </div>
+
+              {/* Event Selection (only for new users) */}
+              {!editingId && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Evento {editingId ? '(Opcional)' : ''}
+                  </label>
+                  <select
+                    value={formData.eventId}
+                    onChange={(e) => setFormData(prev => ({ ...prev, eventId: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                    disabled={eventsLoading}
+                  >
+                    <option value="">Selecione um evento (opcional)</option>
+                    {events.map((event) => (
+                      <option key={event.id} value={event.id}>
+                        {event.title}
+                      </option>
+                    ))}
+                  </select>
+                  {events.length === 0 && !eventsLoading && (
+                    <p className="text-xs text-muted-foreground mt-2">Nenhum evento disponível</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Actions */}
