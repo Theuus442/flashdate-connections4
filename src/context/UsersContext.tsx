@@ -34,7 +34,7 @@ export interface User {
 
 interface UsersContextType {
   users: User[];
-  addUser: (user: Omit<User, 'id'>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
+  addUser: (user: Omit<User, 'id'>, profileImage?: File, eventId?: string) => Promise<{ data: User | null; error: string | null }>;
   updateUser: (id: string, user: Partial<User>, profileImage?: File) => Promise<{ data: User | null; error: string | null }>;
   deleteUser: (id: string) => Promise<boolean>;
   deleteAllByRole: (role: 'admin' | 'client') => Promise<{ count: number; error: any }>;
@@ -139,8 +139,8 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     loadUsers();
   }, [supabaseConfigured]);
 
-  const addUser = async (user: Omit<User, 'id'>, profileImage?: File) => {
-    console.log('[UsersContext] addUser called with:', user);
+  const addUser = async (user: Omit<User, 'id'>, profileImage?: File, eventId?: string) => {
+    console.log('[UsersContext] addUser called with:', user, 'eventId:', eventId);
 
     if (!supabaseConfigured) {
       console.log('[UsersContext] Supabase not configured, using local state');
@@ -155,7 +155,7 @@ export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     try {
       console.log('[UsersContext] Calling usersService.createUser...');
-      const { data, error } = await usersService.createUser(user, profileImage);
+      const { data, error } = await usersService.createUser(user, profileImage, eventId);
 
       const errorMessage = typeof error === 'string' ? error : serializeError(error);
       console.log('[UsersContext] createUser response:', {

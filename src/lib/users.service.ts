@@ -334,8 +334,9 @@ export const usersService = {
 
   /**
    * Create new user - creates user in both database and authentication
+   * @param eventId - Optional event ID to link the user to an event as a participant
    */
-  async createUser(user: Omit<User, 'id'>, profileImage?: File): Promise<{ data: User | null; error: any }> {
+  async createUser(user: Omit<User, 'id'>, profileImage?: File, eventId?: string): Promise<{ data: User | null; error: any }> {
     if (!isSupabaseConfigured()) {
       console.error('[usersService] Supabase not configured');
       return { data: null, error: 'Supabase not configured' };
@@ -469,6 +470,33 @@ export const usersService = {
         role: userData.role || 'client',
         profileImage: userData.profile_image_url,
       };
+
+      // If eventId is provided, register the user as a participant in that event
+      if (eventId) {
+        console.log('[usersService] Registering user as participant for event:', eventId);
+        try {
+          const { error: participantError } = await supabase
+            .from('event_participants')
+            .insert([{
+              event_id: eventId,
+              user_id: userId,
+              status: 'confirmed', // User is confirmed by admin
+              finalizado: false,
+            }]);
+
+          if (participantError) {
+            const errorStr = serializeError(participantError);
+            console.warn('[usersService] Warning: Could not register user as event participant:', errorStr);
+            // Don't throw error - user creation was successful, just participant registration failed
+            // The user is still created, just not linked to the event
+          } else {
+            console.log('[usersService] User registered as participant for event:', eventId);
+          }
+        } catch (error) {
+          console.warn('[usersService] Error registering user as event participant:', error);
+          // Don't throw error - user creation was successful
+        }
+      }
 
       console.log('[usersService] User created successfully:', transformedData);
       return { data: transformedData, error: null };
