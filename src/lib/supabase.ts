@@ -132,3 +132,15 @@ export const isSupabaseConfigured = (): boolean => {
 export const getSupabaseInitError = (): string | null => {
   return supbaseInitError;
 };
+
+// Helper to get Supabase configuration status
+export const getSupabaseStatus = () => {
+  return {
+    configured: isConfigured,
+    initialized: supabaseClient !== null,
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseAnonKey,
+    url: supabaseUrl ? supabaseUrl.substring(0, 20) + '...' : 'NOT SET',
+    error: supbaseInitError,
+  };
+};
