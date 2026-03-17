@@ -129,7 +129,7 @@ export const eventsService = {
   /**
    * Create new event
    */
-  async createEvent(eventData: Omit<EventData, 'id'>, eventImage?: File): Promise<{ data: EventData | null; error: any }> {
+  async createEvent(eventData: Omit<EventData, 'id'>, eventImage?: File, userId?: string): Promise<{ data: EventData | null; error: any }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Supabase not configured' };
     }
@@ -144,29 +144,36 @@ export const eventsService = {
         eventImageUrl = result.data || eventData.eventImage;
       }
 
+      const insertData: any = {
+        title: eventData.title,
+        location: eventData.location,
+        city: eventData.city,
+        date: eventData.date,
+        next_date: convertDateToSupabaseFormat(eventData.nextDate),
+        schedule: eventData.schedule,
+        check_in: eventData.checkIn,
+        environment: eventData.environment,
+        music: eventData.music,
+        dress_code: eventData.dressCode,
+        parking: eventData.parking,
+        price: eventData.price,
+        description: eventData.description,
+        event_image_url: eventImageUrl,
+        email: eventData.email,
+        whatsapp: eventData.whatsapp,
+        vagas: parseInt(eventData.vagas) || 0,
+        vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
+        age_range: eventData.ageRange,
+      };
+
+      // Add user_id if provided (required by RLS policy)
+      if (userId) {
+        insertData.user_id = userId;
+      }
+
       const { data, error } = await supabase
         .from('events')
-        .insert([{
-          title: eventData.title,
-          location: eventData.location,
-          city: eventData.city,
-          date: eventData.date,
-          next_date: convertDateToSupabaseFormat(eventData.nextDate),
-          schedule: eventData.schedule,
-          check_in: eventData.checkIn,
-          environment: eventData.environment,
-          music: eventData.music,
-          dress_code: eventData.dressCode,
-          parking: eventData.parking,
-          price: eventData.price,
-          description: eventData.description,
-          event_image_url: eventImageUrl,
-          email: eventData.email,
-          whatsapp: eventData.whatsapp,
-          vagas: parseInt(eventData.vagas) || 0,
-          vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
-          age_range: eventData.ageRange,
-        }])
+        .insert([insertData])
         .select()
         .single();
 

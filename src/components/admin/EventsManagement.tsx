@@ -5,6 +5,7 @@ import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { searchCities } from '@/lib/cities.service';
+import { useAuth } from '@/context/AuthContext';
 import { format, parse } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -61,6 +62,7 @@ const emptyEventForm: EventData = {
 
 export const EventsManagement = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const supabaseConfigured = isSupabaseConfigured();
   const [eventData, setEventData] = useState<EventData>(defaultEventData);
   const [isEditing, setIsEditing] = useState(false);
@@ -400,7 +402,8 @@ export const EventsManagement = () => {
       if (supabaseConfigured) {
         const { data, error } = await eventsService.createEvent(
           formData,
-          selectedImageFile || undefined
+          selectedImageFile || undefined,
+          user?.id
         );
 
         if (error) {
