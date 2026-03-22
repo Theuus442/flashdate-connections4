@@ -37,6 +37,22 @@ export const NextEventSection = () => {
       }
       return cleaned;
     };
+
+    // Exibe o número formatado com +55 (ex: +55 11 94163-7875)
+    const displayWhatsAppNumber = (number: string) => {
+      if (!number) return '';
+      let cleaned = number.replace(/\D/g, '');
+      if (!cleaned.startsWith('55')) {
+        cleaned = '55' + cleaned;
+      }
+      // Formatação: +55 11 94163-7875
+      if (cleaned.length === 13) {
+        return `+${cleaned.slice(0,2)} ${cleaned.slice(2,4)} ${cleaned.slice(4,9)}-${cleaned.slice(9)}`;
+      } else if (cleaned.length === 12) {
+        return `+${cleaned.slice(0,2)} ${cleaned.slice(2,4)} ${cleaned.slice(4,8)}-${cleaned.slice(8)}`;
+      }
+      return `+${cleaned}`;
+    };
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [event, setEvent] = useState<EventData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -261,7 +277,7 @@ export const NextEventSection = () => {
                     <div className="min-w-0">
                       <p className="text-xs text-muted-foreground">WhatsApp</p>
                       <a href={`https://wa.me/${event.whatsapp.replace(/\D/g, '')}`} className="text-foreground font-semibold hover:text-wine transition-colors break-all">
-                        {event.whatsapp}
+                        {displayWhatsAppNumber(event.whatsapp)}
                       </a>
                     </div>
                   </div>
