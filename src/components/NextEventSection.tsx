@@ -28,6 +28,15 @@ const formatDateToBR = (dateString: string): string => {
 };
 
 export const NextEventSection = () => {
+    // Garante que o número tenha o prefixo +55
+    const formatWhatsAppNumber = (number: string) => {
+      if (!number) return '';
+      let cleaned = number.replace(/\D/g, '');
+      if (!cleaned.startsWith('55')) {
+        cleaned = '55' + cleaned;
+      }
+      return cleaned;
+    };
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [event, setEvent] = useState<EventData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -269,7 +278,7 @@ export const NextEventSection = () => {
                   </div>
                   <div className="flex justify-center">
                     <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
-                      <a href={`https://wa.me/${event.whatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.`}>
+                      <a href={`https://wa.me/${formatWhatsAppNumber(event.whatsapp)}?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.`}>
                         Garantir Minha Vaga
                       </a>
                     </Button>
