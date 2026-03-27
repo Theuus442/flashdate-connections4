@@ -15,21 +15,14 @@ const steps = [
     number: '02',
     icon: UserPlus,
     title: 'Inscrição',
-    description: 'Após o pagamento, envie as informações abaixo para o email: contato@flashdate.com.br ou WhatsApp 11 941637875:',
-    details: [
-      'Comprovante de pagamento',
-      'Data de Nascimento',
-      'Sexo',
-      'E-mail de contato',
-      'Celular com DDD',
-      'Data do Evento desejado'
-    ],
+    description: 'Após o pagamento, envie o comprovante para o WhatsApp: 11 94163 7875',
+    details: [],
   },
   {
     number: '03',
     icon: Brain,
     title: 'Análise de IA',
-    description: 'Você receberá um questionário simples de 15 perguntas por e-mail. Nossa IA utilizará suas respostas para entender melhor seu perfil e encontrar o match mais compatível.',
+    description: 'Você receberá um questionário simples via WhatsApp. Nossa IA irá cruzar seus dados com os outros participantes para mostrar a compatibilidade entre vocês.',
     details: [],
   },
   {
@@ -50,8 +43,8 @@ const steps = [
     number: '06',
     icon: Mail,
     title: 'Resultados',
-    description: 'Você recebe o resultado via e-mail em até 24 horas com seus matches confirmados e contatos trocados.',
-    details: ['Contatos trocados quando ambos selecionam: Match ou Amizade', 'Contatos NÃO trocados quando um ou dois participantes selecionam: Não faz meu tipo', 'O contato só é liberado com Match ou Amizade mútua. Sua privacidade é sempre respeitada.'],
+    description: 'No final do evento, você já poderá acessar os seus "matchs", e ficar para um encontro, sem limite de tempo. Ou continuar no ambiente, interagindo com os outros participantes livremente em um "After". Você também receberá o resultado dos seus "matchs" via email.',
+    details: [],
   },
 ];
 
