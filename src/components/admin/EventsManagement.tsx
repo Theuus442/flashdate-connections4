@@ -34,6 +34,7 @@ const defaultEventData: EventData = {
   vagas: '1',
   vagasLimitDate: '25/01/2026',
   ageRange: '',
+  isLgbtOnly: false,
 };
 
 // Empty form for creating new events
@@ -58,12 +59,15 @@ const emptyEventForm: EventData = {
   vagas: '',
   vagasLimitDate: '',
   ageRange: '',
+  isLgbtOnly: false,
 };
 
 export const EventsManagement = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const supabaseConfigured = isSupabaseConfigured();
+  const [eventsList, setEventsList] = useState<EventData[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [eventData, setEventData] = useState<EventData>(defaultEventData);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -77,9 +81,9 @@ export const EventsManagement = () => {
   const [citySearchInput, setCitySearchInput] = useState('');
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
 
-  // Load event from Supabase on mount
+  // Load all events from Supabase on mount
   useEffect(() => {
-    const loadEvent = async () => {
+    const loadEvents = async () => {
       if (!supabaseConfigured) {
         console.log('[EventsManagement] Supabase not configured, using offline mode');
         return;
@@ -89,27 +93,29 @@ export const EventsManagement = () => {
       try {
         const events = await eventsService.getEvents();
         if (events.data && events.data.length > 0) {
-          // Get the first event (or latest)
-          const event = events.data[0];
-          console.log('[EventsManagement] Loaded event:', event);
-          setEventData(event);
-          setFormData(event);
-          setImagePreview(event.eventImage);
+          console.log('[EventsManagement] Loaded events:', events.data);
+          setEventsList(events.data);
+          // Select the first event by default
+          const firstEvent = events.data[0];
+          setSelectedEventId(firstEvent.id);
+          setEventData(firstEvent);
+          setFormData(firstEvent);
+          setImagePreview(firstEvent.eventImage);
           setImageLoadError(false);
           setPreviewLoadError(false);
         } else {
           console.warn('[EventsManagement] No events found in database');
           toast({
             title: 'Aviso',
-            description: 'Nenhum evento encontrado no banco de dados',
+            description: 'Nenhum evento encontrado. Crie um novo evento.',
             variant: 'default',
           });
         }
       } catch (error) {
-        console.error('[EventsManagement] Error loading event:', error);
+        console.error('[EventsManagement] Error loading events:', error);
         toast({
           title: 'Erro',
-          description: 'Erro ao carregar evento do banco de dados',
+          description: 'Erro ao carregar eventos do banco de dados',
           variant: 'destructive',
         });
       } finally {
@@ -117,8 +123,23 @@ export const EventsManagement = () => {
       }
     };
 
-    loadEvent();
+    loadEvents();
   }, [supabaseConfigured, toast]);
+
+  // Handle event selection change
+  const handleEventSelect = (eventId: string) => {
+    const selected = eventsList.find(e => e.id === eventId);
+    if (selected) {
+      setSelectedEventId(eventId);
+      setEventData(selected);
+      setFormData(selected);
+      setImagePreview(selected.eventImage);
+      setImageLoadError(false);
+      setPreviewLoadError(false);
+      setIsEditing(false);
+      setIsCreating(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -534,12 +555,41 @@ export const EventsManagement = () => {
             <Button variant="outline" onClick={handleCreateNew} disabled={isLoading}>
               + Adicionar Evento
             </Button>
-            <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading}>
+            <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading || eventsList.length === 0}>
               Editar Evento
+            </Button>
+            <Button variant="outline" asChild>
+              <a href="#lgbtq" className="flex items-center gap-2">
+                🏳️‍🌈 Seção LGBT+
+              </a>
             </Button>
           </div>
         )}
       </div>
+
+      {/* Events List Section - Show when not editing */}
+      {!isEditing && eventsList.length > 0 && (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <h3 className="font-semibold text-lg text-foreground mb-4">Selecione um evento para visualizar ou editar</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {eventsList.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => handleEventSelect(event.id)}
+                className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  selectedEventId === event.id
+                    ? 'border-gold bg-gold/10'
+                    : 'border-border hover:border-gold/50'
+                }`}
+              >
+                <h4 className="font-semibold text-foreground mb-1">{event.title}</h4>
+                <p className="text-sm text-muted-foreground">{event.city}</p>
+                <p className="text-xs text-muted-foreground mt-1">{event.date}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Event Form or Display */}
       {isEditing ? (
@@ -853,6 +903,26 @@ export const EventsManagement = () => {
                   rows={4}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300 resize-none"
                 />
+              </div>
+
+              {/* LGBT Only Checkbox */}
+              <div className="md:col-span-2">
+                <label className="flex items-center gap-3 p-4 rounded-lg border border-border bg-muted/30 hover:border-primary/50 transition-colors cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isLgbtOnly"
+                    checked={formData.isLgbtOnly}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      isLgbtOnly: e.target.checked
+                    }))}
+                    className="w-5 h-5 rounded border-border cursor-pointer accent-primary"
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-foreground">🏳️‍🌈 Evento Exclusivo LGBT+</p>
+                    <p className="text-sm text-muted-foreground">Este evento será exibido apenas na seção LGBT+ do site</p>
+                  </div>
+                </label>
               </div>
             </div>
 
