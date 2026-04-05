@@ -25,6 +25,7 @@ export interface EventData {
   vagasLimitDate: string;
   ageRange: string;
   isLgbtOnly: boolean;
+  lgbtType: string;
 }
 
 /**
@@ -75,6 +76,7 @@ function transformEventData(event: any): EventData {
     vagasLimitDate: event.vagas_limit_date,
     ageRange: event.age_range || '',
     isLgbtOnly: event.is_lgbt_only || false,
+    lgbtType: event.lgbt_type || '',
   };
 }
 
@@ -167,6 +169,7 @@ export const eventsService = {
         vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate) || null,
         age_range: eventData.ageRange,
         is_lgbt_only: eventData.isLgbtOnly || false,
+        lgbt_type: eventData.lgbtType || '',
       };
 
       // Add user_id if provided (required by RLS policy)
@@ -229,6 +232,7 @@ export const eventsService = {
       if (updates.vagasLimitDate !== undefined) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate) || null;
       if (updates.ageRange) updateData.age_range = updates.ageRange;
       if (updates.isLgbtOnly !== undefined) updateData.is_lgbt_only = updates.isLgbtOnly;
+      if (updates.lgbtType !== undefined) updateData.lgbt_type = updates.lgbtType || '';
 
       // Update event without .single() - RLS might affect return value
       const { error: updateError } = await supabase

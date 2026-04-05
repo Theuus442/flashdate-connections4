@@ -35,6 +35,7 @@ const defaultEventData: EventData = {
   vagasLimitDate: '25/01/2026',
   ageRange: '',
   isLgbtOnly: false,
+  lgbtType: '',
 };
 
 // Empty form for creating new events
@@ -60,6 +61,7 @@ const emptyEventForm: EventData = {
   vagasLimitDate: '',
   ageRange: '',
   isLgbtOnly: false,
+  lgbtType: '',
 };
 
 export const EventsManagement = () => {
@@ -558,11 +560,6 @@ export const EventsManagement = () => {
             <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading || eventsList.length === 0}>
               Editar Evento
             </Button>
-            <Button variant="outline" asChild>
-              <a href="#lgbtq" className="flex items-center gap-2">
-                🏳️‍🌈 Seção LGBT+
-              </a>
-            </Button>
           </div>
         )}
       </div>
@@ -924,6 +921,27 @@ export const EventsManagement = () => {
                   </div>
                 </label>
               </div>
+
+              {/* LGBT Type Input */}
+              {formData.isLgbtOnly && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-foreground mb-2">
+                    Tipo do Evento LGBT+ (ex: Lésbicas, Gays, Trans, Outros)
+                  </label>
+                  <input
+                    type="text"
+                    name="lgbtType"
+                    maxLength={20}
+                    value={formData.lgbtType}
+                    onChange={handleInputChange}
+                    placeholder="Máx. 20 caracteres"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formData.lgbtType.length}/20
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
