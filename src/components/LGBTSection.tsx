@@ -342,7 +342,7 @@ export const LGBTSection = () => {
                             <div className="flex items-start gap-3">
                               <Calendar className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                               <div>
-                                <p className="text-xs text-muted-foreground">Data/Frequência</p>
+                                <p className="text-xs text-muted-foreground">Data</p>
                                 <p className="text-sm font-semibold text-foreground">{selectedEvent.date}</p>
                               </div>
                             </div>
