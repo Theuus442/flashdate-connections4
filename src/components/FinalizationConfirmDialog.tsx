@@ -86,6 +86,13 @@ export default function FinalizationConfirmDialog({
           </div>
         </div>
 
+        {/* Information about match distribution */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-sm text-blue-900">
+            <strong>💌 Seus matches serão enviados por email</strong> assim que a administração finalizar o processo para todos os participantes.
+          </p>
+        </div>
+
 
         {/* Agreement checkbox */}
         <label className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
