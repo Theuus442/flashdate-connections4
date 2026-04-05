@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, Users, Music, Shirt, CreditCard, AlertCircle, Phone, Mail, Clock8 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import venueImage from '@/assets/WhatsApp Image 2026-01-05 at 21.51.33.jpeg';
@@ -57,6 +57,7 @@ export const NextEventSection = () => {
   const [events, setEvents] = useState<EventData[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const eventDetailsRef = useRef<HTMLDivElement | null>(null);
   const supabaseConfigured = isSupabaseConfigured();
 
   useEffect(() => {
@@ -78,6 +79,23 @@ export const NextEventSection = () => {
 
     loadEvents();
   }, [supabaseConfigured]);
+
+  // Auto-scroll to event details when selected
+  useEffect(() => {
+    if (selectedEventId && eventDetailsRef.current) {
+      // Usar um delay maior para garantir que o DOM foi renderizado
+      const timer = setTimeout(() => {
+        if (eventDetailsRef.current) {
+          eventDetailsRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedEventId]);
 
   const selectedEvent = events.find(e => e.id === selectedEventId) || null;
 
@@ -169,7 +187,10 @@ export const NextEventSection = () => {
 
               {/* Expanded Event Details */}
               {selectedEvent && (
-                <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div 
+                  ref={eventDetailsRef}
+                  className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant animate-in fade-in slide-in-from-bottom-4 duration-300"
+                >
                   <div className="grid md:grid-cols-2 gap-8 p-6 md:p-12">
                     {/* Image */}
                     <div className="relative overflow-hidden rounded-2xl h-96">
