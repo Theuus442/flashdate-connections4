@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Calendar, Heart, LogOut } from 'lucide-react';
+import { Users, Calendar, Heart, LogOut, Sparkles } from 'lucide-react';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { EventsManagement } from '@/components/admin/EventsManagement';
 import { SelectionsManagement } from '@/components/admin/SelectionsManagement';
+import MatchesManagement from '@/components/admin/MatchesManagement';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
-type AdminTab = 'users' | 'events' | 'selections';
+type AdminTab = 'users' | 'events' | 'selections' | 'matches';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('users');
@@ -96,6 +97,17 @@ export default function AdminPanel() {
                 <Heart size={18} />
                 <span className="hidden sm:inline">Seleções</span>
               </button>
+              <button
+                onClick={() => setActiveTab('matches')}
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 text-sm sm:text-base whitespace-nowrap ${
+                  activeTab === 'matches'
+                    ? 'border-gold text-gold'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Sparkles size={18} />
+                <span className="hidden sm:inline">Matches</span>
+              </button>
             </div>
           </div>
         </div>
@@ -106,6 +118,7 @@ export default function AdminPanel() {
             {activeTab === 'users' && <UsersManagement />}
             {activeTab === 'events' && <EventsManagement />}
             {activeTab === 'selections' && <SelectionsManagement />}
+            {activeTab === 'matches' && <MatchesManagement />}
           </div>
         </div>
       </div>

@@ -24,6 +24,8 @@ export interface EventData {
   vagas: string;
   vagasLimitDate: string;
   ageRange: string;
+  isLgbtOnly: boolean;
+  lgbtType: string;
 }
 
 /**
@@ -73,6 +75,8 @@ function transformEventData(event: any): EventData {
     vagas: event.vagas?.toString() || '',
     vagasLimitDate: event.vagas_limit_date,
     ageRange: event.age_range || '',
+    isLgbtOnly: event.is_lgbt_only || false,
+    lgbtType: event.lgbt_type || '',
   };
 }
 
@@ -89,7 +93,7 @@ export const eventsService = {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('next_date', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -149,7 +153,7 @@ export const eventsService = {
         location: eventData.location,
         city: eventData.city,
         date: eventData.date,
-        next_date: convertDateToSupabaseFormat(eventData.nextDate),
+        next_date: convertDateToSupabaseFormat(eventData.nextDate) || null,
         schedule: eventData.schedule,
         check_in: eventData.checkIn,
         environment: eventData.environment,
@@ -162,8 +166,10 @@ export const eventsService = {
         email: eventData.email,
         whatsapp: eventData.whatsapp,
         vagas: parseInt(eventData.vagas) || 0,
-        vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate),
+        vagas_limit_date: convertDateToSupabaseFormat(eventData.vagasLimitDate) || null,
         age_range: eventData.ageRange,
+        is_lgbt_only: eventData.isLgbtOnly || false,
+        lgbt_type: eventData.lgbtType || '',
       };
 
       // Add user_id if provided (required by RLS policy)
@@ -210,7 +216,7 @@ export const eventsService = {
       if (updates.location) updateData.location = updates.location;
       if (updates.city) updateData.city = updates.city;
       if (updates.date) updateData.date = updates.date;
-      if (updates.nextDate) updateData.next_date = convertDateToSupabaseFormat(updates.nextDate);
+      if (updates.nextDate !== undefined) updateData.next_date = convertDateToSupabaseFormat(updates.nextDate) || null;
       if (updates.schedule) updateData.schedule = updates.schedule;
       if (updates.checkIn) updateData.check_in = updates.checkIn;
       if (updates.environment) updateData.environment = updates.environment;
@@ -223,8 +229,10 @@ export const eventsService = {
       if (updates.email) updateData.email = updates.email;
       if (updates.whatsapp) updateData.whatsapp = updates.whatsapp;
       if (updates.vagas) updateData.vagas = parseInt(updates.vagas) || 0;
-      if (updates.vagasLimitDate) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate);
+      if (updates.vagasLimitDate !== undefined) updateData.vagas_limit_date = convertDateToSupabaseFormat(updates.vagasLimitDate) || null;
       if (updates.ageRange) updateData.age_range = updates.ageRange;
+      if (updates.isLgbtOnly !== undefined) updateData.is_lgbt_only = updates.isLgbtOnly;
+      if (updates.lgbtType !== undefined) updateData.lgbt_type = updates.lgbtType || '';
 
       // Update event without .single() - RLS might affect return value
       const { error: updateError } = await supabase

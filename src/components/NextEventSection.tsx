@@ -54,29 +54,32 @@ export const NextEventSection = () => {
       return `+${cleaned}`;
     };
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
-  const [event, setEvent] = useState<EventData | null>(null);
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const supabaseConfigured = isSupabaseConfigured();
 
   useEffect(() => {
-    const loadEvent = async () => {
+    const loadEvents = async () => {
       setIsLoading(true);
       try {
         if (supabaseConfigured) {
           const { data, error } = await eventsService.getEvents();
           if (data && data.length > 0) {
-            setEvent(data[0]);
+            setEvents(data);
           }
         }
       } catch (error) {
-        console.error('Error loading event:', error);
+        console.error('Error loading events:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadEvent();
+    loadEvents();
   }, [supabaseConfigured]);
+
+  const selectedEvent = events.find(e => e.id === selectedEventId) || null;
 
   const cities = [
     { name: 'São Paulo', id: 'sp' },
@@ -110,197 +113,166 @@ export const NextEventSection = () => {
           </h2>
         </div>
 
-        {/* Event Card */}
-        <div className="max-w-5xl mx-auto mb-16">
+        {/* Events Grid with Expandable Cards */}
+        <div className="max-w-6xl mx-auto mb-16">
           {isLoading ? (
             <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant p-12 text-center">
-              <p className="text-muted-foreground">Carregando próximo evento...</p>
+              <p className="text-muted-foreground">Carregando eventos...</p>
             </div>
-          ) : event ? (
-            <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant">
-              {/* Venue Image */}
-              <div className="relative w-full overflow-hidden rounded-t-3xl" style={{aspectRatio: '16/9', maxHeight: '350px'}}>
-                <img
-                  src={event.eventImage || venueImage}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.error('[NextEventSection] Error loading event image:', event.eventImage);
-                    // Fallback to default image
-                    (e.target as HTMLImageElement).src = venueImage;
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-              </div>
+          ) : events.length > 0 ? (
+            <div className="space-y-8">
+              {/* Events Grid - Thumbnails */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {events.map((event) => (
+                  <button
+                    key={event.id}
+                    onClick={() => setSelectedEventId(event.id)}
+                    className={`relative group overflow-hidden rounded-2xl border-2 transition-all duration-300 h-64 ${
+                      selectedEventId === event.id
+                        ? 'border-primary shadow-elegant col-span-full lg:col-span-1'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    {/* Image */}
+                    <img
+                      src={event.eventImage || venueImage}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = venueImage;
+                      }}
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-              {/* Header Banner */}
-              <div className="bg-gradient-to-r from-primary via-primary-light to-primary p-6 text-center">
-                <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
-                  {event.title}
-                </h3>
-                <p className="text-white/80 text-sm">{event.description}</p>
-              </div>
-
-              {/* Content */}
-              <div className="p-8 md:p-12">
-                <div className="grid md:grid-cols-2 gap-8 mb-10">
-                  {/* Location & Date */}
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-6 h-6 text-secondary" />
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-4">
+                      <h3 className="font-serif text-xl font-bold text-white mb-1">{event.title}</h3>
+                      <div className="flex items-center gap-2 text-white/80 text-sm">
+                        <MapPin className="w-4 h-4" />
+                        <span>{event.city}</span>
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Local</h4>
-                        <p className="text-muted-foreground text-sm">{event.location}</p>
-                        {event.city && <p className="text-muted-foreground text-sm">{event.city}</p>}
+                      <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{event.date}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-6 h-6 text-secondary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Data</h4>
-                        <p className="text-muted-foreground text-sm">{event.date}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-6 h-6 text-secondary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Horário</h4>
-                        <p className="text-muted-foreground text-sm">{event.schedule}</p>
-                        <p className="text-wine font-semibold text-xs mt-1">Check-in: {event.checkIn}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Details */}
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                      <Music className="w-6 h-6 text-secondary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Ambiente</h4>
-                        <p className="text-muted-foreground text-sm">{event.environment}</p>
-                        {event.music && <p className="text-muted-foreground text-sm mt-1">{event.music}</p>}
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <Shirt className="w-6 h-6 text-secondary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Dress Code</h4>
-                        <p className="text-muted-foreground text-sm">{event.dressCode}</p>
-                      </div>
-                    </div>
-
-                    {event.ageRange && (
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                          <Users className="w-6 h-6 text-secondary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-foreground mb-1">Faixa Etária</h4>
-                          <p className="text-muted-foreground text-sm">{event.ageRange}</p>
-                        </div>
-                      </div>
+                    {/* Selected Indicator */}
+                    {selectedEventId === event.id && (
+                      <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-primary border-2 border-white" />
                     )}
-
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <Users className="w-6 h-6 text-secondary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Estacionamento</h4>
-                        <p className="text-muted-foreground text-sm">{event.parking}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Important Warnings */}
-                <div className="space-y-4 mb-10">
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                    <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Valor: {event.price}</p>
-                      <p className="text-muted-foreground">Pagamento via Pix: {event.whatsapp}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/10 border border-primary/20">
-                    <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Garanta sua vaga até: {formatDateToBR(event.vagasLimitDate)}</p>
-                      <p className="text-muted-foreground">Vagas limitadas</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                    <AlertCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Após o pagamento</p>
-                      <p className="text-muted-foreground">Acesse a aba <a href="#como-funciona" className="text-wine font-semibold hover:underline">Como Funciona</a> para saber os próximos passos</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                    <Clock8 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">Horário do Evento</p>
-                      <p className="text-muted-foreground">{event.schedule} (chegue com 15-30 min de antecedência para o check-in)</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="grid md:grid-cols-2 gap-4 mb-10 p-4 rounded-xl bg-card border border-border">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <Mail className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">Email</p>
-                      <a href={`mailto:${event.email}`} className="text-foreground font-semibold hover:text-wine transition-colors break-all">
-                        {event.email}
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 min-w-0">
-                    <Phone className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">WhatsApp</p>
-                      <a href={`https://wa.me/${event.whatsapp.replace(/\D/g, '')}`} className="text-foreground font-semibold hover:text-wine transition-colors break-all">
-                        {displayWhatsAppNumber(event.whatsapp)}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Price & CTA */}
-                <div className="text-center border-t border-border pt-8">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <CreditCard className="w-5 h-5 text-secondary" />
-                    <span className="text-sm text-muted-foreground">Valor Promocional</span>
-                  </div>
-                  <div className="mb-6">
-                    <span className="font-serif text-5xl font-bold text-gradient-wine">{event.price}</span>
-                  </div>
-                  <div className="flex justify-center">
-                    <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
-                      <a href={`https://wa.me/${formatWhatsAppNumber(event.whatsapp)}?text=Olá! Gostaria de me inscrever no próximo evento Flashdate.`}>
-                        Garantir Minha Vaga
-                      </a>
-                    </Button>
-                  </div>
-                </div>
+                  </button>
+                ))}
               </div>
+
+              {/* Expanded Event Details */}
+              {selectedEvent && (
+                <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="grid md:grid-cols-2 gap-8 p-6 md:p-12">
+                    {/* Image */}
+                    <div className="relative overflow-hidden rounded-2xl h-96">
+                      <img
+                        src={selectedEvent.eventImage || venueImage}
+                        alt={selectedEvent.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = venueImage;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex flex-col justify-between">
+                      <div className="space-y-6">
+                        {/* Header */}
+                        <div>
+                          <h2 className="font-serif text-3xl font-bold text-foreground mb-2">
+                            {selectedEvent.title}
+                          </h2>
+                          <p className="text-muted-foreground text-base">{selectedEvent.description}</p>
+                        </div>
+
+                        {/* Info Grid */}
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <MapPin className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                              <p className="text-xs text-muted-foreground">Local</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedEvent.location}</p>
+                              {selectedEvent.city && <p className="text-xs text-muted-foreground">{selectedEvent.city}</p>}
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Calendar className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Data/Frequência</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedEvent.date}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Clock className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Horário</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedEvent.schedule}</p>
+                              <p className="text-xs text-wine mt-1">Check-in: {selectedEvent.checkIn}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Music className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                              <p className="text-xs text-muted-foreground">Ambiente</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedEvent.environment}</p>
+                              {selectedEvent.music && <p className="text-xs text-muted-foreground mt-1">{selectedEvent.music}</p>}
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Shirt className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Dress Code</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedEvent.dressCode}</p>
+                            </div>
+                          </div>
+
+                          {selectedEvent.ageRange && (
+                            <div className="flex items-start gap-3">
+                              <Users className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Faixa Etária</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedEvent.ageRange}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Price & CTA */}
+                      <div className="flex items-end justify-between gap-4 pt-6 border-t border-border">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Valor do Evento</p>
+                          <p className="text-3xl font-bold text-gradient-wine">{selectedEvent.price}</p>
+                        </div>
+                        <div className="space-y-2 flex-1">
+                          <Button variant="hero" size="sm" className="w-full" asChild>
+                            <a href={`https://wa.me/${formatWhatsAppNumber(selectedEvent.whatsapp)}?text=Olá! Gostaria de me inscrever no evento: ${selectedEvent.title}`}>
+                              Garantir Vaga
+                            </a>
+                          </Button>
+                          <Button variant="outline" size="sm" className="w-full" onClick={() => setSelectedEventId(null)}>
+                            Fechar
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-card-gradient rounded-3xl border border-secondary/20 overflow-hidden shadow-elegant p-12 text-center">
