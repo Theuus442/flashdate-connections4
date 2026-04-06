@@ -10,6 +10,7 @@ import { useSelections } from '@/context/SelectionsContext';
 import { selectionsService } from '@/lib/selections.service';
 import { eventsService } from '@/lib/events.service';
 import { finalizationService } from '@/lib/finalization.service';
+import { eventParticipantsService } from '@/lib/event-participants.service';
 import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
 import FinalizedProfileBadge from '@/components/FinalizedProfileBadge';
 
@@ -93,13 +94,14 @@ export default function EventUserSelection() {
 
   // Load current user and participants from database
   useEffect(() => {
-    if (!authUser) {
-      console.log('[EventUserSelection] No auth user yet');
+    if (!authUser || !currentEventId) {
+      console.log('[EventUserSelection] Waiting for auth user or event ID...');
       return;
     }
 
     console.log('[EventUserSelection] Loading data...', {
       authUserId: authUser.id,
+      eventId: currentEventId,
       usersCount: users.length,
       isLoading,
     });
@@ -125,41 +127,58 @@ export default function EventUserSelection() {
       }
     }
 
-    // Get other participants (excluding current user and admin users)
-    const otherUsers = users.filter(u => {
-      const isCurrentUser = u.id === authUser.id;
-      const isAdmin = u.role === 'admin';
-      const isParticipant = !isCurrentUser && !isAdmin;
+    // Load event participants and filter users
+    const loadEventParticipants = async () => {
+      try {
+        const { data: eventParticipants, error } = await eventParticipantsService.getEventParticipants(currentEventId);
+        
+        if (error) {
+          console.error('[EventUserSelection] Error loading event participants:', error);
+          setParticipants([]);
+          return;
+        }
 
-      if (!isParticipant && u.id !== authUser.id) {
-        console.log('[EventUserSelection] Filtering out:', {
-          name: u.name,
-          id: u.id,
-          role: u.role,
-          isCurrentUser,
-          isAdmin,
+        if (!eventParticipants || eventParticipants.length === 0) {
+          console.log('[EventUserSelection] No participants in this event yet');
+          setParticipants([]);
+          return;
+        }
+
+        // Get user IDs of event participants (excluding current user)
+        const participantUserIds = eventParticipants
+          .map(p => p.userId)
+          .filter(id => id !== authUser.id);
+
+        console.log('[EventUserSelection] Event participant IDs:', participantUserIds);
+
+        // Filter users to only include event participants (excluding admins)
+        const otherUsers = users.filter(u => {
+          const isEventParticipant = participantUserIds.includes(u.id);
+          const isAdmin = u.role === 'admin';
+          return isEventParticipant && !isAdmin;
         });
+
+        console.log('[EventUserSelection] Participants loaded for event:', {
+          eventId: currentEventId,
+          count: otherUsers.length,
+          totalUsers: users.length,
+          currentUserId: authUser.id,
+          participantNames: otherUsers.map(u => ({ name: u.name, id: u.id })),
+        });
+        
+        setParticipants(otherUsers);
+
+        if (otherUsers.length === 0) {
+          console.warn('[EventUserSelection] No other participants found in this event');
+        }
+      } catch (error) {
+        console.error('[EventUserSelection] Error loading participants:', error);
+        setParticipants([]);
       }
+    };
 
-      return isParticipant;
-    });
-
-    console.log('[EventUserSelection] Participants loaded:', {
-      count: otherUsers.length,
-      totalUsers: users.length,
-      currentUserId: authUser.id,
-      participantNames: otherUsers.map(u => ({ name: u.name, role: u.role })),
-    });
-    setParticipants(otherUsers);
-
-    if (otherUsers.length === 0 && users.length > 0) {
-      console.warn('[EventUserSelection] No participants found but users exist', {
-        totalUsers: users.length,
-        userRoles: users.map(u => ({ name: u.name, role: u.role, id: u.id })),
-      });
-      toast.warning('Nenhum outro participante disponível');
-    }
-  }, [authUser, users]);
+    loadEventParticipants();
+  }, [authUser, currentEventId, users]);
 
   // Load existing selections from database on mount
   useEffect(() => {

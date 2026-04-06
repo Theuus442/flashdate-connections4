@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, AlertCircle, Search } from 'lucide-react';
+import { Upload, AlertCircle, Search, Trash2 } from 'lucide-react';
 import { eventsService, EventData } from '@/lib/events.service';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -82,6 +82,7 @@ export const EventsManagement = () => {
   const [cities, setCities] = useState<Array<{ id: number; nome: string }>>([]);
   const [citySearchInput, setCitySearchInput] = useState('');
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Load all events from Supabase on mount
   useEffect(() => {
@@ -508,6 +509,79 @@ export const EventsManagement = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedEventId) {
+      toast({
+        title: 'Erro',
+        description: 'Nenhum evento selecionado',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setShowDeleteConfirm(false);
+
+    try {
+      if (supabaseConfigured) {
+        const { error } = await eventsService.deleteEvent(selectedEventId);
+
+        if (error) {
+          const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+          console.error('[EventsManagement] Error deleting event:', errorMsg);
+          toast({
+            title: 'Erro',
+            description: `Falha ao deletar evento: ${errorMsg}`,
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        // Remove event from local list
+        const updatedList = eventsList.filter(e => e.id !== selectedEventId);
+        setEventsList(updatedList);
+
+        // Select another event if available
+        if (updatedList.length > 0) {
+          const newSelectedEvent = updatedList[0];
+          setSelectedEventId(newSelectedEvent.id);
+          setEventData(newSelectedEvent);
+          setFormData(newSelectedEvent);
+          setImagePreview(newSelectedEvent.eventImage);
+        } else {
+          // No events left, reset to empty state
+          setSelectedEventId('');
+          setEventData(emptyEventForm);
+          setFormData(emptyEventForm);
+          setImagePreview('');
+        }
+
+        setImageLoadError(false);
+        setPreviewLoadError(false);
+
+        toast({
+          title: 'Sucesso',
+          description: 'Evento deletado com sucesso!',
+        });
+      } else {
+        toast({
+          title: 'Erro',
+          description: 'Supabase não configurado',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('[EventsManagement] Error deleting event:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao deletar evento',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading && !eventData.id) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -559,6 +633,15 @@ export const EventsManagement = () => {
             </Button>
             <Button variant="gold" onClick={() => setIsEditing(true)} disabled={isLoading || eventsList.length === 0}>
               Editar Evento
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => setShowDeleteConfirm(true)} 
+              disabled={isLoading || eventsList.length === 0}
+              className="gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Deletar Evento
             </Button>
           </div>
         )}
@@ -1000,6 +1083,44 @@ export const EventsManagement = () => {
               <InfoItem label="WhatsApp" value={eventData.whatsapp} />
               <InfoItem label="Vagas" value={eventData.vagas} />
               <InfoItem label="Limite de Vagas" value={formatDateToDisplay(eventData.vagasLimitDate)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-md mx-4">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-6 h-6 text-destructive" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-bold text-foreground mb-2">
+                  Deletar Evento
+                </h3>
+                <p className="text-muted-foreground">
+                  Tem certeza que deseja deletar o evento <strong>"{eventData.title}"</strong>? 
+                  Esta ação não pode ser desfeita.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleDelete}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Deletando...' : 'Sim, Deletar'}
+              </Button>
             </div>
           </div>
         </div>

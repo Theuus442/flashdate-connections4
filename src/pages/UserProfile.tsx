@@ -8,6 +8,7 @@ import { useSelections } from '@/context/SelectionsContext';
 import { useAuth } from '@/context/AuthContext';
 import { eventsService } from '@/lib/events.service';
 import { finalizationService } from '@/lib/finalization.service';
+import { eventParticipantsService } from '@/lib/event-participants.service';
 import FinalizationConfirmDialog from '@/components/FinalizationConfirmDialog';
 import FinalizedProfileBadge, { FinalizedStatusCard } from '@/components/FinalizedProfileBadge';
 
@@ -90,10 +91,57 @@ export default function UserProfile() {
   const [isUserFinalized, setIsUserFinalized] = useState(false);
   const [showFinalizationDialog, setShowFinalizationDialog] = useState(false);
   const [isFinalizingSelections, setIsFinalizingSelections] = useState(false);
+  const [eventParticipantIds, setEventParticipantIds] = useState<string[]>([]);
+
+  // Load event participants when event changes
+  useEffect(() => {
+    const loadEventParticipants = async () => {
+      if (!currentEventId) {
+        setEventParticipantIds([]);
+        return;
+      }
+
+      try {
+        const { data: participants, error } = await eventParticipantsService.getEventParticipants(currentEventId);
+        
+        if (error) {
+          console.error('[UserProfile] Error loading event participants:', error);
+          setEventParticipantIds([]);
+          return;
+        }
+
+        if (participants) {
+          const participantIds = participants.map(p => p.userId);
+          console.log('[UserProfile] Loaded event participants:', {
+            eventId: currentEventId,
+            count: participantIds.length,
+            ids: participantIds
+          });
+          setEventParticipantIds(participantIds);
+        }
+      } catch (error) {
+        console.error('[UserProfile] Error loading participants:', error);
+        setEventParticipantIds([]);
+      }
+    };
+
+    loadEventParticipants();
+  }, [currentEventId]);
 
   // Filter and sort users excluding the current user and admins
   const otherUsers = useMemo(() => {
-    let filtered = currentUser ? allUsers.filter(user => user.id !== currentUser.id && user.role !== 'admin') : allUsers;
+    let filtered = currentUser ? allUsers.filter(user => {
+      // Exclude current user and admins
+      if (user.id === currentUser.id || user.role === 'admin') return false;
+      
+      // Only show participants of the current event
+      if (currentEventId && eventParticipantIds.length > 0) {
+        return eventParticipantIds.includes(user.id);
+      }
+      
+      // If no event selected, show no participants
+      return false;
+    }) : [];
 
     // Apply gender filter
     if (genderFilter !== 'all') {
@@ -107,7 +155,7 @@ export default function UserProfile() {
     });
 
     return filtered;
-  }, [currentUser, allUsers, genderFilter, sortOrder]);
+  }, [currentUser, allUsers, genderFilter, sortOrder, currentEventId, eventParticipantIds]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

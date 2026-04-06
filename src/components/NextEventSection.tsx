@@ -67,7 +67,9 @@ export const NextEventSection = () => {
         if (supabaseConfigured) {
           const { data, error } = await eventsService.getEvents();
           if (data && data.length > 0) {
-            setEvents(data);
+            // Filter out LGBT+ exclusive events - they should only appear in LGBT section
+            const generalEvents = data.filter(event => !event.isLgbtOnly);
+            setEvents(generalEvents);
           }
         }
       } catch (error) {

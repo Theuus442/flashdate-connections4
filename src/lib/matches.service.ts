@@ -56,6 +56,12 @@ export const matchesService = {
 
       if (participantsError) throw participantsError;
 
+      console.log('[matchesService.getEventMatchStatus] Raw participants data:', {
+        eventId,
+        count: participants?.length || 0,
+        participants,
+      });
+
       // Get event title
       const { data: eventData, error: eventError } = await supabase
         .from('events')
@@ -65,15 +71,33 @@ export const matchesService = {
 
       if (eventError) throw eventError;
 
-      const participantStatuses = (participants || []).map((p: any) => ({
-        userId: p.user_id,
-        name: p.users?.name || 'Unknown',
-        email: p.users?.email || 'Unknown',
-        finalizado: p.finalizado || false,
-      }));
+      const participantStatuses = (participants || []).map((p: any) => {
+        // Log if user data is missing
+        if (!p.users) {
+          console.warn('[matchesService.getEventMatchStatus] Missing user data for participant:', {
+            eventId,
+            userId: p.user_id,
+          });
+        }
+        
+        return {
+          userId: p.user_id,
+          name: p.users?.name || 'Usuário Desconhecido',
+          email: p.users?.email || 'Email não encontrado',
+          finalizado: p.finalizado || false,
+        };
+      });
 
       const finalizedCount = participantStatuses.filter((p) => p.finalizado).length;
       const matchesSent = (participants || [])[0]?.matches_sent || false;
+
+      console.log('[matchesService.getEventMatchStatus] Processed status:', {
+        eventId,
+        eventTitle: eventData?.title,
+        totalParticipants: participants?.length || 0,
+        finalizedCount,
+        matchesSent,
+      });
 
       return {
         eventId,

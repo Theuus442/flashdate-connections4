@@ -4,6 +4,7 @@ import { Trash2, Edit2, Plus, Upload, X, UserCircle2 } from 'lucide-react';
 import { useUsers, type User } from '@/context/UsersContext';
 import { useToast } from '@/hooks/use-toast';
 import { eventsService } from '@/lib/events.service';
+import { eventParticipantsService } from '@/lib/event-participants.service';
 
 /**
  * Helper to check if email already exists
@@ -196,6 +197,50 @@ export const UsersManagement = () => {
         const result = await updateUser(editingId, updates, selectedImageFile);
 
         if (result.data) {
+          // Update event participation
+          try {
+            // Get current events user is in
+            const { data: currentEventIds } = await eventParticipantsService.getUserEventIds(editingId);
+            const currentEventId = currentEventIds && currentEventIds.length > 0 ? currentEventIds[0] : null;
+            
+            console.log('[UsersManagement] Event update:', {
+              currentEventId,
+              newEventId: formData.eventId || null,
+            });
+
+            // If event changed, update participation
+            if (currentEventId !== formData.eventId) {
+              // Remove from current event if exists
+              if (currentEventId) {
+                console.log('[UsersManagement] Removing user from event:', currentEventId);
+                await eventParticipantsService.removeParticipant(currentEventId, editingId);
+              }
+              
+              // Add to new event if selected
+              if (formData.eventId) {
+                console.log('[UsersManagement] Adding user to event:', formData.eventId);
+                const { error: addError } = await eventParticipantsService.registerParticipant(
+                  formData.eventId,
+                  editingId,
+                  'confirmed'
+                );
+                
+                if (addError) {
+                  console.error('[UsersManagement] Error adding to event:', addError);
+                  toast({
+                    title: 'Aviso',
+                    description: 'Usuário atualizado, mas houve erro ao vincular ao evento',
+                    variant: 'default',
+                  });
+                } else {
+                  console.log('[UsersManagement] Successfully added to event');
+                }
+              }
+            }
+          } catch (eventError) {
+            console.error('[UsersManagement] Error updating event participation:', eventError);
+          }
+
           toast({
             title: 'Sucesso',
             description: 'Usuário atualizado com sucesso!',
@@ -320,7 +365,23 @@ export const UsersManagement = () => {
     }
   };
 
-  const handleEdit = (user: User) => {
+  const handleEdit = async (user: User) => {
+    console.log('[UsersManagement] Editing user, loading event data...', user.id);
+    
+    // Load user's current event
+    let userEventId = '';
+    try {
+      const { data: eventIds } = await eventParticipantsService.getUserEventIds(user.id);
+      if (eventIds && eventIds.length > 0) {
+        userEventId = eventIds[0]; // Take the first event if multiple
+        console.log('[UsersManagement] User is in event:', userEventId);
+      } else {
+        console.log('[UsersManagement] User is not in any event');
+      }
+    } catch (error) {
+      console.error('[UsersManagement] Error loading user events:', error);
+    }
+    
     setFormData({
       name: user.name,
       username: user.username,
@@ -329,6 +390,7 @@ export const UsersManagement = () => {
       gender: user.gender,
       password: '', // Leave empty for optional password change on edit
       role: user.role || 'client',
+      eventId: userEventId,
     });
     setImagePreview(user.profileImage);
     setEditingId(user.id);
@@ -689,39 +751,40 @@ export const UsersManagement = () => {
                 </select>
               </div>
 
-              {/* Event Selection (only for new users) */}
-              {!editingId && (
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Evento {editingId ? '(Opcional)' : ''}
-                  </label>
-                  <select
-                    value={formData.eventId}
-                    onChange={(e) => {
-                      console.log('[UsersManagement] Event selected:', e.target.value);
-                      setFormData(prev => ({ ...prev, eventId: e.target.value }));
-                    }}
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
-                    disabled={eventsLoading}
-                  >
-                    <option value="">Selecione um evento (opcional)</option>
-                    {events.map((event) => (
-                      <option key={event.id} value={event.id}>
-                        {event.title}
-                      </option>
-                    ))}
-                  </select>
-                  {eventsLoading && (
-                    <p className="text-xs text-gold mt-2">Carregando eventos...</p>
-                  )}
-                  {events.length === 0 && !eventsLoading && (
-                    <p className="text-xs text-muted-foreground mt-2">Nenhum evento disponível</p>
-                  )}
-                  {events.length > 0 && !eventsLoading && (
-                    <p className="text-xs text-muted-foreground mt-2">{events.length} evento(s) disponível(is)</p>
-                  )}
-                </div>
-              )}
+              {/* Event Selection */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Evento (Opcional)
+                </label>
+                <select
+                  value={formData.eventId}
+                  onChange={(e) => {
+                    console.log('[UsersManagement] Event selected:', e.target.value);
+                    setFormData(prev => ({ ...prev, eventId: e.target.value }));
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
+                  disabled={eventsLoading}
+                >
+                  <option value="">Selecione um evento (opcional)</option>
+                  {events.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.title}
+                    </option>
+                  ))}
+                </select>
+                {eventsLoading && (
+                  <p className="text-xs text-gold mt-2">Carregando eventos...</p>
+                )}
+                {events.length === 0 && !eventsLoading && (
+                  <p className="text-xs text-muted-foreground mt-2">Nenhum evento disponível</p>
+                )}
+                {events.length > 0 && !eventsLoading && editingId && formData.eventId && (
+                  <p className="text-xs text-emerald-600 mt-2">✓ Usuário está cadastrado neste evento</p>
+                )}
+                {events.length > 0 && !eventsLoading && !editingId && (
+                  <p className="text-xs text-muted-foreground mt-2">{events.length} evento(s) disponível(is)</p>
+                )}
+              </div>
             </div>
 
             {/* Actions */}
