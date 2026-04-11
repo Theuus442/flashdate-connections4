@@ -559,26 +559,7 @@ export const usersService = {
         console.log('[usersService] Profile image uploaded:', profileImageUrl);
       }
 
-      // If password is being updated, update it in auth system first
-      // NOTE: Password is only updated if explicitly provided and not empty
-      if (updates.password && updates.password.trim()) {
-        console.log('[usersService] ✏️ Password change requested - updating auth system...');
-        const authResult = await authService.updateUserPasswordAsAdmin(id, updates.password.trim());
-        if (authResult.error) {
-          const errorMsg = authResult.error instanceof Error
-            ? authResult.error.message
-            : JSON.stringify(authResult.error);
-          console.warn('[usersService] ⚠️ Could not update password via auth API:', errorMsg);
-          // Don't throw error - password update is secondary, continue with other updates
-        } else {
-          console.log('[usersService] ✅ Password updated successfully');
-        }
-      } else {
-        // No password update requested - this is normal for profile updates
-        console.log('[usersService] ℹ️ No password change - updating profile only');
-      }
-
-      // Build update data for Edge Function (NEVER include password here - it's handled separately)
+      // Build update data for Edge Function - Edge Function handles EVERYTHING including password
       const updateData: any = {};
       if (updates.name !== undefined && updates.name !== '') updateData.name = updates.name;
       if (updates.username !== undefined && updates.username !== '') updateData.username = updates.username;
@@ -587,11 +568,9 @@ export const usersService = {
       if (updates.gender !== undefined && updates.gender !== '') updateData.gender = updates.gender;
       if (updates.role !== undefined && updates.role !== '') updateData.role = updates.role;
       if (profileImageUrl) updateData.profile_image_url = profileImageUrl;
-
-      // Explicitly ensure password is NEVER sent to Edge Function
-      if (updateData.password) {
-        console.warn('[usersService] WARNING: Removing password from updateData before sending to Edge Function');
-        delete updateData.password;
+      // Include password if provided - Edge Function uses Admin API to update ANY user's password
+      if (updates.password !== undefined && updates.password.trim() !== '') {
+        updateData.password = updates.password.trim();
       }
 
       console.log('[usersService] Building update request for Edge Function:', {
@@ -606,7 +585,7 @@ export const usersService = {
           gender: !!updateData.gender,
           role: !!updateData.role,
           profileImage: !!updateData.profile_image_url,
-          password: !!updateData.password, // Should always be false
+          password: !!updateData.password,
         }
       });
 

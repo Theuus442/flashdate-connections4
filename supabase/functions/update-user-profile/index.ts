@@ -96,6 +96,12 @@ serve(async (req) => {
       authUpdatePayload.email = body.email
     }
 
+    // Se senha foi fornecida, atualizar no auth (ADMIN ONLY)
+    if (body.password !== undefined && body.password.trim() !== '') {
+      console.log('[update-user-profile] Password change requested, updating in auth...')
+      authUpdatePayload.password = body.password.trim()
+    }
+
     console.log('[update-user-profile] Auth update payload:', {
       has_email: !!authUpdatePayload.email,
       user_metadata_keys: Object.keys(userMetadata),
