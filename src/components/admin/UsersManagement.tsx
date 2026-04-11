@@ -713,9 +713,15 @@ export const UsersManagement = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder={editingId ? 'Deixe em branco para manter a senha atual' : 'Insira uma senha segura'}
+                  placeholder={editingId ? 'Deixe em branco para manter a senha atual' : 'Insira uma senha'}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all duration-300"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {editingId 
+                    ? 'Deixe em branco se não quiser alterar (mínimo 6 se alterar)'
+                    : 'Mínimo 6 caracteres (requisito do Supabase)'
+                  }
+                </p>
               </div>
 
               {/* Role */}
