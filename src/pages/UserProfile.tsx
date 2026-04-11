@@ -85,7 +85,6 @@ export default function UserProfile() {
   const [selectedImageFile, setSelectedImageFile] = useState<File | undefined>(undefined);
   const [showSelectionsDetail, setShowSelectionsDetail] = useState(false);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches' | 'profile'>('participants');
-  const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUserFinalized, setIsUserFinalized] = useState(false);
@@ -143,11 +142,6 @@ export default function UserProfile() {
       return false;
     }) : [];
 
-    // Apply gender filter
-    if (genderFilter !== 'all') {
-      filtered = filtered.filter(user => user.gender === genderFilter);
-    }
-
     // Apply sorting
     filtered.sort((a, b) => {
       const comparison = a.name.localeCompare(b.name, 'pt-BR');
@@ -155,7 +149,7 @@ export default function UserProfile() {
     });
 
     return filtered;
-  }, [currentUser, allUsers, genderFilter, sortOrder, currentEventId, eventParticipantIds]);
+  }, [currentUser, allUsers, sortOrder, currentEventId, eventParticipantIds]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -538,10 +532,6 @@ export default function UserProfile() {
                           <Phone size={14} />
                           <span>{user.whatsapp}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">Gênero:</span>
-                          <span>{user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}</span>
-                        </div>
                       </div>
                     </div>
                   );
@@ -729,9 +719,6 @@ export default function UserProfile() {
                             <h3 className="font-semibold text-foreground text-lg">{user.name}</h3>
                             <p className="text-sm text-muted-foreground">
                               @{user.username}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {user.gender === 'M' ? 'Masculino' : user.gender === 'F' ? 'Feminino' : 'Outro'}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground mb-4">

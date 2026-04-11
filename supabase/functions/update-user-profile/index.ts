@@ -13,14 +13,22 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     const authHeader = req.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '') || ''
 
-    // Cliente com Service Role para ter poder total
+    // Cliente com ANON KEY para validar o token do usuário
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
+      global: {
+        headers: { Authorization: authHeader ?? '' }
+      }
+    })
+
+    // Cliente com Service Role para ter poder total nas operações
     const supabase = createClient(supabaseUrl, serviceKey)
 
-    // 1. Validar quem está pedindo a alteração
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token)
+    // 1. Validar quem está pedindo a alteração usando o cliente ANON
+    const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser(token)
     if (authError || !authUser) {
       console.error('[update-user-profile] Auth error:', authError?.message || 'Token inválido')
       throw new Error("Não autorizado ou token inválido")
