@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, Settings, Upload, X, Heart, Lock, Camera, Users as UsersIcon } from 'lucide-react';
+import { LogOut, User, Calendar, Upload, X, Heart, Lock, Camera, Users as UsersIcon, HeartHandshake } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useUsers } from '@/context/UsersContext';
 import { useSelections } from '@/context/SelectionsContext';
@@ -106,7 +106,6 @@ export default function ClientDashboard() {
             const syncResult = await usersService.syncAuthUserToDatabase({
               id: authUser.id,
               email: authUser.email || '',
-              user_metadata: authUser.user_metadata,
             });
 
             if (syncResult.data) {
@@ -527,7 +526,7 @@ export default function ClientDashboard() {
                 onClick={() => navigate('/event-selection')}
                 className="hidden sm:flex items-center gap-2"
               >
-                <Heart size={16} />
+                <HeartHandshake size={16} />
                 Selecionar Matches
               </Button>
               <span className="hidden sm:inline text-sm text-muted-foreground">
@@ -601,7 +600,7 @@ export default function ClientDashboard() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Settings size={20} />
+              <HeartHandshake size={20} />
               <span>Meus Matches</span>
             </button>
 
@@ -610,7 +609,7 @@ export default function ClientDashboard() {
               onClick={() => navigate('/event-selection')}
               className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-gold to-gold-dark text-secondary-foreground hover:from-gold-light hover:to-gold transition-colors shadow-gold-glow"
             >
-              <Heart size={20} />
+              <HeartHandshake size={20} />
               <span>Selecionar Matches</span>
             </button>
           </div>
@@ -664,14 +663,6 @@ export default function ClientDashboard() {
                             </span>
                           </div>
                         )}
-                        {!isEditingImage && !isUserFinalized && (
-                          <button
-                            onClick={() => setIsEditingImage(true)}
-                            className="absolute bottom-0 right-0 p-2 bg-gold rounded-full text-secondary-foreground hover:bg-gold-dark transition-colors shadow-lg"
-                          >
-                            <Upload size={18} />
-                          </button>
-                        )}
                       </div>
 
                       {/* Hidden File Input */}
@@ -693,14 +684,6 @@ export default function ClientDashboard() {
                         </button>
                       )}
 
-                      <button
-                        onClick={() => setIsEditingImage(!isEditingImage)}
-                        disabled={isUserFinalized}
-                        className="text-sm text-gold hover:text-gold-light transition-colors mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isEditingImage ? 'Cancelar' : 'Editar Foto'}
-                      </button>
-
                       <h2 className="font-serif text-2xl font-bold text-foreground">{clientUser?.name || 'Usuário'}</h2>
                       <p className="text-muted-foreground text-sm">@{clientUser?.username || 'username'}</p>
                     </div>
@@ -708,7 +691,6 @@ export default function ClientDashboard() {
                     <div className="space-y-4 border-t border-border pt-6">
                       <InfoItem label="Email" value={clientUser?.email || '-'} />
                       <InfoItem label="WhatsApp" value={clientUser?.whatsapp || '-'} />
-                      <InfoItem label="Gênero" value={clientUser?.gender || '-'} />
                     </div>
                   </div>
 
