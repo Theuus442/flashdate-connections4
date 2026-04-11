@@ -36,25 +36,39 @@ export default function UserProfile() {
     return allUsers.find(u => u.id === authUser.id) || null;
   }, [authUser, allUsers]);
 
-  // Load first available event from database
+  // Load user's first registered event
   useEffect(() => {
-    const loadEvent = async () => {
+    const loadUserEvent = async () => {
+      if (!authUser?.id) {
+        console.log('[UserProfile] No auth user, skipping event load');
+        return;
+      }
+
       try {
-        const { data, error } = await eventsService.getEvents();
-        if (error) {
-          console.error('Error loading events:', error);
+        // Get events where user is registered as participant
+        console.log('[UserProfile] Loading events for user:', authUser.id);
+        const { data: eventIds, error: idsError } = await eventParticipantsService.getUserEventIds(authUser.id);
+
+        if (idsError) {
+          console.error('[UserProfile] Error loading user event IDs:', idsError);
           return;
         }
-        if (data && data.length > 0) {
-          setEventId(data[0].id);
+
+        if (!eventIds || eventIds.length === 0) {
+          console.log('[UserProfile] User has no registered events');
+          return;
         }
+
+        // Set the first event as current
+        console.log('[UserProfile] User registered events:', eventIds.length, 'Setting first event:', eventIds[0]);
+        setEventId(eventIds[0]);
       } catch (error) {
-        console.error('Unexpected error loading events:', error);
+        console.error('[UserProfile] Unexpected error loading user event:', error);
       }
     };
 
-    loadEvent();
-  }, []);
+    loadUserEvent();
+  }, [authUser?.id]);
 
   // Set current user and event in selections context
   useEffect(() => {
