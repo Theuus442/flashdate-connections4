@@ -848,13 +848,55 @@ interface MatchUser {
   email?: string;
   whatsapp?: string;
   matchType: 'MATCH' | 'AMIZADE';
+  eventId: string;
+}
+
+interface UserEvent {
+  id: string;
+  title: string;
 }
 
 function MatchesTab({ userId }: { userId?: string }) {
-  const [matches, setMatches] = useState<MatchUser[]>([]);
+  const [allMatches, setAllMatches] = useState<MatchUser[]>([]);
+  const [filteredMatches, setFilteredMatches] = useState<MatchUser[]>([]);
+  const [userEvents, setUserEvents] = useState<UserEvent[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>('all');
   const [isLoadingMatches, setIsLoadingMatches] = useState(true);
   const { users } = useUsers();
 
+  // Load user events
+  useEffect(() => {
+    const loadUserEvents = async () => {
+      if (!userId) return;
+
+      try {
+        const { data: eventIds } = await eventParticipantsService.getUserEventIds(userId);
+        
+        if (eventIds && eventIds.length > 0) {
+          const eventsData = await Promise.all(
+            eventIds.map(async (eventId) => {
+              const { data: event } = await eventsService.getEventById(eventId);
+              return event ? { id: event.id, title: event.title } : null;
+            })
+          );
+          
+          const validEvents = eventsData.filter((e): e is UserEvent => e !== null);
+          setUserEvents(validEvents);
+          
+          // Set first event as default if available
+          if (validEvents.length > 0) {
+            setSelectedEventId(validEvents[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('[MatchesTab] Error loading user events:', error);
+      }
+    };
+
+    loadUserEvents();
+  }, [userId]);
+
+  // Load matches
   useEffect(() => {
     const loadMatches = async () => {
       if (!userId) return;
@@ -881,18 +923,19 @@ function MatchesTab({ userId }: { userId?: string }) {
                 email: matchedUser?.email,
                 whatsapp: matchedUser?.whatsapp,
                 matchType: m.matchType,
+                eventId: m.eventId,
               };
             });
 
           console.log('[MatchesTab] Loaded', userMatches.length, 'finalized matches for user', userId);
-          setMatches(userMatches);
+          setAllMatches(userMatches);
         } else {
           console.log('[MatchesTab] No finalized matches found');
-          setMatches([]);
+          setAllMatches([]);
         }
       } catch (error) {
         console.error('[MatchesTab] Error loading matches:', error);
-        setMatches([]);
+        setAllMatches([]);
       } finally {
         setIsLoadingMatches(false);
       }
@@ -900,6 +943,16 @@ function MatchesTab({ userId }: { userId?: string }) {
 
     loadMatches();
   }, [userId, users]);
+
+  // Filter matches by selected event
+  useEffect(() => {
+    if (selectedEventId === 'all') {
+      setFilteredMatches(allMatches);
+    } else {
+      const filtered = allMatches.filter(m => m.eventId === selectedEventId);
+      setFilteredMatches(filtered);
+    }
+  }, [selectedEventId, allMatches]);
 
   if (isLoadingMatches) {
     return (
@@ -921,11 +974,35 @@ function MatchesTab({ userId }: { userId?: string }) {
       <div className="mb-8">
         <h1 className="font-serif text-4xl font-bold text-foreground">Meus Matches</h1>
         <p className="text-muted-foreground mt-2">Pessoas com quem você teve match ou amizade mútua</p>
+        
+        {/* Event Filter */}
+        {userEvents.length > 0 && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
+              Filtrar por evento:
+            </label>
+            <select
+              value={selectedEventId}
+              onChange={(e) => setSelectedEventId(e.target.value)}
+              className="w-full md:w-auto px-4 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+            >
+              <option value="all">Todos os eventos ({allMatches.length})</option>
+              {userEvents.map(event => {
+                const eventMatchCount = allMatches.filter(m => m.eventId === event.id).length;
+                return (
+                  <option key={event.id} value={event.id}>
+                    {event.title} ({eventMatchCount})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
       </div>
 
-      {matches.length > 0 ? (
+      {filteredMatches.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6">
-          {matches.map(match => (
+          {filteredMatches.map(match => (
             <div key={match.id} className="bg-card border border-gold/20 rounded-2xl p-6 hover:border-gold/50 transition-colors">
               <div className="flex items-center gap-4 mb-4">
                 {match.profileImage ? (

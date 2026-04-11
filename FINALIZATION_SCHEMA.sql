@@ -131,6 +131,7 @@ RETURNS TABLE (
   user_id UUID,
   selected_user_id UUID,
   match_type TEXT,
+  event_id UUID,
   created_at TIMESTAMP
 ) AS $$
 WITH mutual_selections AS (
@@ -171,6 +172,7 @@ SELECT
     WHEN vote_a_to_b = 'SIM' AND vote_b_to_a = 'SIM' THEN 'MATCH'
     ELSE 'AMIZADE'
   END as match_type,
+  event_id,
   created_at
 FROM with_finalization
 -- Only return matches where BOTH users have finalized

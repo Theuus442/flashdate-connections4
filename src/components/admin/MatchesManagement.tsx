@@ -228,14 +228,6 @@ export default function MatchesManagement() {
                       <span>{formatDateToBR(event.eventDate)}</span>
                     </div>
                   )}
-                  {event.totalUsersInSystem && event.totalUsersInSystem > event.totalParticipants && (
-                    <div className="flex items-center gap-2 text-xs text-orange-600 mt-2 font-medium">
-                      <Users className="w-3 h-3" />
-                      <span>
-                        {event.totalParticipants}/{event.totalUsersInSystem} usuários cadastrados neste evento
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <div className="text-right">
                   {event.matchesSent ? (
@@ -267,11 +259,6 @@ export default function MatchesManagement() {
                     <p className="text-xs text-gray-500 mt-1">
                       {event.finalizedCount} de {event.totalParticipants} participantes finalizaram suas seleções
                     </p>
-                    {event.totalUsersInSystem && event.totalUsersInSystem > event.totalParticipants && (
-                      <p className="text-xs text-orange-600 mt-1 font-medium">
-                        ⚠️ {event.totalUsersInSystem - event.totalParticipants} usuário(s) não cadastrado(s) neste evento
-                      </p>
-                    )}
                   </div>
                   <span className="text-2xl font-bold text-gray-700">
                     {event.totalParticipants > 0

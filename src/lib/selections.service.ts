@@ -461,7 +461,7 @@ export const selectionsService = {
    * This ensures contact information is only shared when both parties have confirmed.
    * Uses the RPC function get_mutual_matches_if_finalized() from the database.
    */
-  async getMutualMatchesIfFinalized(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; createdAt: string }> | null; error: any }> {
+  async getMutualMatchesIfFinalized(): Promise<{ data: Array<{ userId: string; selectedUserId: string; matchType: 'MATCH' | 'AMIZADE'; eventId: string; createdAt: string }> | null; error: any }> {
     if (!isSupabaseConfigured()) {
       console.log('[getMutualMatchesIfFinalized] Supabase not configured');
       return { data: null, error: 'Supabase not configured' };
@@ -494,6 +494,7 @@ export const selectionsService = {
         userId: match.user_id,
         selectedUserId: match.selected_user_id,
         matchType: match.match_type as 'MATCH' | 'AMIZADE',
+        eventId: match.event_id,
         createdAt: match.created_at,
       }));
 
