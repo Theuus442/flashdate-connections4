@@ -275,6 +275,13 @@ export const NextEventSection = () => {
                         </div>
                       </div>
 
+                      {/* Purchase Instructions */}
+                      <div className="bg-wine/10 border border-wine/30 rounded-lg p-4 mb-6">
+                        <p className="text-sm text-wine font-semibold">
+                          Para a compra acesse <strong>como funciona</strong> faça o pix do valor do evento
+                        </p>
+                      </div>
+
                       {/* Price & CTA */}
                       <div className="flex items-end justify-between gap-4 pt-6 border-t border-border">
                         <div>
@@ -284,7 +291,7 @@ export const NextEventSection = () => {
                         <div className="space-y-2 flex-1">
                           <Button variant="hero" size="sm" className="w-full" asChild>
                             <a href={`https://wa.me/${formatWhatsAppNumber(selectedEvent.whatsapp)}?text=Olá! Gostaria de me inscrever no evento: ${selectedEvent.title}`}>
-                              Garantir Vaga
+                              Fale com um atendente agora
                             </a>
                           </Button>
                           <Button variant="outline" size="sm" className="w-full" onClick={() => setSelectedEventId(null)}>
