@@ -278,7 +278,7 @@ export const NextEventSection = () => {
                       {/* Purchase Instructions */}
                       <div className="bg-wine/10 border border-wine/30 rounded-lg p-4 mb-6">
                         <p className="text-sm text-wine font-semibold">
-                          Para a compra acesse <a href="#como-funciona" className="underline hover:text-wine-dark transition-colors"><strong>como funciona</strong></a> faça o pix do valor do evento
+                          Para a compra, acesse <a href="#como-funciona" className="underline hover:text-wine-dark transition-colors"><strong>Como Funciona</strong></a> e realize o pagamento via pix
                         </p>
                       </div>
 
